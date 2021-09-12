@@ -3,6 +3,14 @@
    (Mostly taken from TheDM)
 */
 
+/* Sheet settings */
+
+div#sheet {
+	border: 1px solid black;
+	margin-top: 10px;
+	padding: 10px;
+}
+
 /* Make sure floating windows are on top of everything else */
 div.jswindow {
 	z-index: 10000; /* This should be higher than Leaflet's z-index values */
@@ -129,6 +137,12 @@ td.disabled {
 
 caption {
 	font-style: italic;
+}
+
+/* Smart input */
+
+.settingslabel {
+	padding-right: 10px;
 }
 
 /* Smart sliders */

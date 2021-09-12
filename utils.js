@@ -245,7 +245,12 @@
 		}
 		
 		Object.keys(attrs).forEach((key) => {
-			element.setAttribute(key, attrs[key]);
+			if(element instanceof jQuery) {
+				element.attr(key, attrs[key]);
+			}
+			else {
+				element.setAttribute(key, attrs[key]);
+			}
 		});
 	}
 	
@@ -260,6 +265,8 @@
 	utils.cookie = cookie;
 	
 	cookie.set = function(key, value, maxAge) {
+		console.log(key + " = " + value);
+		
 		key = encodeURIComponent(key);
 		var expiryString = "";
 		if(maxAge == undefined) {
@@ -328,6 +335,7 @@
 		var holder = document.createDocumentFragment();
 		
 		var label = document.createElement("label");
+		label.className = "settingslabel";
 		var sliderId = name;
 		label.for = sliderId;
 		label.innerHTML = utils.capitalize(name);
@@ -379,6 +387,7 @@
 		var holder = document.createDocumentFragment();
 		
 		var label = document.createElement("label");
+		label.className = "settingslabel";
 		var textId = name;
 		label.for = textId;
 		label.innerHTML = utils.capitalize(name);
@@ -400,6 +409,7 @@
 		var holder = document.createDocumentFragment();
 		
 		var label = document.createElement("label");
+		label.className = "settingslabel";
 		var boolId = name;
 		label.for = boolId;
 		label.innerHTML = utils.capitalize(name);
@@ -420,6 +430,7 @@
 		var holder = document.createDocumentFragment();
 		
 		var label = document.createElement("label");
+		label.className = "settingslabel";
 		var selectId = name;
 		label.for = selectId;
 		label.innerHTML = utils.capitalize(name);
@@ -447,6 +458,41 @@
 		holder.appendChild(input);
 		
 		return holder;
+	}
+	
+	utils.attachSaving = (elem, delay) => {
+		let e = elem;
+		if(e instanceof DocumentFragment) {
+			e = e.querySelector("input,select");
+		}
+		e = $(e);
+		delay = delay || 1000;
+		
+		// Load saved value, if any
+		let lastValue = utils.cookie.get(e.attr("name"));
+		if(lastValue != undefined) {
+			e.val(JSON.load(lastValue));
+		}
+		
+		let lastTimeout = null;
+		
+		let saveElementData = () => {
+			lastTimeout = null;
+			
+			utils.cookie.set(e.attr("name"), JSON.stringify(e.val()));
+		};
+		
+		e.on("input change", () => {
+			if(lastTimeout != null) {
+				clearTimeout(lastTimeout);
+			}
+			
+			lastTimeout = setTimeout(saveElementData, delay);
+		});
+		
+		window.addEventListener("beforeunload", saveElementData);
+		
+		return elem;
 	}
 	
 	utils.disableEvent = (evt) => {

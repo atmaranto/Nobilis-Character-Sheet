@@ -151,8 +151,8 @@
 	UI.EditorFactory = function(object, containerClass) {
 		this.object = object;
 		
-		this.fragment = document.createDocumentFragment();
-		this.container = document.createElement("table");
+		this.fragments = [$("<table></table>")];
+		this.container = $("<div></div");
 		this.container.className = containerClass || "";
 	}
 	
@@ -160,28 +160,46 @@
 		add: function(element) {
 			if(typeof element == "string") {
 				if(element.indexOf("<") != -1) {
-					var el = document.createElement("div");
-					el.innerHTML = element;
-					if(el.childNodes.length > 1) {
-						element = el;
-					}
-					else {
-						element = el.firstChild;
-					}
+					var el = $(element);
 				}
 				else {
-					element = document.createElement(element);
+					element = $(document.createElement(element));
 				}
 			}
 			
-			var cell = document.createElement("td");
-			cell.appendChild(element);
+			var cell = $("<td></td>");
+			cell.append(element);
 			
-			var row = document.createElement("tr");
-			row.appendChild(cell);
+			var row = $("<tr></tr>");
+			row.append(cell);
 			
-			this.fragment.appendChild(row);
+			this.fragments[this.fragments.length - 1].append(row[0]);
 			return row;
+		},
+		
+		startSection: function(heading) {
+			let container = $("<center></center>").first();
+			
+			container.append($("<hr />"));
+			
+			if(heading) {
+				if(typeof heading === "string") {
+					container.append(
+							$("<h2></h2>")
+								.text(heading)
+								.addClass("centeredx sectionheading")
+							)
+						.append($("<hr />"));
+				}
+				else {
+					container.append(heading);
+				}
+			}
+			
+			this.fragments.push(container);
+			this.fragments.push($("<table></table>"));
+			
+			return container;
 		},
 		
 		//Creates an attached text input for an attribute in object
@@ -191,14 +209,13 @@
 				(text || capitalize(name)) + "</label>"
 			);
 			
-			var input = document.createElement("input");
-			input.id = "text"+rnd;
-			applyAttrs(input, attrs);
+			var input = $("<input />");
+			input.attr("id", "text"+rnd);
+			utils.applyAttrs(input, attrs);
 			
-			attachInput(input, undefined, this.object, name);
+			utils.attachInput(input, undefined, this.object, name);
 			
-			row.appendChild(document.createElement("td"));
-			row.childNodes[1].appendChild(input);
+			row.append($("<td></td>").append(input));
 			
 			return input;
 		},
@@ -213,23 +230,23 @@
 				(text || capitalize(name)) + "</label>"
 			);
 			
-			var input = document.createElement("input");
-			input.type = "number";
-			input.id = "num"+rnd;
-			applyAttrs(input, attrs);
+			var input = $("<input type='number'/>");
+			input.attr("id", "num"+rnd);
+			utils.applyAttrs(input, attrs);
 			
-			attachInput(input, "value", this.object, name, undefined, undefined,
-				defaultValue, parseInt);
+			utils.attachInput(
+				input, "value", this.object, name, undefined, undefined,
+				defaultValue, parseInt
+			);
 			
 			if(bounds.min) {
-				input.setAttribute("min", bounds.min);
+				input.attr("min", bounds.min);
 			}
 			if(bounds.max) {
-				input.setAttribute("max", bounds.max);
+				input.attr("max", bounds.max);
 			}
 			
-			row.appendChild(document.createElement("td"));
-			row.childNodes[1].appendChild(input);
+			row.append($("<td></td>").append(input));
 			
 			return input;
 		},
@@ -241,14 +258,15 @@
 				(text || capitalize(name)) + "</label>"
 			);
 			
-			var select = utils.createSmartSelection(name, values, values[0]).lastChild;
-			select.id = "select"+rnd;
-			applyAttrs(select, attrs);
+			var select = $(utils.createSmartSelection(name, values, values[0])).children().last();
+			select.attr("id", "select"+rnd);
+			utils.applyAttrs(select, attrs);
 			
-			row.appendChild(document.createElement("td"));
-			row.childNodes[1].appendChild(select);
+			row.appendChild($("<td></td>").append(select));
 			
-			/*if(trackSettingsValue) {
+			select = select[0]; // At this point, it's better to use the HTMLElement than the jQuery object
+			
+			if(trackSettingsValue) {
 				var check = (value, firstTime) => {
 					if(!document.getElementById("select"+rnd) && !firstTime) {
 						//The select input has been removed; remove the tracker
@@ -279,9 +297,9 @@
 				check(UI.settings.get(trackSettingsValue), true);
 				
 				UI.settings.addTracker(trackSettingsValue, check);
-			}*/
+			}
 			
-			attachInput(select, (select, set) => {
+			utils.attachInput(select, (select, set) => {
 				if(set != undefined) {
 					var i;
 					for(var i = 0; i < select.options.length; i++) {
@@ -303,15 +321,14 @@
 		},
 		
 		attachParagraph: function(text) {
-			var row = this.add("<p></p>");
-			row.firstChild.innerHTML = text;
+			var row = this.add("<p></p>").text(text);
 			
-			return row.firstChild;
+			return row.children()[0];
 		},
 		
 		create: function() {
 			//Creates the final table element from the container. Should only be called once per factory.
-			this.container.appendChild(this.fragment);
+			this.container.append(this.fragments);
 			return this.container;
 		}
 	};
