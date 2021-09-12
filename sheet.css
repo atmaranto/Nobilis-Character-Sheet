@@ -79,6 +79,11 @@ iframe.windowiframe {
 	height: 100%;
 }
 
+textarea.editorarea {
+	width: 100%;
+	min-height: 150px;
+}
+
 .inline {
 	display: inline;
 }

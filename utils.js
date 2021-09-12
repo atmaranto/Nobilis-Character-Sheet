@@ -383,20 +383,20 @@
 		return holder;
 	}
 	
-	utils.createSmartTextInput = (name, current) => {
+	utils.createSmartTextInput = (name, current, labelText) => {
 		var holder = document.createDocumentFragment();
 		
 		var label = document.createElement("label");
 		label.className = "settingslabel";
 		var textId = name;
 		label.for = textId;
-		label.innerHTML = utils.capitalize(name);
+		label.innerText = labelText || utils.capitalize(name);
 		var input = document.createElement("input");
 		input.type = "text";
 		input.name = name;
 		input.id = textId;
 		input.value = current || "";
-		input.hint = utils.capitalize(name);
+		input.hint = labelText || utils.capitalize(name);
 		input.className = "settingsinput";
 		
 		holder.appendChild(label);
@@ -405,14 +405,14 @@
 		return holder;
 	}
 	
-	utils.createSmartBooleanInput = (name, current) => {
+	utils.createSmartBooleanInput = (name, current, labelText) => {
 		var holder = document.createDocumentFragment();
 		
 		var label = document.createElement("label");
 		label.className = "settingslabel";
 		var boolId = name;
 		label.for = boolId;
-		label.innerHTML = utils.capitalize(name);
+		label.innerText = labelText || utils.capitalize(name);
 		var input = document.createElement("input");
 		input.type = "checkbox";
 		input.name = name;
@@ -426,14 +426,14 @@
 		return holder;
 	}
 	
-	utils.createSmartSelection = (name, options, value) => {
+	utils.createSmartSelection = (name, options, value, labelText) => {
 		var holder = document.createDocumentFragment();
 		
 		var label = document.createElement("label");
 		label.className = "settingslabel";
 		var selectId = name;
 		label.for = selectId;
-		label.innerHTML = utils.capitalize(name);
+		label.innerText = labelText || utils.capitalize(name);
 		var input = document.createElement("select");
 		input.name = name;
 		input.id = selectId;
@@ -445,7 +445,7 @@
 			element = document.createElement("option");
 			
 			element.name = option;
-			element.innerHTML = utils.capitalize(option);
+			element.innerText = utils.capitalize(option);
 			
 			if(option == value) {
 				element.setAttribute("selected", "true");

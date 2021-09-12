@@ -151,12 +151,18 @@
 	UI.EditorFactory = function(object, containerClass) {
 		this.object = object;
 		
-		this.fragments = [$("<table></table>")];
+		this.fragments = [];
+		this.pushTable();
+		
 		this.container = $("<div></div");
 		this.container.className = containerClass || "";
 	}
 	
 	UI.EditorFactory.prototype = {
+		pushTable: function() {
+			this.fragments.push($("<table class='editortable'></table>"));
+		},
+		
 		add: function(element) {
 			if(typeof element == "string") {
 				if(element.indexOf("<") != -1) {
@@ -177,19 +183,19 @@
 			return row;
 		},
 		
-		startSection: function(heading) {
+		startSection: function(heading, headingStyle) {
+			headingStyle = headingStyle || "h2";
 			let container = $("<center></center>").first();
 			
 			container.append($("<hr />"));
 			
 			if(heading) {
-				if(typeof heading === "string") {
-					container.append(
-							$("<h2></h2>")
+				if(typeof heading === "string" && heading.length > 0) {
+					container.prepend(
+							$(document.createElement(headingStyle))
 								.text(heading)
-								.addClass("centeredx sectionheading")
-							)
-						.append($("<hr />"));
+								.addClass("sectionheading")
+							);
 				}
 				else {
 					container.append(heading);
@@ -197,7 +203,7 @@
 			}
 			
 			this.fragments.push(container);
-			this.fragments.push($("<table></table>"));
+			this.pushTable();
 			
 			return container;
 		},
@@ -206,7 +212,7 @@
 		attachText: function(name, text, attrs) {
 			var rnd = (Math.random()).toString().substr(2);
 			var row = this.add("<label for=\"text"+rnd+"\">" +
-				(text || capitalize(name)) + "</label>"
+				(text || utils.capitalize(name)) + "</label>"
 			);
 			
 			var input = $("<input />");
@@ -220,6 +226,24 @@
 			return input;
 		},
 		
+		attachTextArea: function(name, text, label, attrs) {
+			var rnd = (Math.random()).toString().substr(2);
+			
+			var input = $("<textarea class='editorarea'/>");
+			input.attr("id", "text"+rnd);
+			utils.applyAttrs(input, attrs);
+			
+			utils.attachInput(input, undefined, this.object, name);
+			
+			if(label != false) {
+				this.attachParagraph(label || utils.capitalize(name));
+			}
+			this.fragments.push(input)
+			this.pushTable();
+			
+			return input;
+		},
+		
 		attachNumber: function(name, text, bounds, defaultValue, attrs) {
 			if(bounds == undefined) {
 				bounds = {min: 0};
@@ -227,7 +251,7 @@
 			
 			var rnd = (Math.random()).toString().substr(2);
 			var row = this.add("<label for=\"num"+rnd+"\">" +
-				(text || capitalize(name)) + "</label>"
+				(text || utils.capitalize(name)) + "</label>"
 			);
 			
 			var input = $("<input type='number'/>");
@@ -251,11 +275,26 @@
 			return input;
 		},
 		
+		attachSlider: function(name, text, bounds, defaultValue, scale, attrs) {
+			let slider = utils.createSmartSlider(name, bounds.min, bounds.max, defaultValue, scale);
+			let theSlider = slider.children[1];
+			
+			let row = this.add(slider.children[0]);
+			let cell = $("<td></td>");
+			
+			while(slider.children.length > 0) {
+				cell.append(slider.children[0]);
+			}
+			row.append(cell);
+			
+			return $(theSlider);
+		},
+		
 		//Creates an attached selection input for an attribute in object
 		attachSelection: function(name, text, values, trackSettingsValue, attrs) {
 			var rnd = (Math.random()).toString().substr(2);
 			var row = this.add("<label for=\"select"+rnd+"\">" +
-				(text || capitalize(name)) + "</label>"
+				(text || utils.capitalize(name)) + "</label>"
 			);
 			
 			var select = $(utils.createSmartSelection(name, values, values[0])).children().last();
@@ -282,7 +321,7 @@
 					
 					values.forEach((value) => {
 						var opt = document.createElement("option");
-						opt.text = capitalize(value);
+						opt.text = utils.capitalize(value);
 						opt.value = value;
 						
 						select.add(opt);
