@@ -286,6 +286,63 @@ $(document).ready(() => {
 	
 	factory.startSection("Temporary Miracle Points", "h4");
 	
+	let maxTemporaryMPs = 25;
+	
+	let temporaryAMPSlider = factory.attachSlider("temporaryAMP", "<b>Aspect</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
+		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate)
+	let temporaryDMPSlider = factory.attachSlider("temporaryDPP", "<b>Domain</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
+		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate);
+	let temporaryRMPSlider = factory.attachSlider("temporaryRMP", "<b>Realm</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
+		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate);
+	let temporarySMPSlider = factory.attachSlider("temporarySMP", "<b>Spirit</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
+		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate);
+	
+	let syncTempPerm = (permanentSlider, temporarySlider) => {
+		$(temporarySlider).prop("max", $(permanentSlider).val());
+		$(temporarySlider).val(Math.min(parseInt($(temporarySlider).val()), parseInt($(permanentSlider).val())).toString());
+		$(temporarySlider).trigger("input");
+	};
+	
+	let tempPermSyncs = [
+		{"temp": temporaryAMPSlider, "perm": permanentAMPSlider},
+		{"temp": temporaryDMPSlider, "perm": permanentDMPSlider},
+		{"temp": temporaryRMPSlider, "perm": permanentRMPSlider},
+		{"temp": temporarySMPSlider, "perm": permanentSMPSlider}
+	];
+	
+	let installTempPermSync = (enableSliderSync) => {
+		if(enableSliderSync) {
+			tempPermSyncs.forEach((obj) => {
+				obj._func = () => (syncTempPerm(obj.perm, obj.temp));
+				obj._func();
+				
+				obj.perm.on("input", obj._func);
+			});
+		}
+		else {
+			tempPermSyncs.forEach((obj) => {
+				obj.perm.off("input", obj._func);
+				obj._func = undefined;
+				obj.temp.prop("max", maxTemporaryMPs);
+			});
+		}
+	};
+	
+	factory.attachStandalone(
+		UI.addHoverInfo(
+			$("<div></div>")
+				.append($("<label for='tempPermSync' style='cursor: help'>Enable synchronization with Permanent Miracle Points: </label>"))
+				.append(
+					$("<input id='tempPermSync' type='checkbox' />")
+						.click(() => {
+							installTempPermSync($("#tempPermSync").prop("checked"));
+						})
+				),
+				$("<p>This option makes sure the maximum temporary MPs you have is no greater than your permanent MPs.<br />" +
+				  "Disabling this option may be helpful, as there are ways of acquiring temporary MPs during play.</p>")
+		)
+	);
+	
 	factory.startSection("Gifts", "h3");
 	
 	factory.startSection("Handicaps", "h3");
