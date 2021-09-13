@@ -448,6 +448,11 @@
 			return itemHolder;
 		},
 		
+		attachStandalone: function(element) {
+			this.fragments.push(element);
+			this.pushTable();
+		},
+		
 		removeEmptyTables: function() {
 			this.fragments = this.fragments.filter((item) => {
 				if($(item).hasClass("editortable") && $(item).children().length == 0) {
@@ -469,6 +474,10 @@
 	
 	/* Floating element windows */
 	UI.ElementWindow = function(elem, title, buttons) {
+		if(elem instanceof window.jQuery) {
+			elem = elem[0];
+		}
+		
 		this.container = document.createElement("div");
 		this.container.className = "jswindow";
 		this.container.style.top = "10px";
@@ -489,6 +498,9 @@
 	UI.ElementWindow.prototype = {
 		show: function() {
 			if(this.hidden) {
+				this.container.style.top = (window.scrollY + 10).toString() + "px";
+				this.container.style.left = (window.scrollX + 10).toString() + "px";
+				
 				document.body.appendChild(this.container);
 				this.hidden = false;
 			}
@@ -871,5 +883,22 @@
 		
 		win = new UI.ElementWindow(table, "Settings");
 		return win;
-	}
+	};
+	
+	// TODO: Hover-over
+	UI.addHoverInfo = (anchor, hoverElement) => {
+		if(typeof hoverElement === "string") {
+			hoverElement = $("<p></p>").text(hoverElement);
+		}
+		
+		hoverElement = $("<div class='hoverinfo'></div>").append(hoverElement);
+		
+		$(anchor).hover(() => {
+			$(anchor).append(hoverElement);
+		}, () => {
+			$(hoverElement).remove()
+		});
+		
+		return anchor;
+	};
 })()

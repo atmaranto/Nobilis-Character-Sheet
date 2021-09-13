@@ -12,6 +12,58 @@ div#sheet {
 	max-width: 50%;
 }
 
+/* Miracle settings */
+
+.miracleName:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+table.miracletable, table.miracletable th, table.miracletable td {
+	border: 1px solid black;
+}
+
+.uhoh {
+	color: red;
+}
+
+/* Hover Info */
+
+div.hoverinfo * {
+	position: absolute;
+	z-index: 4;
+	border: 1px solid black;
+	width: auto;
+	height: auto;
+	background: white;
+}
+
+/* Miracle point stuff */
+
+div.lockunlockbutton {
+	position: relative;
+	color: #000000;
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	font-size: 22px;
+	border: 2px solid #000000;
+	border-radius: 3px;
+	cursor: pointer;
+	text-decoration: initial;
+	text-align: center;
+}
+
+div.lockbutton {
+	background: url("images/lock.svg");
+	background-size: cover;
+}
+
+div.unlockbutton {
+	background: url("images/unlock.svg");
+	background-size: cover;
+}
+
 /* Make sure floating windows are on top of everything else */
 div.jswindow {
 	z-index: 10000; /* This should be higher than Leaflet's z-index values */
