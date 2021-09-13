@@ -9,6 +9,7 @@ div#sheet {
 	border: 1px solid black;
 	margin-top: 10px;
 	padding: 10px;
+	max-width: 50%;
 }
 
 /* Make sure floating windows are on top of everything else */
@@ -79,11 +80,6 @@ iframe.windowiframe {
 	height: 100%;
 }
 
-textarea.editorarea {
-	width: 100%;
-	min-height: 150px;
-}
-
 .inline {
 	display: inline;
 }
@@ -102,6 +98,60 @@ div.greyout {
 	background-color: black;
 	opacity: 0.5;
 	z-index: 9999;
+}
+
+/* EditorFactory stuff */
+
+textarea.editorarea {
+	width: 100%;
+	min-height: 150px;
+}
+
+div.editorlist {
+	width: 100%;
+}
+
+div.editorlistholder {
+	width: 100%;
+	border: 1-x dotted black;
+}
+
+div.editorlistelement {
+	
+}
+
+.editorbutton {
+	position: absolute;
+	height: 20px;
+	width: 20px;
+	line-height: 30px;
+	font-size: 22px;
+	border: 2px solid #000000;
+	border-radius: 3px;
+	cursor: pointer;
+	color: #000000;
+	text-decoration: initial;
+	text-align: center;
+}
+
+a.addbutton {
+	background-color: green;
+	background-image: url("images/add.svg");
+	background-size: cover;
+}
+
+a.removebutton {
+	background-color: red;
+	background-image: url("images/remove.svg");
+	background-size: cover;
+}
+
+.editorbutton[disabled] {
+	background-color: grey;
+}
+
+.editorevents {
+	/* Receives editor events that could pertain to it */
 }
 
 /* Table editing */

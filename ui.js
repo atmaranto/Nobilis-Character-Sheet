@@ -148,13 +148,13 @@
 		utils.updateCSSStyle("div.windowcontent", "max-height", value+"px");
 	});
 	
-	UI.EditorFactory = function(object, containerClass) {
+	UI.EditorFactory = function(object, containerClass, container) {
 		this.object = object;
 		
 		this.fragments = [];
 		this.pushTable();
 		
-		this.container = $("<div></div");
+		this.container = container || $("<div></div");
 		this.container.className = containerClass || "";
 	}
 	
@@ -276,7 +276,7 @@
 		},
 		
 		attachSlider: function(name, text, bounds, defaultValue, scale, attrs) {
-			let slider = utils.createSmartSlider(name, bounds.min, bounds.max, defaultValue, scale);
+			let slider = utils.createSmartSlider(name, bounds.min, bounds.max, defaultValue, scale, text);
 			let theSlider = slider.children[1];
 			
 			let row = this.add(slider.children[0]);
@@ -286,6 +286,11 @@
 				cell.append(slider.children[0]);
 			}
 			row.append(cell);
+			
+			utils.attachInput(
+				theSlider, "value", this.object, name, undefined, undefined,
+				defaultValue, parseInt
+			);
 			
 			return $(theSlider);
 		},
@@ -365,8 +370,98 @@
 			return row.children()[0];
 		},
 		
+		attachList: function(constructItem, attributes) {
+			/* Adds a list to the EditorFactory. Lists use their constructor and event subscription to define their functionality. */
+			attributes = attributes || {};
+			let list = $("<div class='editorlist'></div>");
+			let itemHolder = $("<div class='editoritemholder'></div>").appendTo(list);
+			let controls = $("<div class='editorcontrols editorevents'></div>")
+				.append(
+					$("<a class='editorbutton addbutton editorevents'></a>")
+						.click(function() {
+							if($(this).attr("disabled")) return;
+							addItem();
+						}).on("checkdisabled", function() {
+							if($(itemHolder).children().length >= attributes.max) {
+								$(this).attr("disabled", true);
+							}
+							else {
+								$(this).removeAttr("disabled");
+							}
+						})
+				);
+			
+			let updateButtons = () => {
+				list.find(".editorevents").trigger("checkdisabled");
+			};
+			
+			let addItem = (i) => {
+				i = i || itemHolder.children().length;
+				if(attributes.max && i >= attributes.max) return;
+				
+				let wrapper = $("<table class='editoritem'></table>");
+				let returnedItem = constructItem(i);
+				
+				let checkDisabled = function() {
+					if($(returnedItem).find(".unremovable").length > 0 || (attributes.min && itemHolder.children().length == attributes.min)) {
+						$(this).attr("disabled", true);
+					}
+					else {
+						$(this).removeAttr("disabled");
+					}
+				};
+				
+				let removeButton = $("<a class='editorbutton removebutton editorevents'></a>")
+					.on("checkdisabled", checkDisabled)
+					.click(function() {
+						if($(this).attr("disabled")) return;
+						checkDisabled();
+						
+						$(returnedItem).trigger("removed");
+						wrapper.remove();
+						
+						updateButtons();
+					});
+				
+				checkDisabled = checkDisabled.bind(removeButton);
+				
+				wrapper.append(removeButton);
+				wrapper.append(returnedItem);
+				
+				returnedItem.wrap("<tr><td></td></tr>");
+				
+				itemHolder.append(wrapper);
+				updateButtons();
+			};
+			
+			for(let i = 0; i < (attributes.min || 0); i++) {
+				addItem(i);
+			}
+			
+			list.append(controls);
+			
+			// I'm still not sure if I want this to be part of a table or its own thing, although I'm leaning towards the latter
+			//this.add(list);
+			this.fragments.push(list);
+			this.pushTable();
+			
+			return itemHolder;
+		},
+		
+		removeEmptyTables: function() {
+			this.fragments = this.fragments.filter((item) => {
+				if($(item).hasClass("editortable") && $(item).children().length == 0) {
+					return false;
+				}
+				
+				return true;
+			});
+		},
+		
 		create: function() {
 			//Creates the final table element from the container. Should only be called once per factory.
+			this.removeEmptyTables();
+			
 			this.container.append(this.fragments);
 			return this.container;
 		}
@@ -485,7 +580,7 @@
 				var x = document.createElement("a");
 				//x.innerHTML = "X";
 				x.className = "button xbutton";
-				x.href = "#";
+				// x.href = "#";
 				
 				$(x).on("click", (e) => {
 					utils.disableEvent(e);

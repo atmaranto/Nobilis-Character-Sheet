@@ -204,7 +204,7 @@
 		//Try to set the initial value for the input to the current object value
 		if(defaultValue != undefined) {
 			if(typeof value == "function") value(inputElement, defaultValue);
-			else inputElement[value] = defaultValue;
+			else $(inputElement).prop(value, defaultValue).trigger("input");
 		}
 		
 		if(event.startsWith("on")) event = event.substring(2);
@@ -212,7 +212,7 @@
 		$(inputElement).on(event, (evt) => {
 			var newValue;
 			if(typeof value == "function") newValue = value(inputElement);
-			else newValue = inputElement[value];
+			else newValue = $(inputElement).prop(value);
 			
 			newValue = cast(newValue); //Cast to the correct type
 			
@@ -331,14 +331,14 @@
 		return done;
 	}
 	
-	utils.createSmartSlider = (name, min, max, current, scale) => {
+	utils.createSmartSlider = (name, min, max, current, scale, labelText) => {
 		var holder = document.createDocumentFragment();
 		
 		var label = document.createElement("label");
 		label.className = "settingslabel";
 		var sliderId = name;
 		label.for = sliderId;
-		label.innerHTML = utils.capitalize(name);
+		label.innerHTML = labelText || utils.capitalize(name);
 		
 		if(min == null || max == null) {
 			//Just create a normal number text input
@@ -349,7 +349,7 @@
 			if(min != null) input.min = min;
 			if(max != null) input.max = max;
 			input.value = current || min || 0;
-			input.hint = utils.capitalize(name);
+			input.hint = labelText || utils.capitalize(name);
 			input.className = "settingsinput";
 			
 			if(scale != undefined) input.setAttribute("scale", scale);
