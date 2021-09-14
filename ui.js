@@ -224,18 +224,21 @@
 		},
 		
 		attachTextArea: function(name, text, label, attrs) {
-			var rnd = (Math.random()).toString().substr(2);
+			let rnd = (Math.random()).toString().substr(2);
 			
-			var input = $("<textarea class='editorarea'/>");
+			let container = $("<div></div>");
+			let input = $("<textarea class='editorarea'/>");
+			
 			input.attr("id", "text"+rnd);
 			utils.applyAttrs(input, attrs);
 			
 			utils.attachInput(input, undefined, this.object, name);
 			
 			if(label != false) {
-				this.attachParagraph(label || utils.capitalize(name));
+				container.append($("<p></p>").text(label || utils.capitalize(name)).css("margin-bottom", "2px"));
 			}
-			this.fragments.push(input)
+			container.append(input);
+			this.fragments.push(container)
 			this.pushTable();
 			
 			return input;

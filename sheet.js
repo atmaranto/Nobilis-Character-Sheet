@@ -497,7 +497,17 @@ $(document).ready(() => {
 	factory.startSection("Handicaps", "h3");
 	
 	factory.startSection("Bonds and Anchors", "h3");
-	factory.attachTextArea("anchors");
+	
+	let anchors = factory.attachTextArea("anchors");
+	let anchorsMax = $("<i title='Calculated from Spirit + 1'> (Loading...)</i>").appendTo(anchors.prev());
+	
+	let updateAnchorMax = () => {
+		anchorsMax.text(" (up to " + (parseInt(spiritSlider.val()) + 1).toString() + ")");
+	};
+	
+	spiritSlider.on("input", updateAnchorMax);
+	updateAnchorMax();
+	
 	factory.attachTextArea("bondAllocation");
 	
 	factory.startSection("Wound Levels", "h3");
