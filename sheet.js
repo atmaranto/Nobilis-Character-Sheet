@@ -36,6 +36,12 @@ $(document).ready(() => {
 		$(".attributePermanentPoint").each((index, item) => {
 			_s += parseInt($(item).val()) - 5;
 		});
+		$(".giftcost").each((index, item) => {
+			let result = parseInt($(item).text());
+			if(result !== NaN) {
+				_s += result;
+			}
+		});
 		
 		let attributeSum = $("#attributeSum")
 			.html("").text(_s.toString() + " character points");
@@ -341,27 +347,89 @@ $(document).ready(() => {
 	factory.attachStandalone(
 		UI.addHoverInfo(
 			$("<div></div>")
-				.append($("<label for='tempPermSync' style='cursor: help' class='noselect'>Enable synchronization with Permanent Miracle Points: </label>"))
+				.append($("<label for='tempPermSync' class='noselect'>Enable synchronization with Permanent Miracle Points: </label>"))
 				.append(
 					$("<input id='tempPermSync' type='checkbox' />")
 						.click(() => {
 							installTempPermSync($("#tempPermSync").prop("checked"));
 						})
 				),
-				$("<p class='noselect'>This option makes sure the maximum temporary MPs you have is no greater than your permanent MPs.<br />" +
+				$("<p>This option makes sure the maximum temporary MPs you have is no greater than your permanent MPs.<br />" +
 				  "Disabling this option may be helpful, as there are ways of acquiring additional temporary MPs during play.</p>")
 		)
 	);
 	
 	factory.startSection("Gifts", "h3");
+	let giftMiracleExampleWindow = new UI.ElementWindow(
+		$("<p>Gift miracles could include:</p>")
+			.append(
+				$("<ul></ul>")
+					.append(
+						nobilisData.giftMiracleExamples.map((example) => {
+							let item = $("<li></li>");
+							
+							item.html(example);
+						})
+					)
+			),
+		"Gift Miracle Examples"
+	);
 	
 	let createGiftSection = (i) => {
 		let gift = {};
 		let giftFactory = new UI.EditorFactory(gift);
 		
-		giftFactory.attachText("giftName", "Name");
+		giftFactory.attachText("giftName", "Gift Name");
+		let _slider = $(giftFactory.attachSlider("miracleLevel", "Miracle Level", {min: 0, max: 9}, 0));
+		_slider.find("label").css("cursor", "pointer").click(() => {
+			giftMiracleExampleWindow.show();
+		});
 		
-		return {"element": giftFactory.createHorizontal().css("padding-left", "30px"), "object": gift};
+		let miracleLevel = UI.addHoverInfo(
+			_slider,
+			$("<p>This is the cost of the miracle your gift requires. Click the label for some examples.</p>")
+		);
+		
+		let giftEstate = UI.addHoverInfo(
+			giftFactory.attachText("giftEstate", "Gift Estates"),
+			$("<p>List whatever Estate or Estates this gift directly affects.</p>")
+		);
+		
+		let giftEstateType = UI.addHoverInfo(
+			giftFactory.attachSelection("giftEstateType", "Number of Distinct Estates Affected", [
+				"One Estate (Cost x1)",
+				"Family of Estates (Cost x2)",
+				"Almost Anything and Everything (Cost x3)"
+			]),
+			$("<p>The number of distinct Estates affected by a gift is a multiplier to its cost. If the miracle <i>directly</i> affects<br />" +
+			  " a family of distinct domains (such as \"any living thing\" or \"any physical thing\") then its cost is multiplied by 2. If<br />" +
+			  " it could directly affect almost anything <i>conceivable</i>, then its cost is multiplied by 3.</p>")
+		);
+		
+		let giftCostCalculation = $("<p class='giftcost'>Loading...</p>");
+		giftFactory.add($("<p class='secretnoselect'>Gift cost</p>")).append($("<td></td>").append(giftCostCalculation));
+		
+		let recalculateCost = () => {
+			let cost = parseInt(miracleLevel.val()) * (parseInt(giftEstateType.prop("selectedIndex")) + 1);
+			
+			cost = Math.max(cost, 1);
+			
+			giftCostCalculation.text(cost.toString());
+			
+			attributeUpdate();
+		};
+		
+		miracleLevel.on("input", recalculateCost);
+		giftEstateType.on("input", recalculateCost);
+		
+		giftCostCalculation.addClass("editorevents").on("removed", () => {
+			giftCostCalculation.text("0");
+			attributeUpdate();
+		});
+		
+		recalculateCost();
+		
+		return {"element": giftFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": gift};
 	};
 	
 	factory.attachList("gifts", createGiftSection, {min: 0, max: 5});

@@ -229,4 +229,8 @@
 		"deep": {"cost": 4, "name": "Deep", "description": "These miracles require a lot of effort: (C) (A)MP and your miraculous action."},
 		"wordOfCommand": {"cost": 8, "name": "Word of Command", "description": "These are the rarest and most difficult of miracles. You may only cast them at the cost of (C) (A)MP, your miraculous action, and a grievous wound."},
 	};
+	
+	nobilisData.giftMiracleExamples = [
+		
+	];
 })(this)

@@ -298,13 +298,13 @@
 			var rnd = (Math.random()).toString().substr(2);
 			var row = this.add("<label for=\"select"+rnd+"\">" +
 				(text || utils.capitalize(name)) + "</label>"
-			);
+			).addClass('secretnoselect');
 			
 			var select = $(utils.createSmartSelection(name, values, values[0])).children().last();
 			select.attr("id", "select"+rnd);
 			utils.applyAttrs(select, attrs);
 			
-			row.appendChild($("<td></td>").append(select));
+			row.append($("<td></td>").append(select));
 			
 			select = select[0]; // At this point, it's better to use the HTMLElement than the jQuery object
 			
@@ -359,13 +359,14 @@
 				}
 			}, this.object, name, undefined, "onchange");
 			
-			return select;
+			return $(select);
 		},
 		
 		attachParagraph: function(text) {
-			var row = this.add("<p></p>").text(text);
+			let p = $("<p></p>").text(text);
+			this.add(p);
 			
-			return row.children()[0];
+			return p;
 		},
 		
 		attachList: function(property, constructItem, attributes) {
@@ -426,7 +427,7 @@
 						if($(this).attr("disabled")) return;
 						checkDisabled();
 						
-						$(returnedItem).trigger("removed");
+						$(returnedItem).find(".editorevents").trigger("removed");
 						wrapper.remove();
 						
 						updateButtons();
@@ -923,7 +924,7 @@
 			$(anchor).append(hoverElement);
 		}, () => {
 			$(hoverElement).remove()
-		});
+		}).find("*").css("cursor", "help");
 		
 		return anchor;
 	};
