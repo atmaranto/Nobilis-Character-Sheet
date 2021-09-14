@@ -554,13 +554,13 @@ $(document).ready(() => {
 	// factory.attachParagraph("You have the following wound levels:");
 	let woundLevelTable = $("<table class='woundleveltable'></table>");
 	
-	let surfaceWoundExplanation = $("<p>Surface wound levels are the lowest level of wound, and the last one lost. It doesn't take much to damage a character with only</br>" +
-									"these left: unless they have a gift that protects them, even a knife or a claw could cause a surface wound.</p>").css("font-weight", "normal");
-	let seriousWoundExplanation = $("<p>Serious wound levels are the second wound level to be lost. You'd need a gun or the equivalent of a large claw to serious injure</br>" +
-									"a player enough to give them a serious wound.</p>").css("font-weight", "normal");
-	let deadlyWoundExplanation = $("<p>Deadly wound levels are the highest level of wound and the first to be lost. This means that, until you've taken at least one \"deadly\"</br>" +
-								   "blow, you <b>cannot</b> be damaged by anything less serious. That is, until you lose your deadly wound levels, you can't lose any other wound<br />" +
-								   "levels, so your threshold for damage is \"deadly\".</p>").css("font-weight", "normal");
+	let surfaceWoundExplanation = $("<p>Surface wound levels are the lowest level of wound, and the last one lost. It doesn't take much to damage a character with only" +
+									" these left: unless they have a gift that protects them, even a knife or a claw could cause a surface wound.</p>").css("font-weight", "normal");
+	let seriousWoundExplanation = $("<p>Serious wound levels are the second wound level to be lost. You'd need a gun or the equivalent of a large claw to serious injure" +
+									" a player enough to give them a serious wound.</p>").css("font-weight", "normal");
+	let deadlyWoundExplanation = $("<p>Deadly wound levels are the highest level of wound and the first to be lost. This means that, until you've taken at least one \"deadly\"" +
+								   " blow, you <b>cannot</b> be damaged by anything less serious. That is, until you lose your deadly wound levels, you can't lose any other wound" +
+								   " levels, so your threshold for damage is \"deadly\".</p>").css("font-weight", "normal");
 	
 	// Note: The UI.addHoverInfo doesn't seem to work with the headers, for some reason.
 	let woundLevelHeader = $("<tr><th></th></tr>")
