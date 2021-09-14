@@ -458,6 +458,26 @@
 			return itemHolder;
 		},
 		
+		attachCheckbox: function(property, title, current) {
+			current = current === undefined ? false : current;
+			let holder = utils.createSmartBooleanInput(property, current, title);
+			
+			let label = $(holder.children[0]);
+			let checkbox = $(holder.children[1]);
+			let row = this.add(label);
+			
+			utils.attachInput(
+				checkbox, "value", this.object, property, undefined, undefined,
+				current, undefined
+			);
+			
+			row.append(
+				$("<td></td>").append(checkbox)
+			);
+			
+			return checkbox;
+		},
+		
 		attachStandalone: function(element) {
 			this.fragments.push(element);
 			this.pushTable();
@@ -925,6 +945,11 @@
 		}, () => {
 			$(hoverElement).remove()
 		}).find("*").css("cursor", "help");
+		
+		// A hack to prevent the hover from staying if they somehow get the mouse ONTO it
+		$(hoverElement).hover(() => {
+			$(hoverElement).remove();
+		}, () => (undefined));
 		
 		return anchor;
 	};

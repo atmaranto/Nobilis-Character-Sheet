@@ -143,7 +143,7 @@ $(document).ready(() => {
 						);
 					}
 					else {
-						row.append($("<td>You <span class='uhoh'>cannot perform this miracle type</span></td>"));
+						row.append($("<td><span class='uhoh'>You cannot perform this miracle type</span></td>"));
 						row.append($("<td></td>"));
 					}
 				}
@@ -365,11 +365,7 @@ $(document).ready(() => {
 			.append(
 				$("<ul></ul>")
 					.append(
-						nobilisData.giftMiracleExamples.map((example) => {
-							let item = $("<li></li>");
-							
-							item.html(example);
-						})
+						nobilisData.giftMiracleExamples.map((example) => ($("<li></li>").html(example)))
 					)
 			),
 		"Gift Miracle Examples"
@@ -380,50 +376,114 @@ $(document).ready(() => {
 		let giftFactory = new UI.EditorFactory(gift);
 		
 		giftFactory.attachText("giftName", "Gift Name");
-		let _slider = $(giftFactory.attachSlider("miracleLevel", "Miracle Level", {min: 0, max: 9}, 0));
-		_slider.find("label").css("cursor", "pointer").click(() => {
+		let miracleLevel = $(giftFactory.attachSlider("miracleLevel", "Miracle Level", {min: 0, max: 9}, 0));
+		miracleLevel.parent().prev().find("label").css("cursor", "pointer").click(() => {
 			giftMiracleExampleWindow.show();
-		});
+		}).attr("title", "Click for examples").addClass("giftmiraclelabel");
 		
-		let miracleLevel = UI.addHoverInfo(
-			_slider,
+		 UI.addHoverInfo(
+			miracleLevel.parent(),
 			$("<p>This is the cost of the miracle your gift requires. Click the label for some examples.</p>")
 		);
 		
 		let giftEstate = UI.addHoverInfo(
 			giftFactory.attachText("giftEstate", "Gift Estates"),
-			$("<p>List whatever Estate or Estates this gift directly affects.</p>")
+			$("<p>List whatever Estate or Estates this gift directly affects. Alternatively, if this is a Gift of Realm, Aspect, or Spirit, you may" +
+			  " enter one of those values.</p>")
 		);
 		
-		let giftEstateType = UI.addHoverInfo(
-			giftFactory.attachSelection("giftEstateType", "Number of Distinct Estates Affected", [
+		const giftModifiers = [1, -1, -2, -3];
+		let giftInvocationType = giftFactory.attachSelection("giftInvocationType", "How does the Gift Activate", [
+			"Automatically/Passively (+1)",
+			"Simple Miracle (-1)",
+			"Normal Miracle (-2)",
+			"Hard Miracle (-3)"
+		]);
+		UI.addHoverInfo(
+			giftInvocationType.parent(),
+			$("<p>How the gift is activated. If it activates automatically or provides a passive benefit, it costs +1 point. If it requires a<br />" +
+			  " miracle to activate, it costs less depending on that miracle's difficulty for you.</p>")
+		);
+		
+		let giftAOEType = giftFactory.attachSelection("giftAOEType", "Area of Effect", [
+			"Almost anywhere (+1)",
+			"Local things only (-1)",
+			"One person - you or a nearby moratal (-2)",
+			"Only oneself (-3)"
+		]);
+		UI.addHoverInfo(
+			giftAOEType.parent(),
+			$("<p>What the gift can \"target\" when it affects something. Note that gifts that can affect almost anything hundreds of miles away<br />" +
+			  "may cost additional points beyond those described here.</p>")
+		);
+		
+		let giftFlexibility = giftFactory.attachSelection("giftFlexibility", "Gift Flexibility", [
+			"All imaginable uses (+1)",
+			"A wide variety of situations (-1)",
+			"A limited selection of applications (-2)",
+			"One single \"trick\" (-3)"
+		]);
+		UI.addHoverInfo(
+			giftFlexibility.parent(),
+			$("<p>This defines how flexible the gift is. This is a very subjective category, but in general, the more widely usable the gift can<br />" +
+			  "be and the more directly the character can dictate what they want out of it, the more costly the flexibility of the gift.</p>")
+		);
+		
+		let giftRarity = giftFactory.attachCheckbox("isGiftRare", "Is Gift Rare", false);
+		UI.addHoverInfo(
+			giftRarity.parent(),
+			$("<p>Rare gifts cost an extra 1 character point. Imagination has its price.</p>")
+		);
+		
+		let giftEstateType = giftFactory.attachSelection("giftEstateType", "Number of Distinct Estates Affected", [
 				"One Estate (Cost x1)",
 				"Family of Estates (Cost x2)",
 				"Almost Anything and Everything (Cost x3)"
-			]),
+			]);
+		UI.addHoverInfo(
+			giftEstateType.parent(),
 			$("<p>The number of distinct Estates affected by a gift is a multiplier to its cost. If the miracle <i>directly</i> affects<br />" +
 			  " a family of distinct domains (such as \"any living thing\" or \"any physical thing\") then its cost is multiplied by 2. If<br />" +
 			  " it could directly affect almost anything <i>conceivable</i>, then its cost is multiplied by 3.</p>")
 		);
 		
-		let giftCostCalculation = $("<p class='giftcost'>Loading...</p>");
+		let giftCostCalculation = $("<p><span class='giftcost'>Loading...</span><span class='giftcostaddendum'></span></p>");
 		giftFactory.add($("<p class='secretnoselect'>Gift cost</p>")).append($("<td></td>").append(giftCostCalculation));
 		
 		let recalculateCost = () => {
-			let cost = parseInt(miracleLevel.val()) * (parseInt(giftEstateType.prop("selectedIndex")) + 1);
+			let cost = parseInt(miracleLevel.val());
+			cost += giftModifiers[parseInt(giftInvocationType.prop("selectedIndex"))];
+			cost += giftModifiers[parseInt(giftAOEType.prop("selectedIndex"))];
+			cost += giftModifiers[parseInt(giftFlexibility.prop("selectedIndex"))];
+			if(giftRarity.is(":checked")) {
+				cost += 1;
+			}
+			
+			cost *= (parseInt(giftEstateType.prop("selectedIndex")) + 1);
+			
+			if(cost < 1) {
+				giftCostCalculation.find(".giftcostaddendum").text(" (minimum of 1)");
+			}
+			else {
+				giftCostCalculation.find(".giftcostaddendum").text("");
+			}
 			
 			cost = Math.max(cost, 1);
 			
-			giftCostCalculation.text(cost.toString());
+			giftCostCalculation.find(".giftcost").text(cost.toString());
 			
 			attributeUpdate();
 		};
 		
 		miracleLevel.on("input", recalculateCost);
 		giftEstateType.on("input", recalculateCost);
+		giftInvocationType.on("input", recalculateCost);
+		giftAOEType.on("input", recalculateCost);
+		giftFlexibility.on("input", recalculateCost);
+		giftRarity.on("input", recalculateCost);
 		
 		giftCostCalculation.addClass("editorevents").on("removed", () => {
-			giftCostCalculation.text("0");
+			giftCostCalculation.find(".giftcost").text("0");
 			attributeUpdate();
 		});
 		

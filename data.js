@@ -231,6 +231,21 @@
 	};
 	
 	nobilisData.giftMiracleExamples = [
-		
+		"Immortality - <i>Greater Preservation of the Self</i>. This gift provides near-total immunity to anything that would kill a character, in any way, in any situation. Unless you leave Earth, you're pretty dang safe." +
+		" Base cost is 6, it applies automatically as a passive(+1), it affects only one's self (-3), it includes all imaginable uses of immortality (+1), it's relatively rare (+1). This results in a cost of 6+1-3+1+1=<b>6" +
+		" character points</b> for a gift of Immortality, brought about by an automatic invocation of a Major Preservation of the Self.",
+		"Fire Breath - <i>Lesser Creation of Fire</i>. Base cost is 4, it takes a simple miracle to activate (-1), it affects local things only (-1), it has a limited selection of applications (-2), it's relatively common (+0)." +
+		" This results in a cost of 4-1-1-2+0=<b>1 (the minimum cost of a gift)</b>. If the character wished to add Penetration 3, for instance, which would allow the fire breath to extend into any Noble's space with Spirit 3" +
+		" or less, the calculation would be 4<b>+3</b>-1-1-2+0=<b>3</b>.",
+		"Durant - <i>Lesser Preservation of the Self</i>. This gift offers basic resistance to injury without enabling the total immunity of Immortality. Base cost is 3, it activates automatically as a passive (+1), it affects" +
+		" only the self (-3), it has limited scope of usage (-2), and it's common. 3+1-3-2=-1, meaning this gift would cost the <b>minimum of 1 character point</b>.",
+		"Eternal - <i>Greater Preservation of the Self</i>. Base cost is 6, it applies automatically (+1), it only affects one's self (-3), it has comprehensive scope (-1) and it's common. Thus, its cost is 6+1-3-1=<b>3</b>.",
+		"Glorious - <i>Major Creation of Emotion</i>. With this gift, the character can choose to command an appearance that has an <i>enormous</i> impact on the behaviors of mortals and, to a lesser extent, other Nobles. This" +
+		" could be an otherworldly beauty, a visage of terror, or something else. Powers are immunte to the miraculous part of the gift, but they could still be moved by the beauty or horror. As a Major Creation of Emotion, this" +
+		" gift would have a base cost of 7. It requires a simple miracle to activate (-1), it affects the creatures in the local area (-1), its utility is limited to \"one trick\" with regards to its miraculous aspect (-3), and" +
+		" it's a fairly common gift (+0). This results in a cost of 7-1-1-3+0=<b>2 character points</b>." +
+			"<ul><li>One notable example of someone possessing this gift? <b>Helen of Troy</b>. You might have heard of her.</li></ul>",
+		"Immutable - <i>Lesser Preservation of the Self</i>. This gift lowers the requiremnets for the Power to continue living. They may get hungry or tired, but they do not explicitly require food, water, air, etc., as they are" +
+		" maintained by this gift. Like Durant, this gift would cost fewer than 1 character point, so it costs the minimum of <b>1</b>."
 	];
 })(this)

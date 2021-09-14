@@ -46,9 +46,19 @@ table.miracletable, table.miracletable th, table.miracletable td {
 	border: 1px dashed grey;
 }
 
+/* Gift stuff */
+
+.giftcostaddendum {
+	font-style: italic;
+}
+
+.giftmiraclelabel:hover {
+	text-decoration: underline;
+}
+
 /* Hover Info */
 
-div.hoverinfo * {
+div.hoverinfo > * {
 	position: absolute;
 	z-index: 4;
 	border: 1px solid black;
