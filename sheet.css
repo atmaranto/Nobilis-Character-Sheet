@@ -9,7 +9,7 @@ div#sheet {
 	border: 1px solid black;
 	margin-top: 10px;
 	padding: 10px;
-	max-width: 50%;
+	max-width: 100%;
 }
 
 /* General settings */
@@ -54,6 +54,11 @@ table.miracletable, table.miracletable th, table.miracletable td {
 
 .giftmiraclelabel:hover {
 	text-decoration: underline;
+}
+
+.lookslikelink:hover {
+	text-decoration: underline;
+	cursor: pointer;
 }
 
 /* Wound level stuff */

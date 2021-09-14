@@ -248,4 +248,99 @@
 		"Immutable - <i>Lesser Preservation of the Self</i>. This gift lowers the requiremnets for the Power to continue living. They may get hungry or tired, but they do not explicitly require food, water, air, etc., as they are" +
 		" maintained by this gift. Like Durant, this gift would cost fewer than 1 character point, so it costs the minimum of <b>1</b>."
 	];
+	
+	nobilisData.estatePropertiesExamples = [
+		{
+			"estate": "Fire",
+			"bonds": [
+				"Fire is a useful tool (1 point)",
+				"Fire brings enlightenment (3 points)",
+				"Fire wards off danger (1 point)",
+				"Fire belongs to humanity (2 points)"
+			]
+		},
+		{
+			"estate": "Fire, differently",
+			"bonds": [
+				"Fire is always hungry (3 points)",
+				"Fire dstroys that which it consumes (2 points)",
+				"Fire harms what it touches (2 points)"
+			]
+		},
+		{
+			"estate": "Death",
+			"bonds": [
+				"Death ends life (1 point)",
+				"Death brings grief (1 point)",
+				"Death comes for us all (1 point)",
+				"Death waits patiently (1 point)",
+				"Death comes suddenly (1 point)",
+				"Death cannot be returned from (1 point)",
+				"Death leads to a new existence (1 point)"
+			]
+		},
+		{
+			"estate": "Taxes",
+			"bonds": [
+				"Taxes take your money and valuables (2 points)",
+				"Taxes build public works (1 point)",
+				"Takes empower governments (1 point)",
+				"Takes redirect the flow of money (2 points)",
+				"Takes are as certain as Death (1 point)"
+			]
+		},
+		{
+			"estate": "Death",
+			"bonds": [
+				"Death cuts things short (4 points)",
+				"Death comes suddenly (2 points)",
+				"Death brings numbness (1 point)"
+			]
+		},
+		{
+			"estate": "Color",
+			"bonds": [
+				"Color makes things distinctive (2 points)",
+				"Color exudes life (2 points)",
+				"Color carries meaning (2 points)",
+				"Color catches the eye (1 point)"
+			]
+		},
+		{
+			"estate": "The Void",
+			"bonds": [
+				"The Void is the space where something <i>could</i> be (2 points)",
+				"The Void hungers to be filled (2 point)",
+				"The Void extinguishes emotion, knowledge, and value (2 points)",
+				"The Void is home to very strange things (1 point)"
+			]
+		},
+		{
+			"estate": "Time",
+			"bonds": [
+				"Time separates events from each other (2 points)",
+				"Time relates given events to each other (1 point)",
+				"Time gives you cause and effect (3 points)",
+				"Time lets you change and become different (1 point)"
+			]
+		},
+		{
+			"estate": "The Infinite",
+			"bonds": [
+				"The Infinite is inexhaustible (3 points)",
+				"The Infinite defies arithmetics (1 point)",
+				"The Infinite inspires awe and confusion (2 points)",
+				"The Infinite contains all possibilities (1 point)"
+			]
+		},
+		{
+			"estate": "Networks",
+			"bonds": [
+				"Networks are grand systems made of humble parts (2 points)",
+				"Networks grow to support their utilization (2 points)",
+				"Networks behave unpredictably when their particulars fail (1 point)",
+				"Networks take things where they need to go (2 points)"
+			]
+		},
+	];
 })(this)

@@ -223,7 +223,7 @@
 			return input;
 		},
 		
-		attachTextArea: function(name, text, label, attrs) {
+		attachTextArea: function(name, label, attrs) {
 			let rnd = (Math.random()).toString().substr(2);
 			
 			let container = $("<div></div>");
@@ -235,7 +235,12 @@
 			utils.attachInput(input, undefined, this.object, name);
 			
 			if(label != false) {
-				container.append($("<p></p>").text(label || utils.capitalize(name)).css("margin-bottom", "2px"));
+				if(typeof label === "string" || !label) {
+					container.append($("<p></p>").text(label || utils.capitalize(name)).css("margin-bottom", "2px"));
+				}
+				else {
+					container.append($(label));
+				}
 			}
 			container.append(input);
 			this.fragments.push(container)

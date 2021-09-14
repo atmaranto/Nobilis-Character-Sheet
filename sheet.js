@@ -166,6 +166,25 @@ $(document).ready(() => {
 		return updateTable;
 	};
 	
+	let estatePropertiesInfoWindow = new UI.ElementWindow(
+		$("<p>Your Estate (the concept you rule over) should be relatively well-defined. You have <b>seven \"points\"</b> with which to define your estate. Create" +
+		  " three to seven statements about your Estate and allocate those points amongst them. You may do this for your primary Domain and incorporate" +
+		  " your secondary or tertiary Domains, <b>or</b> you may do this on a per-domain basis. Please note that there could be <i>many, many ways</i> to describe" +
+		  " the same Estate. Define it how you see it; subsequent Powers may define it differently, but that's okay; you aren't them.<br />Technically, this" +
+		  " is from Nobilis 3e, but we're going with it.<br />Some examples follow:</p>")
+			.append(
+				$("<ul></ul>").append(
+					nobilisData.estatePropertiesExamples.map((item) => (
+						$("<li class='estatePropertyExample'><span>" + item.estate + "</span><i> (7 points)</i></li>")
+							.append(
+								$("<ul></ul>").append(item.bonds.map((example) => ($("<li></li>").html(example))))
+							)
+					))
+				),
+			),
+		"Estate Properties Info"
+	);
+	
 	let createDomainSection = (i) => {
 		let thisObject = {};
 		
@@ -259,6 +278,11 @@ $(document).ready(() => {
 		});
 		
 		attributeFactory.attachStandalone(infoTable);
+		attributeFactory.attachTextArea(
+			"estateProperties", 
+			$("<p class='lookslikelink'>Estate Properties (click for info)</p>")
+				.click(() => (estatePropertiesInfoWindow.show()))
+		);
 		
 		slider.on("input change", updateTable);
 		
@@ -499,12 +523,13 @@ $(document).ready(() => {
 	factory.startSection("Bonds and Anchors", "h3");
 	
 	let anchors = factory.attachTextArea("anchors");
-	let anchorsMax = $("<i title='Calculated from Spirit + 1'> (Loading...)</i>").appendTo(anchors.prev());
+	let anchorsMax = $("<i> (Loading...)</i>").appendTo(anchors.prev());
 	
 	UI.addHoverInfo(
 		anchors.prev(),
 		$("<p><b>Anchors</b> are mortals (typically humans) who Nobles have made into their allies by the Rite of Servitude. They will loyally serve<br />" +
-		  "their Soverign's cause, even if they work against the Noble they serve. Anchors can only be created through bonds of Love or Hate.</p>")
+		  "their Soverign's cause, even if they work against the Noble they serve. Anchors can only be created through bonds of Love or Hate.<br />" +
+		  "You can have a number of them equal to your Spirit + 1.</p>")
 	);
 	
 	let updateAnchorMax = () => {
@@ -518,7 +543,7 @@ $(document).ready(() => {
 	
 	factory.startSection("Wound Levels", "h3");
 	
-	factory.attachParagraph("You have the following wound levels:");
+	// factory.attachParagraph("You have the following wound levels:");
 	let woundLevelTable = $("<table class='woundleveltable'></table>");
 	
 	let surfaceWoundExplanation = $("<p>Surface wound levels are the lowest level of wound, and the last one lost. It doesn't take much to damage a character with only</br>" +
