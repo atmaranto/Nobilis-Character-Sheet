@@ -12,6 +12,17 @@ div#sheet {
 	max-width: 50%;
 }
 
+/* General settings */
+
+.noselect {
+	user-select: none;
+}
+
+.secretnoselect {
+	user-select: none;
+	cursor: text;
+}
+
 /* Miracle settings */
 
 .miracleName:hover {

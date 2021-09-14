@@ -50,7 +50,7 @@ $(document).ready(() => {
 		}
 	};
 	
-	factory.add().append($("<td><span id='attributeSum'>Loading...</span></td>").ready(attributeUpdate));
+	factory.add().append($("<td><span id='attributeSum' class='secretnoselect'>Loading...</span></td>").ready(attributeUpdate));
 	
 	// TODO: Attach saving to all via function in EditorFactory
 	factory.startSection("Attributes", "h3");
@@ -73,7 +73,7 @@ $(document).ready(() => {
 		let MPName = attribute.charAt(0).toUpperCase() + "MP";
 		
 		let updateTable = () => {
-			let table = $("<table class='miracletable'></table>");
+			let table = $("<table class='miracletable secretnoselect'></table>");
 			
 			$("<tr><th>Level</th><th>Miracle Name</th><th>Difficulty for You</th><th>" + MPName + " Cost for You</th></tr>").appendTo(table);
 			let currentDomainLevel = parseInt(slider.prop("value"));
@@ -103,10 +103,13 @@ $(document).ready(() => {
 				}
 				
 				row.append(
-					$("<td><span class='miracleName' alt='Click for info'>" + miracle.label + "</span></td>")
-						.click(() => {
-							infoWindow.show();
-						})
+					$("<td></td>")
+						.append(
+							$("<span class='miracleName' title='Click for info'>" + miracle.label + "</span>")
+								.click(() => {
+									infoWindow.show();
+								})
+						)
 				);
 				
 				if(miracle.level >= 0) {
@@ -139,6 +142,7 @@ $(document).ready(() => {
 					}
 				}
 				else {
+					row.append($("<td></td>"));
 					row.append($("<td></td>"));
 				}
 				
@@ -265,7 +269,7 @@ $(document).ready(() => {
 	
 	let lockUnlockButton = $("<div id='lockunlockbutton' title='Lock or Unlock Permanent Miracle Points' class='unlockbutton lockunlockbutton'></div>");
 	
-	factory.add($("<label for='lockunlockbutton'>Lock/Unlock Permanent Miracle Points:  </label>"))
+	factory.add($("<label for='lockunlockbutton' class='noselect'>Lock/Unlock Permanent Miracle Points:  </label>"))
 		.append($("<td></td>").append(lockUnlockButton));
 	
 	let permanentAMPSlider = factory.attachSlider("permanentAMP", "<b>Aspect</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
@@ -337,22 +341,27 @@ $(document).ready(() => {
 	factory.attachStandalone(
 		UI.addHoverInfo(
 			$("<div></div>")
-				.append($("<label for='tempPermSync' style='cursor: help'>Enable synchronization with Permanent Miracle Points: </label>"))
+				.append($("<label for='tempPermSync' style='cursor: help' class='noselect'>Enable synchronization with Permanent Miracle Points: </label>"))
 				.append(
 					$("<input id='tempPermSync' type='checkbox' />")
 						.click(() => {
 							installTempPermSync($("#tempPermSync").prop("checked"));
 						})
 				),
-				$("<p>This option makes sure the maximum temporary MPs you have is no greater than your permanent MPs.<br />" +
-				  "Disabling this option may be helpful, as there are ways of acquiring temporary MPs during play.</p>")
+				$("<p class='noselect'>This option makes sure the maximum temporary MPs you have is no greater than your permanent MPs.<br />" +
+				  "Disabling this option may be helpful, as there are ways of acquiring additional temporary MPs during play.</p>")
 		)
 	);
 	
 	factory.startSection("Gifts", "h3");
 	
 	let createGiftSection = (i) => {
+		let gift = {};
+		let giftFactory = new UI.EditorFactory(gift);
 		
+		giftFactory.attachText("giftName", "Name");
+		
+		return {"element": giftFactory.createHorizontal().css("padding-left", "30px"), "object": gift};
 	};
 	
 	factory.attachList("gifts", createGiftSection, {min: 0, max: 5});

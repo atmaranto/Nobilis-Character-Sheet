@@ -191,27 +191,24 @@
 			
 			if(heading) {
 				if(typeof heading === "string" && heading.length > 0) {
-					container.prepend(
-							$(document.createElement(headingStyle))
-								.text(heading)
-								.addClass("sectionheading")
-							);
+					heading = $(document.createElement(headingStyle)).text(heading).addClass("sectionheading secretnoselect");
+					container.prepend(heading);
 				}
 				else {
-					container.append(heading);
+					container.append($(heading).addClass("secretnoselect"));
 				}
 			}
 			
 			this.fragments.push(container);
 			this.pushTable();
 			
-			return container;
+			return $(heading);
 		},
 		
 		//Creates an attached text input for an attribute in object
 		attachText: function(name, text, attrs) {
 			var rnd = (Math.random()).toString().substr(2);
-			var row = this.add("<label for=\"text"+rnd+"\">" +
+			var row = this.add("<label for=\"text"+rnd+"\" class='secretnoselect'>" +
 				(text || utils.capitalize(name)) + "</label>"
 			);
 			
@@ -250,7 +247,7 @@
 			}
 			
 			var rnd = (Math.random()).toString().substr(2);
-			var row = this.add("<label for=\"num"+rnd+"\">" +
+			var row = this.add("<label for=\"num"+rnd+"\" class='secretnoselect'>" +
 				(text || utils.capitalize(name)) + "</label>"
 			);
 			
@@ -277,6 +274,7 @@
 		
 		attachSlider: function(name, text, bounds, defaultValue, scale, attrs) {
 			let slider = utils.createSmartSlider(name, bounds.min, bounds.max, defaultValue, scale, text);
+			$(slider.children).addClass('secretnoselect');
 			let theSlider = slider.children[1];
 			
 			let row = this.add(slider.children[0]);
@@ -475,11 +473,28 @@
 		},
 		
 		create: function() {
-			//Creates the final table element from the container. Should only be called once per factory.
+			// Creates the final table element from the container. Should only be called once per factory.
 			this.removeEmptyTables();
 			
 			this.container.append(this.fragments);
 			return this.container;
+		},
+		
+		createHorizontal: function() {
+			// Creates the final table element, but instead adds all elements to the same row.
+			
+			let oneRow = $("<tr></tr>").appendTo(this.container);
+			
+			this.fragments.forEach((fragment) => {
+				if($(fragment).prop("tagName") == "table") {
+					$(fragment).children("tr").children("td").appendTo(oneRow);
+				}
+				else {
+					$(fragment).appendTo(oneRow);
+				}
+			});
+			
+			return this.container.css("display", "inline");
 		}
 	};
 	
@@ -902,7 +917,7 @@
 			hoverElement = $("<p></p>").text(hoverElement);
 		}
 		
-		hoverElement = $("<div class='hoverinfo'></div>").append(hoverElement);
+		hoverElement = $("<div class='hoverinfo secretnoselect'></div>").append(hoverElement);
 		
 		$(anchor).hover(() => {
 			$(anchor).append(hoverElement);
