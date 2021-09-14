@@ -576,6 +576,11 @@ $(document).ready(() => {
 	let woundLevelRow = $("<tr><th>Maximum</th><td></td><td></td><td></td></tr>").appendTo(woundLevelTable);
 	//let remainingWoundsRow = $("<tr><th>Current</th><td></td><td></td><td></td></tr>").appendTo(woundLevelTable);
 	
+	factory.attachStandalone(
+		$("<p>Wound levels are calculated by dividing (Aspect + 4) amongst Surface, Serious, and Deadly levels,<br />" +
+		  "prioritizing less major wounds when allocating extra points. The system should automatically use<br />" +
+		  "your Aspect to calculate your wound levels for you.</p>").css("font-style", "italic"));
+	
 	let surfaceWoundSlider = factory.attachSlider("surfaceWounds", "Surface Wounds Remaining", {min: 0, max: 5}, 0)
 			.addClass("surfaceWounds wounds");
 	UI.addHoverInfo(surfaceWoundSlider.parent(), surfaceWoundExplanation);
