@@ -501,6 +501,12 @@ $(document).ready(() => {
 	let anchors = factory.attachTextArea("anchors");
 	let anchorsMax = $("<i title='Calculated from Spirit + 1'> (Loading...)</i>").appendTo(anchors.prev());
 	
+	UI.addHoverInfo(
+		anchors.prev(),
+		$("<p><b>Anchors</b> are mortals (typically humans) who Nobles have made into their allies by the Rite of Servitude. They will loyally serve<br />" +
+		  "their Soverign's cause, even if it works against the Noble they serve. Anchors can only be created through bonds of Love or Hate.</p>")
+	);
+	
 	let updateAnchorMax = () => {
 		anchorsMax.text(" (up to " + (parseInt(spiritSlider.val()) + 1).toString() + ")");
 	};
