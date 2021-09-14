@@ -370,8 +370,12 @@
 			return row.children()[0];
 		},
 		
-		attachList: function(constructItem, attributes) {
+		attachList: function(property, constructItem, attributes) {
 			/* Adds a list to the EditorFactory. Lists use their constructor and event subscription to define their functionality. */
+			if(this.object[property] === undefined) {
+				this.object[property] = [];
+			}
+			
 			attributes = attributes || {};
 			let list = $("<div class='editorlist'></div>");
 			let itemHolder = $("<div class='editoritemholder'></div>").appendTo(list);
@@ -401,6 +405,13 @@
 				
 				let wrapper = $("<table class='editoritem'></table>");
 				let returnedItem = constructItem(i);
+				let returnedObject = null;
+				if(returnedItem.object !== undefined) {
+					returnedObject = returnedItem.object;
+					returnedItem = returnedItem.element;
+				}
+				
+				this.object[property].push(returnedObject);
 				
 				let checkDisabled = function() {
 					if($(returnedItem).find(".unremovable").length > 0 || (attributes.min && itemHolder.children().length == attributes.min)) {

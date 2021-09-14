@@ -27,6 +27,10 @@ table.miracletable, table.miracletable th, table.miracletable td {
 	color: red;
 }
 
+.domaintable {
+	border: 1px dashed grey;
+}
+
 /* Hover Info */
 
 div.hoverinfo * {
@@ -52,6 +56,7 @@ div.lockunlockbutton {
 	cursor: pointer;
 	text-decoration: initial;
 	text-align: center;
+	display: inline-block;
 }
 
 div.lockbutton {

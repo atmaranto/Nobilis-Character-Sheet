@@ -70,11 +70,12 @@ $(document).ready(() => {
 			Creates a miracle cost table that updates live depending on the results of a slider.
 		*/
 		let miracleData = window.nobilisData[attribute + "Miracles"];
+		let MPName = attribute.charAt(0).toUpperCase() + "MP";
 		
 		let updateTable = () => {
 			let table = $("<table class='miracletable'></table>");
 			
-			$("<tr><th>Level</th><th>Miracle Name</th><th>Difficulty for You</th><th>Cost for You)</th></tr>").appendTo(table);
+			$("<tr><th>Level</th><th>Miracle Name</th><th>Difficulty for You</th><th>" + MPName + " Cost for You</th></tr>").appendTo(table);
 			let currentDomainLevel = parseInt(slider.prop("value"));
 			
 			miracleData.data.forEach((miracle) => {
@@ -127,7 +128,10 @@ $(document).ready(() => {
 								miracleType.description.replace("(C)", miracleType.cost.toString()).replace("(A)", attribute.charAt(0).toUpperCase())
 							)
 						);
-						row.append($("<td><span class='miracleCost'>" + miracleType.cost.toString() + " " + attribute.charAt(0).toUpperCase() + "MP</span></td>"));
+						row.append(
+							$("<td><span class='miracleCost'>" + miracleType.cost.toString() + " " + MPName + "</span></td>")
+								.attr("title", miracleType.cost.toString() + " " + utils.capitalize(attribute) + " Miracle Points")
+						);
 					}
 					else {
 						row.append($("<td>You <span class='uhoh'>cannot perform this miracle type</span></td>"));
@@ -250,17 +254,19 @@ $(document).ready(() => {
 		
 		updateTable();
 		
-		return attributeFactory.create();
+		return {"element": attributeFactory.create().addClass("domaintable"), "object": thisObject};
 	};
 	
-	factory.attachList(createDomainSection, {min: 1, max: 5});
+	factory.attachList("domains", createDomainSection, {min: 1, max: 5});
 	
 	factory.startSection("Miracle Points", "h3");
 	
 	factory.startSection("Permanent Miracle Points", "h4");
 	
-	let lockUnlockButton = $("<div class='unlockbutton lockunlockbutton'></div>");
-	factory.attachStandalone(lockUnlockButton);
+	let lockUnlockButton = $("<div id='lockunlockbutton' title='Lock or Unlock Permanent Miracle Points' class='unlockbutton lockunlockbutton'></div>");
+	
+	factory.add($("<label for='lockunlockbutton'>Lock/Unlock Permanent Miracle Points:  </label>"))
+		.append($("<td></td>").append(lockUnlockButton));
 	
 	let permanentAMPSlider = factory.attachSlider("permanentAMP", "<b>Aspect</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
@@ -344,6 +350,12 @@ $(document).ready(() => {
 	);
 	
 	factory.startSection("Gifts", "h3");
+	
+	let createGiftSection = (i) => {
+		
+	};
+	
+	factory.attachList("gifts", createGiftSection, {min: 0, max: 5});
 	
 	factory.startSection("Handicaps", "h3");
 	
