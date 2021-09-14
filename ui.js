@@ -428,6 +428,7 @@
 						$(this).removeAttr("disabled");
 					}
 				};
+				let self = this; // Eh
 				
 				let removeButton = $("<a class='editorbutton removebutton editorevents'></a>")
 					.on("checkdisabled", checkDisabled)
@@ -437,6 +438,7 @@
 						
 						$(returnedItem).find(".editorevents").trigger("removed");
 						wrapper.remove();
+						self.object[property].splice(self.object[property].indexOf(returnedObject));
 						
 						updateButtons();
 					});

@@ -520,6 +520,82 @@ $(document).ready(() => {
 	
 	factory.startSection("Handicaps", "h3");
 	
+	let createRestriction = (i) => {
+		let object = {};
+		
+		let localFactory = new UI.EditorFactory(object);
+		
+		localFactory.attachText("restrictionName");
+		
+		UI.addHoverInfo(
+			localFactory.attachSlider("mps", "Miracle Points Granted", {min: 1, max: 3}),
+			$("<p>This is the number of miracle points your Restriction grants you when it is invoked.</p>")
+		);
+		
+		localFactory.attachTextArea("description");
+		
+		return {"element": localFactory.create().css("padding", "10px").css("padding-left", "30px").css("border", "1px dotted grey"), "object": object};
+	};
+	
+	let restrictionExamples = new UI.ElementWindow(
+		$("<div></div>").html(nobilisData.restrictionDescriptionText)
+			.append($("<p>Some examples include:</p>"))
+			.append($("<ul></ul>")
+				.append(nobilisData.restrictionExamples.map((restriction) => {
+					return $("<li></li>").html(restriction);
+				}))
+			),
+		"Restriction Examples"
+	);
+	
+	let restrictionSection = factory.startSection("Restrictions", "h4").addClass("lookslikelink")
+		.click(() => (restrictionExamples.show()));
+	
+	UI.addHoverInfo(
+		restrictionSection,
+		$(nobilisData.restrictionDescriptionText).css("font-weight", "initial")
+	);
+	
+	factory.attachList("restrictions", createRestriction, {min: 0, max:10});
+	
+	let createLimit = (i) => {
+		let object = {};
+		
+		let localFactory = new UI.EditorFactory(object);
+		
+		localFactory.attachText("limitName");
+		
+		UI.addHoverInfo(
+			localFactory.attachSlider("cps", "Character Points Granted", {min: 1, max: 5}),
+			$("<p>This is the number of miracle points granted by your Limit when you took it.</p>")
+		);
+		
+		localFactory.attachTextArea("description");
+		
+		return {"element": localFactory.create().css("padding", "10px").css("padding-left", "30px").css("border", "1px dotted grey"), "object": object};
+	};
+	
+	let limitExamples = new UI.ElementWindow(
+		$("<div></div>").html(nobilisData.limitDescriptionText)
+			.append($("<p>Some examples include:</p>"))
+			.append($("<ul></ul>")
+				.append(nobilisData.limitExamples.map((limit) => {
+					return $("<li></li>").html(limit);
+				}))
+			),
+		"Limit Examples"
+	);
+	
+	let limitSection = factory.startSection("Limits", "h4").addClass("lookslikelink")
+		.click(() => (limitExamples.show()));
+	
+	UI.addHoverInfo(
+		limitSection,
+		$(nobilisData.limitDescriptionText).css("font-weight", "initial")
+	);
+	
+	factory.attachList("limits", createLimit, {min: 0, max:10});
+	
 	factory.startSection("Bonds and Anchors", "h3");
 	
 	let anchors = factory.attachTextArea("anchors");

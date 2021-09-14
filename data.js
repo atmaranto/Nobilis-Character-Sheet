@@ -343,4 +343,18 @@
 			]
 		},
 	];
+	
+	nobilisData.limitDescriptionText = "<p>Limits are constant restrictions to your features and abilities. They grand character points upon acquisition rather than any miracle points" +
+									   " during play; they are assumed to always affect your character. For instance, you might be hated in your Chancel, despite having a high Realm, or" +
+									   " you might be unable to fully control your Anchors, forcing you to work with them more as equals. Click for more examples.</p>";
+	nobilisData.limitExamples = [
+		
+	];
+	
+	nobilisData.restrictionDescriptionText = "<p><b>Restrictions</b> are handicaps that grand miracle points when they come up as a problem during play. For instance, if you are unable to" +
+											 " enter a house uninvited and <i>really</i> need to get in somewhere, you might get a few miracle points for being bound to the restriction. Click" +
+											 " for more examples.</p>";
+	nobilisData.restrictionExamples = [
+		
+	];
 })(this)

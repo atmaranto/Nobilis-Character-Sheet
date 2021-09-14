@@ -9,7 +9,8 @@ div#sheet {
 	border: 1px solid black;
 	margin-top: 10px;
 	padding: 10px;
-	max-width: 100%;
+	/* max-width: 100%; */
+	max-width: 1000px;
 }
 
 /* General settings */
@@ -77,6 +78,8 @@ div.hoverinfo > * {
 	width: auto;
 	height: auto;
 	background: white;
+	font-size: initial;
+	text-align: left;
 }
 
 /* Miracle point stuff */
