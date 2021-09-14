@@ -56,6 +56,12 @@ table.miracletable, table.miracletable th, table.miracletable td {
 	text-decoration: underline;
 }
 
+/* Wound level stuff */
+
+table.woundleveltable, table.woundleveltable td, table.woundleveltable th {
+	border: 1px solid black;
+}
+
 /* Hover Info */
 
 div.hoverinfo > * {

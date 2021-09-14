@@ -504,7 +504,7 @@ $(document).ready(() => {
 	UI.addHoverInfo(
 		anchors.prev(),
 		$("<p><b>Anchors</b> are mortals (typically humans) who Nobles have made into their allies by the Rite of Servitude. They will loyally serve<br />" +
-		  "their Soverign's cause, even if it works against the Noble they serve. Anchors can only be created through bonds of Love or Hate.</p>")
+		  "their Soverign's cause, even if they work against the Noble they serve. Anchors can only be created through bonds of Love or Hate.</p>")
 	);
 	
 	let updateAnchorMax = () => {
@@ -517,6 +517,92 @@ $(document).ready(() => {
 	factory.attachTextArea("bondAllocation");
 	
 	factory.startSection("Wound Levels", "h3");
+	
+	factory.attachParagraph("You have the following wound levels:");
+	let woundLevelTable = $("<table class='woundleveltable'></table>");
+	
+	let surfaceWoundExplanation = $("<p>Surface wound levels are the lowest level of wound, and the last one lost. It doesn't take much to damage a character with only</br>" +
+									"these left: unless they have a gift that protects them, even a knife or a claw could cause a surface wound.</p>").css("font-weight", "normal");
+	let seriousWoundExplanation = $("<p>Serious wound levels are the second wound level to be lost. You'd need a gun or the equivalent of a large claw to serious injure</br>" +
+									"a player enough to give them a serious wound.</p>").css("font-weight", "normal");
+	let deadlyWoundExplanation = $("<p>Deadly wound levels are the highest level of wound and the first to be lost. This means that, until you've taken at least one \"deadly\"</br>" +
+								   "blow, you <b>cannot</b> be damaged by anything less serious. That is, until you lose your deadly wound levels, you can't lose any other wound<br />" +
+								   "levels, so your threshold for damage is \"deadly\".</p>").css("font-weight", "normal");
+	
+	// Note: The UI.addHoverInfo doesn't seem to work with the headers, for some reason.
+	let woundLevelHeader = $("<tr><th></th></tr>")
+		.append(
+			UI.addHoverInfo(
+				$("<th>Surface Wound Levels</th>"),
+				surfaceWoundExplanation
+			)
+		).append(
+			UI.addHoverInfo(
+				$("<th>Serious Wound Levels</th>"),
+				seriousWoundExplanation
+			)
+		).append(
+			UI.addHoverInfo(
+				$("<th>Deadly Wound Levels</th>"),
+				deadlyWoundExplanation
+			)
+		)
+		.appendTo(woundLevelTable);
+	let woundLevelRow = $("<tr><th>Maximum</th><td></td><td></td><td></td></tr>").appendTo(woundLevelTable);
+	//let remainingWoundsRow = $("<tr><th>Current</th><td></td><td></td><td></td></tr>").appendTo(woundLevelTable);
+	
+	let surfaceWoundSlider = factory.attachSlider("surfaceWounds", "Surface Wounds Remaining", {min: 0, max: 5}, 0)
+			.addClass("surfaceWounds wounds");
+	UI.addHoverInfo(surfaceWoundSlider.parent(), surfaceWoundExplanation);
+	let seriousWoundSlider = factory.attachSlider("seriousWounds", "Serious Wounds Remaining", {min: 0, max: 5}, 0)
+			.addClass("seriousWounds wounds");
+	UI.addHoverInfo(seriousWoundSlider.parent(), seriousWoundExplanation);
+	let deadlyWoundSlider = factory.attachSlider("deadlyWounds", "Deadly Wounds Remaining", {min: 0, max: 5}, 0)
+			.addClass("deadlyWounds wounds");
+	UI.addHoverInfo(deadlyWoundSlider.parent(), deadlyWoundExplanation);
+	
+	let recalculateWoundLevels = () => {
+		let woundValue = parseInt(aspectSlider.val()) + 4;
+		
+		let deadlyLevels = 0;
+		let seriousLevels = 0;
+		let surfaceLevels = 0;
+		
+		while(true) {
+			surfaceLevels++;
+			woundValue--;
+			
+			if(woundValue <= 0) break;
+			
+			seriousLevels++;
+			woundValue--;
+			
+			if(woundValue <= 0) break;
+			
+			deadlyLevels++;
+			woundValue--;
+			
+			if(woundValue <= 0) break;
+		}
+		
+		woundLevelRow.children().first().next()
+			.text(surfaceLevels.toString()).next()
+			.text(seriousLevels.toString()).next()
+			.text(deadlyLevels.toString());
+		
+		surfaceWoundSlider.prop("max", surfaceLevels.toString());
+		seriousWoundSlider.prop("max", seriousLevels.toString());
+		deadlyWoundSlider.prop("max", deadlyLevels.toString());
+		
+		surfaceWoundSlider.val(Math.min(parseInt(surfaceWoundSlider.val()), surfaceLevels)).trigger("input");
+		seriousWoundSlider.val(Math.min(parseInt(seriousWoundSlider.val()), seriousLevels)).trigger("input");
+		deadlyWoundSlider.val(Math.min(parseInt(deadlyWoundSlider.val()), deadlyLevels)).trigger("input");
+	};
+	
+	factory.attachStandalone(woundLevelTable);
+	
+	aspectSlider.on("input", recalculateWoundLevels);
+	recalculateWoundLevels();
 	
 	factory.startSection("Chancel and Imperator Details", "h3");
 	factory.attachTextArea("chancelInformation");
