@@ -18,8 +18,12 @@ div#sheet {
 	user-select: none;
 }
 
-.secretnoselect {
+.secretnoselect  {
 	user-select: none;
+}
+
+.secretnoselect span, .secretnoselect p, .secretnoselect label,
+span.secretnoselect, p.secretnoselect, label.secretnoselect {
 	cursor: text;
 }
 
