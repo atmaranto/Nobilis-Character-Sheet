@@ -527,9 +527,9 @@ $(document).ready(() => {
 	
 	UI.addHoverInfo(
 		anchors.prev(),
-		$("<p><b>Anchors</b> are mortals (typically humans) who Nobles have made into their allies by the Rite of Servitude. They will loyally serve<br />" +
-		  "their Soverign's cause, even if they work against the Noble they serve. Anchors can only be created through bonds of Love or Hate.<br />" +
-		  "You can have a number of them equal to your Spirit + 1.</p>")
+		$("<p><b>Anchors</b> are mortals (typically humans) who Nobles have made into their allies by the Rite of Servitude. They will loyally serve" +
+		  " their Soverign's cause, even if they work against the Noble they serve. Anchors can only be created through bonds of Love or Hate." +
+		  " You can have a number of them equal to your Spirit + 1.</p>")
 	);
 	
 	let updateAnchorMax = () => {
@@ -539,7 +539,15 @@ $(document).ready(() => {
 	spiritSlider.on("input", updateAnchorMax);
 	updateAnchorMax();
 	
-	factory.attachTextArea("bondAllocation");
+	let bondAllocation = factory.attachTextArea("bondAllocation");
+	
+	UI.addHoverInfo(
+		bondAllocation.prev(),
+		$("<p>You have <b>twenty points</b> that you must split up amongst those things that are important to you. This determines how much it hurts when those" +
+		  " things are stolen, altered, or destroyed. Some examples might include loved ones (spouses, children, parents), the sanctity of your Estate (how well or" +
+		  " poorly-regarded it is, or how well it is kept), an important friendship or rivalry, or any objects that are important to you. Many of your Bonds will" +
+		  " probably be allocated more than one point; just make sure the allocation is proportional to the importance.</p>")
+	);
 	
 	factory.startSection("Wound Levels", "h3");
 	

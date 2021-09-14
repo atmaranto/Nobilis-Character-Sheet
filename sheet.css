@@ -70,6 +70,7 @@ table.woundleveltable, table.woundleveltable td, table.woundleveltable th {
 /* Hover Info */
 
 div.hoverinfo > * {
+	max-width: 900px;
 	position: absolute;
 	z-index: 4;
 	border: 1px solid black;
