@@ -1,7 +1,11 @@
 # Nobilis Character Sheet
  A character sheet for the game "Nobilis" that can be viewed in conventional browsers. It's specifically meant for a slightly altered version of 2e.
  
- ## Changes from Standard 2E
+## To-Do
+ - Add titles for the various levels of Aspect, Domain, Realm, and Spirit
+ - Add a sticky sidebar that allows jumping to any section (maybe as an editor function -- Editor.createTableOfContents?) 
+ 
+## Changes from Standard 2E
   - Rather than granting a MP, limits grant a CP. I thought this would add a bit of flexibility. I might regret it.
   - I incorporated the Estate Properties feature, which I believe is only found in 3e. It seemed nice.
 
