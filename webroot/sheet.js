@@ -66,6 +66,9 @@ let initializeSheet = (window, sheetID) => {
 				_s += result;
 			}
 		});
+		$(".limitCPs").each((index, item) => {
+			_s -= parseInt($(item).val());
+		});
 		
 		let attributeSum = $("#attributeSum")
 			.html("").text(_s.toString() + " character points");
@@ -299,8 +302,8 @@ let initializeSheet = (window, sheetID) => {
 		"Estate Properties Info"
 	);
 	
-	let createDomainSection = (i) => {
-		let thisObject = {};
+	let createDomainSection = (i, thisObject) => {
+		thisObject = thisObject || {};
 		
 		let attributeFactory = new UI.EditorFactory(thisObject);
 		let section;
@@ -406,8 +409,6 @@ let initializeSheet = (window, sheetID) => {
 	};
 	
 	factory.attachList("domains", createDomainSection, {min: 1, max: 5});
-	
-	
 	
 	factory.startSection("Wound Levels and Aspect Miracles", "h3");
 	
@@ -536,8 +537,8 @@ let initializeSheet = (window, sheetID) => {
 		"Gift Miracle Examples"
 	);
 	
-	let createGiftSection = (i) => {
-		let gift = {};
+	let createGiftSection = (i, gift) => {
+		gift = gift || {};
 		let giftFactory = new UI.EditorFactory(gift);
 		
 		giftFactory.attachText("giftName", "Gift Name");
@@ -661,8 +662,8 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.startSection("Character Traits", "h3");
 	
-	let createRestriction = (i) => {
-		let object = {};
+	let createRestriction = (i, object) => {
+		object = object || {};
 		
 		let localFactory = new UI.EditorFactory(object);
 		
@@ -699,8 +700,8 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.attachList("restrictions", createRestriction, {min: 0, max:10});
 	
-	let createLimit = (i) => {
-		let object = {};
+	let createLimit = (i, object) => {
+		object = object || {};
 		
 		let localFactory = new UI.EditorFactory(object);
 		
@@ -709,7 +710,8 @@ let initializeSheet = (window, sheetID) => {
 		UI.addHoverInfo(
 			localFactory.attachSlider("cps", "Character Points Granted", {min: 1, max: 5}),
 			$("<p>This is the number of miracle points granted by your Limit when you took it.</p>")
-		);
+		).addClass("limitCPs").on("input change", attributeUpdate);
+		
 		
 		localFactory.attachTextArea("description");
 		
@@ -737,8 +739,8 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.attachList("limits", createLimit, {min: 0, max:10});
 	
-	let createVirtue = (i) => {
-		let object = {};
+	let createVirtue = (i, object) => {
+		object = object || {};
 		
 		let localFactory = new UI.EditorFactory(object);
 		

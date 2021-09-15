@@ -349,10 +349,13 @@
 				UI.settings.addTracker(trackSettingsValue, check);
 			}
 			
+			if(this.object[name] !== undefined) {
+				$(select).prop("selectedIndex", this.object[name]);
+			}
+			
 			utils.attachInput(select, (select, set) => {
-				console.log(select, set);
-				if(set != undefined) {
-					var i;
+				if(set !== undefined) {
+					let i;
 					for(i = 0; i < select.options.length; i++) {
 						if(select.options[i].value == set) {
 							break;
@@ -409,12 +412,12 @@
 				list.find(".editorevents").trigger("checkdisabled");
 			};
 			
-			let addItem = (i) => {
+			let addItem = (i, object) => {
 				i = i || itemHolder.children().length;
 				if(attributes.max && i >= attributes.max) return;
 				
 				let wrapper = $("<table class='editoritem'></table>");
-				let returnedItem = constructItem(i);
+				let returnedItem = constructItem(i, object);
 				let returnedObject = null;
 				if(returnedItem.object !== undefined) {
 					returnedObject = returnedItem.object;
@@ -457,7 +460,13 @@
 				updateButtons();
 			};
 			
-			for(let i = 0; i < (attributes.min || 0); i++) {
+			let i = 0;
+			this.object[property].forEach((item) => {
+				addItem(i, item);
+				i++;
+			});
+			
+			for(; i < (attributes.min || 0); i++) {
 				addItem(i);
 			}
 			
@@ -473,6 +482,7 @@
 		
 		attachCheckbox: function(property, title, current) {
 			current = current === undefined ? false : current;
+			if(this.object[current] !== undefined) current = this.object[current];
 			let holder = utils.createSmartBooleanInput(property, current, title);
 			
 			let label = $(holder.children[0]);
@@ -480,7 +490,7 @@
 			let row = this.add(label);
 			
 			utils.attachInput(
-				checkbox, "value", this.object, property, undefined, undefined,
+				checkbox, "checked", this.object, property, undefined, undefined,
 				current, undefined
 			);
 			
