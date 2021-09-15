@@ -449,7 +449,7 @@ let initializeSheet = (window, sheetID) => {
 	factory.attachStandalone(
 		$("<p>Wound levels are calculated by dividing (Aspect + 4) amongst Surface, Serious, and Deadly levels,<br />" +
 		  "prioritizing less major wounds when allocating extra points. The system should automatically use<br />" +
-		  "your Aspect to calculate your wound levels for you.</p>").css("font-style", "italic"));
+		  "your Aspect to calculate your maximum wound levels for you.</p>").css("font-style", "italic"));
 	
 	let surfaceWoundSlider = factory.attachSlider("surfaceWounds", "Surface Wounds Remaining", {min: 0, max: 5}, 0)
 			.addClass("surfaceWounds wounds");
@@ -499,6 +499,7 @@ let initializeSheet = (window, sheetID) => {
 		deadlyWoundSlider.val(Math.min(parseInt(deadlyWoundSlider.val()), deadlyLevels)).trigger("input");
 	};
 	
+	factory.attachStandalone($("<p>Maximum wound levels:</p>"));
 	factory.attachStandalone(woundLevelTable);
 	
 	aspectSlider.on("input", recalculateWoundLevels);
