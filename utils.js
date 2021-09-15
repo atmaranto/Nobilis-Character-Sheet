@@ -499,6 +499,20 @@
 		evt.stopPropagation();
 	}
 	
+	utils.getParameters = () => {
+		let params = {};
+		
+		window.location.search
+			.substring(1)
+			.split("&")
+			.forEach((parameter) => {
+				let eq = parameter.indexOf("=");
+				params[parameter.substring(0, eq)] = parameter.substring(eq + 1);
+			});
+		
+		return params;
+	};
+	
 	if(this.exports) {
 		this.exports = utils;
 	}

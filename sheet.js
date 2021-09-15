@@ -1,10 +1,12 @@
-$(document).ready(() => {
+let initializeSheet = (window, sheetID) => {
 	console.log("Loading...");
 	
 	let container = $("#container");
 	let sheet = container.html("")
 		.append(
 			"<button id='openSettings' onclick='UI.createSettingsWindow().show()'>Open Settings</button>" +
+			"<button id='saveSheet' onclick='window.saveSheet()'>Save Sheet</button>" +
+			"<p id='saveStatus'></p>" +
 			"<br />"
 		)
 		.append(
@@ -12,12 +14,26 @@ $(document).ready(() => {
 		)
 		.children().last();
 	
-	let characteristics = window.characteristics = {
-		aspect: 2,
-		domain: 2,
-		realm: 2,
-		spirit: 1
+	let characteristics = window.characteristics;
+	
+	window.saveSheet = () => {
+		$("#saveSheet").attr("disabled", true);
+		
+		$.ajax("/api/saveSheetData?id=" + encodeURIComponent(sheetID))
+			.done((data, text, xhr) => {
+				$("#saveStatus").text("Successfully saved sheet.");
+				
+				setTimeout(() => ($("#saveStatus").text("")), 5000);
+			})
+			.fail((xhr, text, err) => {
+				console.error(err);
+				$("#saveStatus").text("Error saving sheet: " + text);
+			})
+			.always(() => {
+				$("#saveSheet").removeAttr("disabled");
+			});
 	};
+	
 	let factory = new UI.EditorFactory(characteristics);
 	
 	factory.startSection("Nobilis Character", "h2");
@@ -815,4 +831,23 @@ $(document).ready(() => {
 	sheet.append(factory.create());
 	
 	console.log("Loaded.");
-});
+};
+
+(() => {
+	let parameters = utils.getParameters();
+	
+	if(parameters.id === undefined) {
+		$("#container").addClass("uhoh").text("No id parameter found (ask Tony what this means)");
+	}
+	else {
+		$.ajax("/api/sheetData?id=" + encodeURIComponent(parameters.id))
+			.done((data, text, xhr) => {
+				window.characteristics = data;
+				initializeSheet(this, parameters.id);
+			})
+			.fail((xhr, text, err) => {
+				console.error(err);
+				$("#container").addClass("uhoh").text("Failed to request sheet data: " + text);
+			});
+	}
+})();
