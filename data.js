@@ -222,6 +222,189 @@
 		}
 	};
 	
+	nobilisData.aspectMiracles = {
+		"data": [
+			{
+				"level": -1,
+				"name": "generalRules",
+				"label": "General Rules for Aspect-Driven Miracles",
+				"text": "Some general guidelines for Aspect-Drive miracles:<br />" +
+						"<ul>" +
+							"<li>Aspect <b>cannot</b>, for instance:<br />" +
+							"<ul>" +
+								"<li>Silence a gun</li>" +
+								"<li>Shroud an area in darkness</li>" +
+								"<li>Make a painting one can walk through</li>" +
+								"<li>Grow a tree from an acorn</li>" +
+								"<li>Provide \"magical\" healing to others</li>" +
+								"<li>Put a new sun in the sky</li>" +
+								"<li>Provoke social influence among Powers</li>" +
+								"<li>Change history</li>" +
+							"</ul></li>" +
+							"<li>In general, Aspect enables Powers to do things with their body and mind. These things can be superhuman, but they cannot inherently be outside of" + 
+							" the scope of their body and mind.</li>" +
+						"</ul>"
+			},
+			{
+				"level": 0,
+				"name": "peakPerformance",
+				"label": "Peak Performance",
+				"text":	"Humans often have bad days. Powers, however, can choose to forsake bad days. With an Aspect 0 miracle, a Power can make the most of thier natural, unmiraculous abilities. Using an" +
+						 " level-0 Aspect miracle instead of an unmiraculous action ensures you perform to the best of your abilities."
+			},
+			{
+				"level": 0,
+				"name": "theSight",
+				"label": "The Sight",
+				"text":	"Powers possess a mythic \"Sight\" that enables them to identify others of their kind as Nobilis, magical objects as magical, Anchors as Anchors, Imperators as Imperators, Excrucians" +
+						" as Excrucians, and so on. It will also give them a vague idea about the nature of a Soverign or object. For instance, they might see the rising sun behind the Soverign of Dawn. Turning" +
+						" the Sight on is a level-0 Aspect miracle. It can be turned off at will. Powers Afflicted with the Code of the Wild can also detect pivotal choices or stolen freedoms, even through walls." +
+						" Without a Gift, however, this is an unreliable ability."
+			},
+			{
+				"level": 1,
+				"name": "highHumanLevel",
+				"label": "High-Human Level",
+				"text":	"Level-1 Aspect miracles lie within the potential of very competent humans. This includes athletic ability, up to the level of bronze-medal Olympians.",
+				"examples": [
+					"Running through a forest in perfect silence.",
+					"Performing a Judo throw on a demon.",
+					"Catching arrows.",
+					"Computing cube roots in one's head.",
+					"Remembering being born.",
+					"Very sharp senses."
+				]
+			},
+			{
+				"level": 2,
+				"name": "worldRecordPerformance",
+				"label": "World-Record Performance",
+				"text": "Level-2 Aspect miracles lie at most a <i>tiny</i> bit above the ability of the greatest mundane humans, including setting world records, solving moderate sets of linear equations instantly, and" +
+						" so on. Humans descended from an Imperator and idiot savants can erform one or two miracles of this level regularly, but no other humans can. At best, it might be something a level-1 performer" +
+						" could hope to do once or twice..",
+				"examples": [
+					"Running soundlessly through a forest with a thorn in one's foot.",
+					"Exactly measuring distances by eye.",
+					"Remembering anything you've ever heard."
+				]
+			},
+			{
+				"level": 2,
+				"name": "guising",
+				"label": "Guising",
+				"text": "Level-2 Aspect miracles also enable \"Guising\", a form of shapeshifting that all Powers possess. This allows a Power to make themselves more suitable for their environment without losing thier" +
+						" selfness. The Power using the Guising does not choose thier form; they take on a shape suited to the local population. Further, their shape" +
+						" reflects their natural appearance as much as possible - unlike some Gifts, Guising alone cannot disguise a Power from those who know of its existence. The Sight sees directly through a Guise." +
+						" Physical laws, however, reflect the Guise.<br />Powers can Guise as animals, but only if those animals are the highest life form in the vicinity.",
+				"examples": [
+					"A stately and august Power could adopt the form of a Chinesse mandarin in China, an African business potentate in Nigeria, a regal Jotun in Jotunheim, a squid person in a Chancel" +
+					" where squids are the dominant species, or a shark undersea.",
+					"A power marooned far from land might Guise into a fish or a bird. No Power likes to rely on this hope."
+				]
+			},
+			{
+				"level": 3,
+				"name": "improbablyFeats",
+				"label": "Improbably Feats",
+				"text": "Level-3 Aspect miracles are physically possible, but unreasonable for a normal human to even attempt. This includes things such as standing on eight fingertips, skeet shooting" +
+						" while surfing, running on fencetops, or punching through steel, and equivalent mental feats.",
+				"examples": [
+					"Outcomputing a Pentium processor.",
+					"Posing for a magazine without needing retouching.",
+					"Shattering rocks with a blow.",
+					"Inventing new martial art styles with a certainty of success."
+				]
+			},
+			{
+				"level": 4,
+				"name": "veryImprobablyFeats",
+				"label": "Very Improbably Feats",
+				"text": "Level-4 Aspect miracles straddle the border of physical impossbility: things like throwing a motorcycle and standing on two fingertips; outcomputing a supercomputer or singing both" +
+						" halve of a duet. In general, if there's any chance a human could have once accomplished it - and humans have apparently bounced cannonballs - it can be done with a level-4 Aspect" +
+						" miracle.",
+				"examples": [
+					"Analyzing complex moral situations precisely.",
+					"Throwing a motorcycle or a small car.",
+					"Running on the heads of a crowd.",
+					"Tracking someone by scent."
+				]
+			},
+			{
+				"level": 5,
+				"name": "featsImpossibleForHumans",
+				"label": "Feats Impossible for Humans",
+				"text": "Level-5 Aspect miracles are not physically possible for humans, but might approximate the abilities of animals or machines; they give capabilities possessed by non-human mundane inhabitants of Earth." +
+						" Birds can fly, so an enormous gliding leap is a level-5 Aspect miracle. Cats are fast, so this level includes inhuman speed. Characters that aren't human can do appropriate things a bit better:" +
+						" for example, winged characters, even without an appropriate Gift, can fly as a level-5 miracle.",
+				"examples": [
+					"Catching bullets",
+					"Archery at 200 feet"
+				]
+			},
+			{
+				"level": 6,
+				"name": "universallyImprobableFeats",
+				"label": "Universally Improbable Feats",
+				"text":	"Level-6 Aspect miracles do not fit any of the levels above but remain bounded by reason and rational constraints. It's a level-6 Aspect miracle if you can imagine someone doing it without magic. It is," +
+						" for example, physically impossible to lift a mountain, because the chunks would break off in one's hands. However, at this level, one can lift a weight that is as heavy as a mountain.",
+				"examples": [
+					"Crushing granite to powder.",
+					"Running at Mach 3.",
+					"Writing a thick novel overnight.",
+					"Memorizing everything ever written.",
+					"Defeating an army in single combat, one-by-one.",
+					"Reconciling quantum mechanics and general relativity."
+				]
+			},
+			{
+				"level": 7,
+				"name": "impossibleForAnyoneLocal",
+				"label": "Impossible Feats (Local effects)",
+				"text":	"Level-7 Aspect miracles are epic in scope. They can be truly impossible, such as drinking a pond, but they must remain easy to conceptualize. Level 7 is additionally limited in that it cannot affect" +
+						" vast areas. These miracles feed on the character's personal energies, and their effects dwindle more than a few miles away. The Power cannot blow down an army, but they could kock down thousands with " +
+						" a breath. At this level, the Power invoking the miracle can show absolute and total mastery of any skill of any sort, and they are able to solve even theoretically unsolvable problems.",
+				"examples": [
+					"Taking down a blimp with a thrown hatpin.",
+					"Taking down a blimp with a thrown courthouse.",
+					"Swallowing elephants.",
+					"Shouting loud enough to kill."
+				]
+			},
+			{
+				"level": 8,
+				"name": "impossibleForAnyone",
+				"label": "Impossible Feats (Non-local effects)",
+				"text": "Level-8 Aspect miracles are also epic, nearly impossible, and can affect huge sweeps of territory. This level is for shouts that deafen countries, for lifting mountains, and for stomping the Earth hard enough" +
+						" to activate the San Andreas fault. This is the penultimate miracle level, and the miracles must still bea easy to imagine, but their potential power is enormous.",
+				"examples": [
+					"Jumping between continents",
+					"Shooting down the sun",
+					"Drinking a lake",
+					"Swallowing cities"
+				]
+			},
+			{
+				"level": 9,
+				"name": "fabled",
+				"label": "Fabled Feats",
+				"text": "Level-9 Aspect miracles can do anything else allowed by Aspect.",
+				"examples": [
+					"Intimidating all the males in a crowd aged 12-20, selectively.",
+					"Writing a song that is truly irresistably catchy.",
+					"Hiding a mountain in your shirt."
+				]
+			}
+		],
+		
+		"attributeMargins": {
+			"simple": 0,
+			"normal": 1,
+			"hard": 2,
+			"deep": 4,
+			"wordOfCommand": 8
+		}
+	};
+	
 	nobilisData.miracleDifficulties = {
 		"simple": {"cost": 0, "name": "Simple", "description": "These miracles require no effort from you; just your miraculous action."},
 		"normal": {"cost": 1, "name": "Normal", "description": "These miracles require a bit of effort: (C) (A)MP and your miraculous action."},
@@ -344,7 +527,7 @@
 		},
 	];
 	
-	nobilisData.limitDescriptionText = "<p>Limits are constant restrictions to your features and abilities. They grand character points upon acquisition rather than any miracle points" +
+	nobilisData.limitDescriptionText = "<p><b>Limits</b> are constant restrictions to your features and abilities. They grand character points upon acquisition rather than any miracle points" +
 									   " during play; they are assumed to always affect your character. For instance, you might be hated in your Chancel, despite having a high Realm, or" +
 									   " you might be unable to fully control your Anchors, forcing you to work with them more as equals. Click for more examples.</p>";
 	nobilisData.limitExamples = [

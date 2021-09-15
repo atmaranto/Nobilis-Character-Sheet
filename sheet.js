@@ -625,7 +625,7 @@ $(document).ready(() => {
 		  " probably be allocated more than one point; just make sure the allocation is proportional to the importance.</p>")
 	);
 	
-	factory.startSection("Wound Levels", "h3");
+	factory.startSection("Wound Levels and Aspect Miracles", "h3");
 	
 	// factory.attachParagraph("You have the following wound levels:");
 	let woundLevelTable = $("<table class='woundleveltable'></table>");
@@ -717,6 +717,14 @@ $(document).ready(() => {
 	
 	aspectSlider.on("input", recalculateWoundLevels);
 	recalculateWoundLevels();
+	
+	factory.attachParagraph("Aspect miracle table:");
+	
+	let aspectMiracleTable = $("<table></table>");
+	let updateAspectTable = createAttributeMiracleTable("aspect", aspectSlider, aspectMiracleTable);
+	factory.attachStandalone(aspectMiracleTable);
+	
+	updateAspectTable();
 	
 	factory.startSection("Chancel and Imperator Details", "h3");
 	factory.attachTextArea("chancelInformation");
