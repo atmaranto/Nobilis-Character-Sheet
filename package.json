@@ -1,0 +1,23 @@
+{
+  "name": "nobilis-character-sheet",
+  "version": "1.0.0",
+  "description": "A character sheet for Nobilis, version 2.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atmaranto/Nobilis-Character-Sheet.git"
+  },
+  "author": "Anthony Maranto",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atmaranto/Nobilis-Character-Sheet/issues"
+  },
+  "homepage": "https://github.com/atmaranto/Nobilis-Character-Sheet#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^6.0.5"
+  }
+}
