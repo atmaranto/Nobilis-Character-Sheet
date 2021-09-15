@@ -299,7 +299,7 @@
 				"examples": [
 					"A stately and august Power could adopt the form of a Chinesse mandarin in China, an African business potentate in Nigeria, a regal Jotun in Jotunheim, a squid person in a Chancel" +
 					" where squids are the dominant species, or a shark undersea.",
-					"A power marooned far from land might Guise into a fish or a bird. No Power likes to rely on this hope."
+					"A Power marooned far from land might Guise into a fish or a bird. No Power likes to rely on this hope."
 				]
 			},
 			{
@@ -701,14 +701,13 @@
 		"<b>Manifestation</b> <i>1-2 points</i> - The character possesses a vulnerability to things conceptually opposed to their Estate. For example, the Domaina of Illusions might be" +
 		" unable to affect any who do not believe in him; the Domina of Fire might find water and suffocation as far more dangerous.",
 		"<b>Unseen</b> <i>2 points</i> - You must maintain your anonymity at all times. If anyone outside of your Imperator, your Familia, and your Anchors discovers your identity, you" +
-		" lose 1MP. If you voluntarily reveal your identity, you lose 3MP. You can only suffer this lost once per story."
+		" lose 1MP. If you voluntarily reveal your identity, you lose 3MP. You can only suffer this loss once per story."
 	];
 	
-	nobilisData.restrictionDescriptionText = "<p><b>Restrictions</b> are handicaps that grand miracle points when they come up as a problem during play. For instance, if you are unable to" +
-											 " enter a house uninvited and <i>really</i> need to get in somewhere, you might get a few miracle points for being bound to the restriction. Click" +
-											 " for more examples.</p>";
+	nobilisData.restrictionDescriptionText = "<p><b>Restrictions</b> are handicaps that grant miracle points when they come up as a problem during play. For instance, if you are unable to" +
+											 " enter a house uninvited and <i>really</i> need to get in somewhere, you might get a few miracle points for being bound to the restriction.</p>";
 	nobilisData.restrictionExamples = [
-		"<b>Blatant</b> - Cannot use inobvious miracles",
+		"<b>Blatant</b> - Cannot use inobvious miracles.",
 		"<b>Cigarette Bond</b> - The character is bound to befriend anyone with whom they share a smoke, and cannot resist the offer of a cigarette." +
 		" Yields 1MP when binding the character to a nice Power, 2MP when binding them to a hostile Power, and 3MP when binding them to an Excrucian.",
 		"<b>Doomed</b> - Some horrible fait awaits the character, and their odds of avoiding it are small. When their doom comes nigh, they gain 3MP" +
