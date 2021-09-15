@@ -635,7 +635,7 @@ $(document).ready(() => {
 	
 	factory.attachList("gifts", createGiftSection, {min: 0, max: 5});
 	
-	factory.startSection("Handicaps", "h3");
+	factory.startSection("Character Traits", "h3");
 	
 	let createRestriction = (i) => {
 		let object = {};
@@ -713,6 +713,69 @@ $(document).ready(() => {
 	
 	factory.attachList("limits", createLimit, {min: 0, max:10});
 	
+	let createVirtue = (i) => {
+		let object = {};
+		
+		let localFactory = new UI.EditorFactory(object);
+		
+		localFactory.attachText("virtueName");
+		localFactory.attachTextArea("description");
+		
+		return {"element": localFactory.create().css("padding", "10px").css("padding-left", "30px").css("border", "1px dotted grey"), "object": object};
+	};
+	
+	let virtueExamples = new UI.ElementWindow(
+		$("<div></div>").html(nobilisData.virtueDescriptionTextExtended)
+			.append($("<p>Four benefits of Virtues:</p>"))
+			.append($("<ul></ul>")
+				.append(nobilisData.virtueBenefits.map((virtue) => {
+					return $("<li></li>").html(virtue);
+				}))
+			),
+		"Virtue Examples"
+	);
+	
+	let virtueSection = factory.startSection("Virtues", "h4").addClass("lookslikelink")
+		.click(() => (virtueExamples.show()));
+	
+	UI.addHoverInfo(
+		virtueSection,
+		$(nobilisData.virtueDescriptionText).css("font-weight", "initial")
+	);
+	
+	factory.attachList("virtues", createVirtue, {min: 0, max:10});
+	
+	UI.addHoverInfo(
+		factory.startSection("Affiliation", "h4"),
+		$("<p><b>Affiliations</b> are a character's code of ethics. Think of them like alignments.</p>").css("font-weight", "initial")
+	)
+	
+	let affiliationPicker = factory.attachSelection(
+		"affiliation",
+		"Your Affiliation:",
+		["Not Selected", ...nobilisData.affiliations.map((affiliation) => (affiliation.name))]
+	);
+	let affiliationNotSelected = "Affiliation not selected";
+	let affiliationDescription = $("<p></p>").html(affiliationNotSelected);
+	
+	affiliationPicker.on("input change", () => {
+		let index = $(affiliationPicker).prop("selectedIndex");
+		if(index == 0) {
+			$(affiliationDescription).html(affiliationNotSelected);
+		}
+		else {
+			let affiliation = nobilisData.affiliations[index - 1];
+			$(affiliationDescription).html(affiliation.name)
+				.append(
+					$("<ul></ul>").append(
+						affiliation.principles.map((principle) => ($("<li>" + principle + "</li>")))
+					)
+				);
+		}
+	});
+	
+	factory.addStandalone(affiliationDescription);
+	
 	factory.startSection("Bonds and Anchors", "h3");
 	
 	let anchors = factory.attachTextArea("anchors");
@@ -746,11 +809,8 @@ $(document).ready(() => {
 	factory.attachTextArea("chancelInformation");
 	factory.attachTextArea("imperatorInformation");
 	
-	/* Future Section Ideas
-	
-	Gift Cost Calculator tab (or window? probably a window.)
-	
-	*/
+	factory.startSection("Other Character Details");
+	factory.attachTextArea("genericCharacterDetails", "Anything else you want to add");
 	
 	sheet.append(factory.create());
 	

@@ -350,9 +350,10 @@
 			}
 			
 			utils.attachInput(select, (select, set) => {
+				console.log(select, set);
 				if(set != undefined) {
 					var i;
-					for(var i = 0; i < select.options.length; i++) {
+					for(i = 0; i < select.options.length; i++) {
 						if(select.options[i].value == set) {
 							break;
 						}
@@ -365,6 +366,8 @@
 					select.selectedIndex = i;
 					return;
 				}
+				
+				return select.selectedIndex;
 			}, this.object, name, undefined, "onchange");
 			
 			return $(select);

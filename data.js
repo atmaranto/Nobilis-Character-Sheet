@@ -630,7 +630,7 @@
 			]
 		},
 		{
-			"estate": "Death",
+			"estate": "Death, differently",
 			"bonds": [
 				"Death cuts things short (4 points)",
 				"Death comes suddenly (2 points)",
@@ -708,15 +708,79 @@
 											 " enter a house uninvited and <i>really</i> need to get in somewhere, you might get a few miracle points for being bound to the restriction. Click" +
 											 " for more examples.</p>";
 	nobilisData.restrictionExamples = [
-		"Cannot enter buildings without an invitation",
-		"Must sleep with a virgin the night before performing miracles",
 		"<b>Blatant</b> - Cannot use inobvious miracles",
-		"Cannot kill",
-		"Cannot cross running water",
 		"<b>Cigarette Bond</b> - The character is bound to befriend anyone with whom they share a smoke, and cannot resist the offer of a cigarette." +
 		" Yields 1MP when binding the character to a nice Power, 2MP when binding them to a hostile Power, and 3MP when binding them to an Excrucian.",
 		"<b>Doomed</b> - Some horrible fait awaits the character, and their odds of avoiding it are small. When their doom comes nigh, they gain 3MP" +
 		" to provide them with a last-ditch opportunity to avoid their fate.",
+		"<b>Summonable</b> - A character can be sumoned with appropriate magic, regardless of if they wish to heed the summons. This is worth 1MP" +
+		" when it comes up during play, and 2MP if the character cannot cross an unbroken pentagram (or the like) so that the summoner can hold them.",
+		"Cannot enter buildings without an invitation",
+		"Must sleep with a virgin the night before performing miracles",
+		"Cannot kill",
+		"Cannot cross running water",
 		"Hated by Animals"
+	];
+	
+	nobilisData.virtueDescriptionText = "<p><b>Virtues</b> are immutible aspects of a Noble's character and the code they follow. There are not many absolutes with humanity, but the divine part of" +
+										" a Noble's soul that goes beyond humanity can result in a Virtue. Unlike lowercase \"virtues\" in humans, a noble with a Virtue <i>cannot</i> perform any" +
+										" action that would violate it. Any virtue or vice may be selected as a Virtue, but characters are only recommended to take one.</p>";
+	nobilisData.virtueDescriptionTextExtended = nobilisData.virtueDescriptionText.substring(0, nobilisData.virtueDescriptionText.indexOf("</p>")) +
+												" Even trickery cannot overcome a Virtue; a Virtuously Honest character cannot be tricked into telling a lie. Someone with" +
+												" the Virtue \"Faith\" cannot lose their faith, even if subjected to all the tortures of Hell.</p>";
+	nobilisData.virtueBenefits = [
+		"Nothing can force or trick you into doing something against your Virtue, although you are not <i>guaranteed</i> the ability to actively pursue it.",
+		"Characters with a Virtue have an uncanny sense of the \"virtuous\" alternative in a given situation.",
+		"A character can spend one Spirit Miracle Point to make their Virtue immediately obvious to all onlookers.",
+		"When the Virtue gets the character into <i>horrible</i> trouble, they receive a miracle point."
+	];
+	
+	nobilisData.affiliations = [
+		{
+			"name": "Code of the Angels",
+			"principles": [
+				"Beauty is the highest principle.",
+				"Justice is a form of beauty.",
+				"Lesser beings should respect their betters."
+			]
+		},
+		{
+			"name": "Code of the Fallen Angels",
+			"principles": [
+				"Corruption is the highest principle.",
+				"Suffering is a form of corruption.",
+				"Power justifies itself."
+			]
+		},
+		{
+			"name": "Code of the Light",
+			"principles": [
+				"Humanity must live, and live forever.",
+				"What must be done ought be done cleanly.",
+				"Humans must be protected, particularly from themselves."
+			]
+		},
+		{
+			"name": "Code of the Dark",
+			"principles": [
+				"Humanity should destroy themselves, individually.",
+				"Humanity should destroy itself, collectively, except for a few toys.",
+				"Ugliness to human eyes shows that one is worthy."
+			]
+		},
+		{
+			"name": "Code of the Wild",
+			"principles": [
+				"Freedom is the highest principle.",
+				"Sanity and mundanity are prisons.",
+				"Give in ind with a gift received."
+			]
+		},
+		{
+			"name": "Other (Write down in character description)",
+			"principles": [
+				"Choose this option if you work with your HG to create a custom Affiliation for your character."
+			]
+		}
 	];
 })(this)
