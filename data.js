@@ -404,13 +404,170 @@
 			"wordOfCommand": 8
 		}
 	};
+	nobilisData.realmMiracles = {
+		"data": [
+			{
+				"level": -1,
+				"name": "generalRules",
+				"label": "General Rules for Realm-Driven Miracles",
+				"text": "Some general guidelines for Domain-Drive miracles:<br />" +
+						"<ul>" +
+							"<li>Realm miracles can <b>only affect things inside your Chancel</b><br />" +
+							"<li>Realm miracles are like Domain miracles in which <i>everything</i> inside your Chancel is part of your Estate<br />" +
+							"<ul>" +
+								"<li>Up to 10 tons of material</li>" +
+								"<li>One square mile of territory</li>" +
+								"<li>One typical instance of the relevant Estate</li>" +
+							"</ul></li>" +
+							"<li>Lesser miracles are not mundane, but they create relatively mundane things, with limited miraculous properties. Anything on an \"epic\" scale typically requires a major" +
+							" miracle.</li>" +
+							"<li>A miracle of any level <b>can be combined with other miracles of its level or lower</b>, as long as it remains a single conceptual action.</li>" +
+							"<li>Unlike Domain miracles, Realm miracles do not require extra RMPs to be used at a distance.</li>" +
+							"<li>Powers cannot be directly targetted by Realm miracles, except by themselves.</li>" +
+						"</ul>"
+			},
+			{
+				"level": 0,
+				"name": "realmDrivenDivinations",
+				"label": "Realm-Driven Divinations",
+				"text":	"Level-0 miracles, Realm-Driven Divinations, tell you about threat or damage to your Chancel. The life and inanimate things of your Chancel will cry out, and you will feel their pain" +
+						" unless you are concentrating intensely on other matters."
+			},
+			{
+				"level": 1,
+				"name": "ghostMiracles",
+				"label": "Ghost Miracles",
+				"text":	"Level-1 miracles summon \"ghosts\" of nearly anything within one's Chancel. Examples include ghostly fires with a little bit of heat and ghostly sunlight that can illuinate a book." +
+						" These miracles, also known as <b>cantrips</b>, are not true illusions. They are partially transparent to the" +
+						" Sight, and even a mortal can sometimes tell that they are only seemings. Characters can use them to make their environment a little more comfortable.<br />" +
+						"They are also the weapon of choice for formal Noble duels: two Nobles will try to best one another using only ghostly miracles that cause no real harm but that show a shimmaring image" +
+						" of what they could accomplish.",
+				"examples": [
+					"(Music) Make an instrument sound better.",
+					"(Forests) Make a \"ghost clearing\" for more comfortable sleep.",
+					"(Storms) Make a day seem gloomier.",
+					"(Night) Decorate a bedroom with little glowing \"stars\".",
+					"(Emotion) Make someone calm sound angry.",
+					"(Roads) Make a trail that doesn't go anywhere important.",
+					"(Books) Fill a shelf with boring textbooks on nothing of note."
+				]
+			},
+			{
+				"level": 2,
+				"name": "lesserDivinations",
+				"label": "Lesser Divinations",
+				"text": "Level-2 miracles give one mundane information things within their Chancel. The biggest limitation of Lesser Divinations of Realm is that the Power must know <i>what</i> they are interested" +
+						" in before they can divine it.",
+				"examples": [
+					"Know just about any mundane thing in your chancel, assuming you know what to ask."
+				]
+			},
+			{
+				"level": 3,
+				"name": "lesserPreservations",
+				"label": "Lesser Preservations",
+				"text": "Level-3 miracles can ward and preserve anything within the character's Chancel. If the protected items leaves the Chancel, the Power must maintain the ward with miracle points," +
+						" or its benefits end. The highest benefits that can be conferred with a Lesser Preservation on a creature is Durant, which is simple damage immunity. However, these protections" +
+						" fade quickly once the creature leaves the Chancel, and they do not come back automatically upon their return.",
+				"examples": [
+					"Ward a creature from damage, at least while they remain in your Chancel."
+				]
+			},
+			{
+				"level": 4,
+				"name": "lesserCreations",
+				"label": "Lesser Creations",
+				"text": "Level-4 miracles can create almost anytihng within one's Realm. However, large-scale creations such as mountains, hurricanes, and armies are beyond the normal scope of a single level-4" +
+						" Realm miracle. These things can be built slowly from such miracles - ten soldiers, one boulder, or a stormcloud at a time. Level-4 miracles can also create items lacking certain normal" +
+						" properties. However, unlike Domain miracles, <b>these miracles can only create physical things</b>. Additionally, Realm-based creation <b>cannot create anything that could not somehow be" +
+						" created within the Chancel without the use of a miracle</b>. This excludes most items of true power (unless purchased during Chancel creation), and it certainly excludes Nobilis.</b>" +
+						"Finally, things created with Realm miracles fade upon leaving the Chancel unless they are sustained with RMPs. If they depend upon magic or technology that only work within the Realm, they" +
+						" will not function on Earth, sustained or no.",
+				"examples": [
+					"Make just about anything... as long as it stays within your Chancel."
+				]
+			},
+			{
+				"level": 5,
+				"name": "lesserDestructions",
+				"label": "Lesser Destructions",
+				"text": "Level-5 miracles can remove any mundane object or property of a mundane object from your Chancel.",
+				"examples": [
+					"Destroy that mosquito that keeps buzzing around you; smite it into oblivion!"
+				]
+			},
+			{
+				"level": 5,
+				"name": "majorDivinations",
+				"label": "Major Divinations",
+				"text": "Level-5 miracles include major Divinations, which can \"see\" or \"hear\" anything that occurs within your Chancel, look into its past, or peer cloudily into its future.",
+				"examples": [
+					"Spy on your friends!"
+				]
+			},
+			{
+				"level": 6,
+				"name": "lesserChanges",
+				"label": "Lesser Changes",
+				"text":	"Level-6 miracles can adjust just about anything minor or change just about any circumstance.",
+				"examples": [
+					"Make your chair <i>slightly</i> higher so it stops hurting your back.<br />Until it leaves the Chancel, of course."
+				]
+			},
+			{
+				"level": 6,
+				"name": "majorPreservations",
+				"label": "Major Preservations",
+				"text": "Level-6 miracles can make any person or thing effectively Immortal while they're within the confines of your Realm. Again, this fades quickly once they leave.",
+				"examples": [
+					"Stop worrying about those bloody assassination attempts by making your skin harder than steel."
+				]
+			},
+			{
+				"level": 7,
+				"name": "majorCreations",
+				"label": "Major Creations",
+				"text":	"Level-7 miracles can create nearly anything within one's Chancel, within the normal limits of a Realm-based Creation miracle. And, of course, they cannot create Nobilis or anything like that." +
+						" Don't try to cheat.",
+				"examples": [
+					"Create a mountain directly over the mosquito assassin's guild."
+				]
+			},
+			{
+				"level": 8,
+				"name": "majorDestructions",
+				"label": "Major Destructions",
+				"text": "Level-8 miracles can destroy just about anything within one's Chancel.",
+				"examples": [
+					"Destroy the mosquito assassin's guild so utterly, it's like it never existed in the first place."
+				]
+			},
+			{
+				"level": 9,
+				"name": "majorChanges",
+				"label": "Major Changes",
+				"text": "Level-9 miracles, Major Changes, can do anything else within a character's Realm, following the other rules regarding miracles of Realm.",
+				"examples": [
+					"<h2>PHENOMINAL COSMIC POWER</h2> <span style='font-size: 8px'>itty-bitty living space</span>."
+				]
+			}
+		],
+		
+		"attributeMargins": {
+			"simple": 0,
+			"normal": 1,
+			"hard": 2,
+			"deep": 4,
+			"wordOfCommand": 8
+		}
+	};
 	
 	nobilisData.miracleDifficulties = {
 		"simple": {"cost": 0, "name": "Simple", "description": "These miracles require no effort from you; just your miraculous action."},
 		"normal": {"cost": 1, "name": "Normal", "description": "These miracles require a bit of effort: (C) (A)MP and your miraculous action."},
 		"hard": {"cost": 2, "name": "Hard", "description": "These miracles require a fair bit of effort: (C) (A)MP and your miraculous action."},
 		"deep": {"cost": 4, "name": "Deep", "description": "These miracles require a lot of effort: (C) (A)MP and your miraculous action."},
-		"wordOfCommand": {"cost": 8, "name": "Word of Command", "description": "These are the rarest and most difficult of miracles. You may only cast them at the cost of (C) (A)MP, your miraculous action, and a grievous wound."},
+		"wordOfCommand": {"cost": 8, "name": "Word of Command", "description": "These are the rarest and most difficult of miracles. You may only cast them at the cost of (C) (A)MP, your miraculous action, and a grievous wound."}
 	};
 	
 	nobilisData.giftMiracleExamples = [
