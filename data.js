@@ -348,13 +348,35 @@
 									   " during play; they are assumed to always affect your character. For instance, you might be hated in your Chancel, despite having a high Realm, or" +
 									   " you might be unable to fully control your Anchors, forcing you to work with them more as equals. Click for more examples.</p>";
 	nobilisData.limitExamples = [
-		
+		"<b>Dead</b> <i>3 points</i> - The PC is dead or otherwise bodiless and can only act through their Anchors. They can create new Anchors using an established Anchor's blood or" +
+		" tear. If they lose all of their Anchors, however, they fade away. Acting through their anchors means they must pay additional SMP to cast Aspect miracles.",
+		"<b>Disabled</b> <i>1-2 points</i> - The PC is disabled in some way. They could be blind, lame, one-handed, psychotic, etc. In this way, their Aspect-based abilities are" +
+		" limited. A minor disability like anosmia (inability to smell) might grant 1CP, but more major disabilities like blindness might grant 2CP.",
+		"<b>Focus</b> <i>1 point per 3 cp invested</i> - This is a very common limit. Some of the Power's abilities (attribute levels, miracle points, Gifts, etc.) are bound in a" +
+		" physical object. If this Focus leaves its owner's hands, whoever takes it gains the abilities brought through it.",
+		"<b>Hated</b> <i>1 per point of Realm level</i> - The Power is not well-loved by their Chancel. Armed rebellion is unlikely, particularly if there are non-Hated PCs, but" +
+		" distrust and conspiracy surround the Chancel when this Power is concerned.",
+		"<b>Light Touch</b> <i>1 per point of Spirit level</i> - The Power cannot directly control their Anchors and cannot use any miracles through their Anchors without their consent." +
+		" The goodwill of a Power's Anchors becomes very important, and an uncooporative Anchor can be much more frustrating.",
+		"<b>Manifestation</b> <i>1-2 points</i> - The character possesses a vulnerability to things conceptually opposed to their Estate. For example, the Domaina of Illusions might be" +
+		" unable to affect any who do not believe in him; the Domina of Fire might find water and suffocation as far more dangerous.",
+		"<b>Unseen</b> <i>2 points</i> - You must maintain your anonymity at all times. If anyone outside of your Imperator, your Familia, and your Anchors discovers your identity, you" +
+		" lose 1MP. If you voluntarily reveal your identity, you lose 3MP. You can only suffer this lost once per story."
 	];
 	
 	nobilisData.restrictionDescriptionText = "<p><b>Restrictions</b> are handicaps that grand miracle points when they come up as a problem during play. For instance, if you are unable to" +
 											 " enter a house uninvited and <i>really</i> need to get in somewhere, you might get a few miracle points for being bound to the restriction. Click" +
 											 " for more examples.</p>";
 	nobilisData.restrictionExamples = [
-		
+		"Cannot enter buildings without an invitation",
+		"Must sleep with a virgin the night before performing miracles",
+		"<b>Blatant</b> - Cannot use inobvious miracles",
+		"Cannot kill",
+		"Cannot cross running water",
+		"<b>Cigarette Bond</b> - The character is bound to befriend anyone with whom they share a smoke, and cannot resist the offer of a cigarette." +
+		" Yields 1MP when binding the character to a nice Power, 2MP when binding them to a hostile Power, and 3MP when binding them to an Excrucian.",
+		"<b>Doomed</b> - Some horrible fait awaits the character, and their odds of avoiding it are small. When their doom comes nigh, they gain 3MP" +
+		" to provide them with a last-ditch opportunity to avoid their fate.",
+		"Hated by Animals"
 	];
 })(this)
