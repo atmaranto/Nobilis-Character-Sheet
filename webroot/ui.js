@@ -308,7 +308,16 @@
 				(text || utils.capitalize(name)) + "</label>"
 			).addClass('secretnoselect');
 			
-			var select = $(utils.createSmartSelection(name, values, values[0])).children().last();
+			let defaultSelected = 0;
+			if(this.object[name] !== undefined) {
+				defaultSelected = this.object[name]
+			}
+			else {
+				this.object[name] = defaultSelected;
+			}
+			defaultSelected = values[defaultSelected];
+			
+			var select = $(utils.createSmartSelection(name, values, defaultSelected)).children().last();
 			select.attr("id", "select"+rnd);
 			utils.applyAttrs(select, attrs);
 			
@@ -349,21 +358,20 @@
 				UI.settings.addTracker(trackSettingsValue, check);
 			}
 			
-			if(this.object[name] !== undefined) {
-				$(select).prop("selectedIndex", this.object[name]);
-			}
-			
 			utils.attachInput(select, (select, set) => {
 				if(set !== undefined) {
-					let i;
-					for(i = 0; i < select.options.length; i++) {
-						if(select.options[i].value == set) {
-							break;
-						}
-					}
+					let i = set;
 					
-					if(i >= select.options.length) {
-						i = 0;
+					if(typeof set === "string") {
+						for(i = 0; i < select.options.length; i++) {
+							if(select.options[i].value == set) {
+								break;
+							}
+						}
+						
+						if(i >= select.options.length) {
+							i = 0;
+						}
 					}
 					
 					select.selectedIndex = i;
@@ -424,7 +432,9 @@
 					returnedItem = returnedItem.element;
 				}
 				
-				this.object[property].push(returnedObject);
+				if(this.object[property].indexOf(returnedObject) == -1) {
+					this.object[property].push(returnedObject);
+				}
 				
 				let checkDisabled = function() {
 					if($(returnedItem).find(".unremovable").length > 0 || (attributes.min && itemHolder.children().length == attributes.min)) {

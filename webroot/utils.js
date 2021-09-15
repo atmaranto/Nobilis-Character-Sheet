@@ -202,7 +202,7 @@
 		if(cast == undefined) cast = utils.identity;
 		
 		//Try to set the initial value for the input to the current object value
-		if(defaultValue != undefined) {
+		if(defaultValue !== undefined) {
 			if(typeof value == "function") value(inputElement, defaultValue);
 			else $(inputElement).prop(value, defaultValue).trigger("input");
 			if(object[key] === undefined) object[key] = defaultValue;
