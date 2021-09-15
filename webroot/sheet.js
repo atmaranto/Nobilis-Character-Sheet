@@ -19,7 +19,15 @@ let initializeSheet = (window, sheetID) => {
 	window.saveSheet = () => {
 		$("#saveSheet").attr("disabled", true);
 		
-		$.ajax("/api/saveSheetData?id=" + encodeURIComponent(sheetID))
+		$.ajax({
+			"url": "/api/sheetData?id=" + encodeURIComponent(sheetID),
+			"data": JSON.stringify(characteristics),
+			"method": "PUT",
+			//"dataType": "text"
+			"headers": {
+				"Content-Type": "text/plain"
+			}
+		})
 			.done((data, text, xhr) => {
 				$("#saveStatus").text("Successfully saved sheet.");
 				
@@ -790,7 +798,7 @@ let initializeSheet = (window, sheetID) => {
 		}
 	});
 	
-	factory.addStandalone(affiliationDescription);
+	factory.attachStandalone(affiliationDescription);
 	
 	factory.startSection("Bonds and Anchors", "h3");
 	
@@ -833,21 +841,23 @@ let initializeSheet = (window, sheetID) => {
 	console.log("Loaded.");
 };
 
-(() => {
+((window) => {
 	let parameters = utils.getParameters();
 	
 	if(parameters.id === undefined) {
-		$("#container").addClass("uhoh").text("No id parameter found (ask Tony what this means)");
+		$(document).ready(() => {
+			$("#container").addClass("uhoh").text("No id parameter found (ask Tony what this means)");
+		});
 	}
 	else {
 		$.ajax("/api/sheetData?id=" + encodeURIComponent(parameters.id))
 			.done((data, text, xhr) => {
 				window.characteristics = data;
-				initializeSheet(this, parameters.id);
+				initializeSheet(window, parameters.id);
 			})
 			.fail((xhr, text, err) => {
 				console.error(err);
 				$("#container").addClass("uhoh").text("Failed to request sheet data: " + text);
 			});
 	}
-})();
+})(this);

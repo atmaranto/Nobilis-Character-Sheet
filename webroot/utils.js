@@ -205,6 +205,7 @@
 		if(defaultValue != undefined) {
 			if(typeof value == "function") value(inputElement, defaultValue);
 			else $(inputElement).prop(value, defaultValue).trigger("input");
+			if(object[key] === undefined) object[key] = defaultValue;
 		}
 		
 		if(event.startsWith("on")) event = event.substring(2);
@@ -507,6 +508,7 @@
 			.split("&")
 			.forEach((parameter) => {
 				let eq = parameter.indexOf("=");
+				if(eq == -1) return;
 				params[parameter.substring(0, eq)] = parameter.substring(eq + 1);
 			});
 		
