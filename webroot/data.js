@@ -773,7 +773,7 @@
 			"principles": [
 				"Freedom is the highest principle.",
 				"Sanity and mundanity are prisons.",
-				"Give in ind with a gift received."
+				"Give in kind with a gift received."
 			]
 		},
 		{

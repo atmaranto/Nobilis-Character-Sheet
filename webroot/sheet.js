@@ -50,6 +50,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	let attributeUpdate = () => {
 		let _s = 0;
+		let max = 25;
 		
 		$(".attribute").each((index, item) => {
 			_s += parseInt($(item).val()) * 3;
@@ -67,18 +68,18 @@ let initializeSheet = (window, sheetID) => {
 			}
 		});
 		$(".limitCPs").each((index, item) => {
-			_s -= parseInt($(item).val());
+			max += parseInt($(item).val());
 		});
 		
 		let attributeSum = $("#attributeSum")
 			.html("").text(_s.toString() + " character points");
 		
-		if(_s > 25) {
+		if(_s > max) {
 			attributeSum.append(
 				$("<span></span>")
 					.css("color", "red")
 					.css("text-style", "italic")
-					.text(" (above maximum of 25 points by " + (_s - 25).toString() + ", only possible with Limits)")
+					.text(" (above maximum of " + max.toString() + " points by " + (_s - max).toString() + ", only possible by adding more Limits)")
 			);
 		}
 	};
@@ -784,7 +785,7 @@ let initializeSheet = (window, sheetID) => {
 	let affiliationNotSelected = "Affiliation not selected";
 	let affiliationDescription = $("<p></p>").html(affiliationNotSelected);
 	
-	affiliationPicker.on("input change", () => {
+	let updateAffiliation = () => {
 		let index = $(affiliationPicker).prop("selectedIndex");
 		if(index == 0) {
 			$(affiliationDescription).html(affiliationNotSelected);
@@ -798,7 +799,10 @@ let initializeSheet = (window, sheetID) => {
 					)
 				);
 		}
-	});
+	};
+	
+	affiliationPicker.on("input change", updateAffiliation);
+	updateAffiliation();
 	
 	factory.attachStandalone(affiliationDescription);
 	
