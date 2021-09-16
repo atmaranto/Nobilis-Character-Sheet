@@ -813,8 +813,48 @@
 		},
 		{
 			"name": "Exemplar",
-			"description": "Yu blur the line between rule over your Domain and your own personal power. You integrate divine essence and use it to the utmost extent. Your fists can split mountains;" +
+			"description": "Yuu blur the line between rule over your Domain and your own personal power. You integrate divine essence and use it to the utmost extent. Your fists can split mountains;" +
 						   " your breath can blow away armies; you can wound the sun with an arrow. Please don't."
+		},
+		{
+			"name": "Imperial",
+			"description": "How did you pick this?"
+		},
+		{
+			"name": "Imperial",
+			"description": "How did you pick this?"
+		}
+	];
+	
+	nobilisData.domainLevels = [
+		{
+			"name": "Pawn, or Crippled Domain",
+			"description": "You do not command your Estate; it commands <i>you</i>. Well, not literally, but you have to spend DMPs to get it to do <i>anything</i>. The term \"Pawn\" is typically" +
+						   " an insult (although some do wear it with pride). This might be a sign of a lack of trust by your Imperator."
+		},
+		{
+			"name": "Baronet, or Weak Domain",
+			"description": "You have basic mastery over your Estate, and you can work a miracle or two on occasion. You're generally a person (human?) first and a symbol of your Estate a distant second."
+		},
+		{
+			"name": "Viscount, or Minor Domain",
+			"description": "Your Domain serves you well. Miracles of comfort and divination come readily. With effort, you can work more interesting marvels. You also appear brightly in the Sight."
+		},
+		{
+			"name": "Marchessa, or Forceful Domain",
+			"description": "The Forceful Domain holds the power of perpetuation: you can Preserve elements of your estate as a simple miracle (see Domain miracles). Marchessas deal with strengthening" +
+						   " states of being."
+		},
+		{
+			"name": "Duchess, or Masterful Domain",
+			"description": "You have immersed yourself deeply in the mysteries of your Estate. Even in mortal eyes, unless you are deeply Guised, your nature is obvious. A man who sees the Duke of" +
+						   " Famine will remember him not by his eyes but by the sense of human hunger and suffering that hangs in the air about him. You never lack in magics; to mortals, your powers" +
+						   " will often seem godlike."
+		},
+		{
+			"name": "Regal, or Majestic Domain",
+			"description": "Regals aren't always the most well-regarded of Powers, but they <i>are</i> the truest representations of their Domains. You are a living god of what you stand for. You are" +
+						   " a force of nature; an aspect of the world. You might perform feats worthy of the Creator."
 		},
 		{
 			"name": "Imperial",
