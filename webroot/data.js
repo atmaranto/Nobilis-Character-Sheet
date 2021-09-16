@@ -866,4 +866,95 @@
 			"description": "How did you pick this?"
 		}
 	];
+	
+	nobilisData.realmLevels = [
+		{
+			"name": "Citizen",
+			"description": "You have almost no gift of rule. You are a mere and mundane (if powerful) citizen of your Chancel. You may have an official title, and you may have dominion over other citizens," +
+						   " but you lack the resources to shape your Chancel directly. Other Noblilis rarely respect you. You might have a... <i>lively</i> time carrying out your duties in your Chancel, as" +
+						   " you'll be a normal human for most of them.<br />" +
+						   "<b>\"Oh,\" he said, and shrugged. \"I can't do any particular magic here...\"<br />" +
+						   "\"Then why do they call you King?\"<br />" +
+						   " - from Lady of the Plague, by Emily Chen</b>"
+		},
+		{
+			"name": "Radiant",
+			"description": "You have the first hints of control over your Chancel. Your reign extens to ghosts and fragmentary forces - not the sun, but traces of light; not the fire, but traces of heat;" + 
+						   " not frigid ice, but hints of cold. You are called Radiant because you are tied not to your Chancel's essence but to its surface condition."
+		},
+		{
+			"name": "Realm's Heart",
+			"description": "You are better able to keep hold on your Chancel. It takes you a thought to learn anything you wish about events and situations, or about its mundane inhabitants. If you" +
+						   " routinely \"patrol\" your Chancel, you will discover most threats to your home early. Almost all Nobilis respect you enough to be polite, and you have a decent home field" +
+						   " advantage. Finally, you are always aware of what is happening at the mystic Heart of your Chancel. You are forever a part of this place."
+		},
+		{
+			"name": "Warden",
+			"description": "It's dangerous to fight a Warden on their own ground. You have the power of Preservations, and you can magically reinforce your armies and lands against assault. You are rooted" +
+						   " firmly in your Chancel, at least in a spiritual sense."
+		},
+		{
+			"name": "True King or Queen",
+			"description": "You are so powerful in your domain, you might even hold off an Imperator or an unsharded Excrucian within your home. Your power is as potent as a Duke's and as versitile as you" +
+						   " can imagine. You are almost universally respected, if not liked, by other Nobles. You are personally responsible for much of the way your Chancel works. This level of power is" +
+						   " appropraite for some Nobles born and raised in their Chancels."
+		},
+		{
+			"name": "Tempest",
+			"description": "You have mastered not only the powers of Creation within your chancel, but those of Destruction as well. Walking into a Tempest's Chancel is the most fearsome danger an enemy can" +
+						   " face. Even Excrucians wilt as the thought of trying to break a Chancel with such a guardian in it. Imperators themselves typically have this level of Realm, although they can be" +
+						   " distracted by an attack in the Spirit World; <i>you</i> cannot be."
+		},
+		{
+			"name": "Imperial",
+			"description": "How did you pick this?"
+		},
+		{
+			"name": "Imperial",
+			"description": "How did you pick this?"
+		}
+	];
+	
+	nobilisData.spiritLevels = [
+		{
+			"name": "Candleflame",
+			"description": "You burn softly. You might be strong-hearted and willful, but your soul is still relentlessly mundane. Your divine soul-shard does not have a firm anchor, leaving your humanity" +
+						   " alone to fill the hole. You have no innate defenses against magical assault."
+		},
+		{
+			"name": "Heartfire",
+			"description": "Hearthfires are those whose company is most comfortable. You have enough presence to be felt in the room, but not enough to burn. You can be looked at without shock; heard without" + 
+						   " an inherent desire to obey. You have some synergy between your human and divine souls. You have some defenses against magical assault."
+		},
+		{
+			"name": "Incandescent Flame",
+			"description": "You have crossed a threshold, between the gift of fire and its curse, between the warmth of a hearth and a flaming arrow used in war. In the end, your passion may bring you to the" +
+						   " point of death. It may not bring you back again. Your presence is impressive, to say the least, and it would take a good disguise to hide this entirely."
+		},
+		{
+			"name": "Sunfire",
+			"description": "Your mortal soul has gained some small mastery over your <i>spiritus Dei</i>. Your obediance to your Imperator is still stong, but it has grown in you less. You are a shout of life;" +
+						   " an obvious presence. You also have some good natural defenses against magical assault."
+		},
+		{
+			"name": "Conflagration",
+			"description": "You are a Conflagration, a titanic personality so deep in selfhood that even your Anchors grow in presence and authority. Whatever traits compose your personality are augmented by" +
+						   " miraculous power. You do not change as the years go by. You are also one one of the finest practitioners of the dark arts - namely, the Nettle Rite and the Abhorrent Investment." +
+						   " This level best fits Nobles who are strong-willed and valorous."
+		},
+		{
+			"name": "Inferno",
+			"description": "The mortal spirit and divine passions locked inside you are perfectly blended and complemenatry. You can wear your Anchor's bodies as if they were your own. You have an <i>enormous</i>" +
+						   " advantage in battles with Excrucians or other powers, all other traits being equal. Your skill with ritual magics approaches that of an Imperator. Achieving this level of accomodation" +
+						   " between your mortal and divine spirit is, to most Sovereigns, one of the most desirable prospects."
+		},
+		{
+			"name": "Imperial",
+			"description": "How did you pick this?"
+		},
+		{
+			"name": "Imperial",
+			"description": "How did you pick this?"
+		}
+	];
 })(this)

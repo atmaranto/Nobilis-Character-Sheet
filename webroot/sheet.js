@@ -110,7 +110,9 @@ let initializeSheet = (window, sheetID) => {
 	};
 	
 	setupAttributeSliderDescription(aspectSlider, window.nobilisData.aspectLevels);
-	setupAttributeSliderDescription(domainSlider, window.domainData.aspectLevels);
+	setupAttributeSliderDescription(domainSlider, window.nobilisData.domainLevels);
+	setupAttributeSliderDescription(realmSlider, window.nobilisData.realmLevels);
+	setupAttributeSliderDescription(spiritSlider, window.nobilisData.spiritLevels);
 	// TODO: The other two
 	
 	factory.startSection("Miracle Points", "h3");
@@ -869,7 +871,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	if(parameters.id === undefined) {
 		$(document).ready(() => {
-			$("#container").addClass("uhoh").text("No id parameter found (ask Tony what this means)");
+			$("#container").addClass("uhoh").text("No id parameter found (consult the README -- you need to generate a character sheet first!)");
 		});
 	}
 	else {

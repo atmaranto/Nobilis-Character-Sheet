@@ -2,8 +2,8 @@
  A character sheet for the game "Nobilis" that can be viewed in conventional browsers. It's specifically meant for a slightly altered version of 2e.
  
 ## To-Do
- - Add titles for the various levels of Aspect, Domain, Realm, and Spirit
  - Add a sticky sidebar that allows jumping to any section (maybe as an editor function -- Editor.createTableOfContents?) 
+ - (Eventually) Make a more easily-configurable server system (and a more easily-configurable client-side API)
  
 ## Changes from Standard 2E
   - Rather than granting a MP, limits grant a CP. I thought this would add a bit of flexibility. I might regret it.
@@ -61,6 +61,4 @@
  This project uses NodeJS ([MIT license here](https://raw.githubusercontent.com/nodejs/node/master/LICENSE)), expressjs ([MIT license here](https://github.com/expressjs/express/blob/master/LICENSE)),
  mongoose (I don't have a link, but also the MIT license as above), and JQuery (also the [MIT license](https://tldrlegal.com/license/mit-license)).
  This game also contains snippets of text and paraphrasing from [*Nobilis: The Game of Soverign Powers*](https://www.drivethrurpg.com/product/141424/Nobilis-the-Game-of-Sovereign-Powers-2002-Edition)
- by Jenna Katerin Moran, 2002/Hogshead edition. It is my hope that this inclusion (which I did only to try to make the character sheet easier to understand) constitutes "Fair Use". If you are the
- copyright holder for this work, please send me a message on GitHub, and when I verify your identity, I'll remove the sheet immediately. I only put this on the web because I thought it might lower
- the barrier of entry for playing Nobilis.
+ by Jenna Katerin Moran, 2002/Hogshead edition. Used with permission (at least, I asked and she said it was okay to make this public, so hopefully this works).
