@@ -28,6 +28,14 @@ span.secretnoselect, p.secretnoselect, label.secretnoselect {
 	cursor: text;
 }
 
+/* Attribute titles/descriptions */
+
+.attributeTitle {
+	font-style: italic;
+	margin-top: 5px;
+	margin-left: 5px;
+}
+
 /* Miracle settings */
 
 .miracleName:hover {

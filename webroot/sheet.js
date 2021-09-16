@@ -86,7 +86,6 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.add().append($("<td><span id='attributeSum' class='secretnoselect'>Loading...</span></td>").ready(attributeUpdate));
 	
-	// TODO: Attach saving to all via function in EditorFactory
 	factory.startSection("Attributes", "h3");
 	let aspectSlider = factory.attachSlider("aspect", "<b>Aspect</b> (body and mind)", {min: 0, max: 5}, 0)
 		.addClass("attribute").on("input change", attributeUpdate);
@@ -96,6 +95,22 @@ let initializeSheet = (window, sheetID) => {
 		.addClass("attribute").on("input change", attributeUpdate);
 	let spiritSlider = factory.attachSlider("spirit", "<b>Spirit</b> (rites and Auctoritas)", {min: 0, max: 5}, 0)
 		.addClass("attribute").on("input change", attributeUpdate);
+	
+	let setupAttributeSliderDescription = (slider, data) => {
+		let title = $("<p class='attributeTitle'></p>").appendTo(slider.parent().parent());
+		let description = $("<p class='attributeDescription'></p>");
+		let updateDescription = () => {
+			let level = data[parseInt(slider.val())];
+			title.html(level.name);
+			description.html(level.description);
+		};
+		updateDescription();
+		slider.on("input change", updateDescription);
+		UI.addHoverInfo(title, description);
+	};
+	
+	setupAttributeSliderDescription(aspectSlider, window.nobilisData.aspectLevels);
+	// TODO: The other three
 	
 	factory.startSection("Miracle Points", "h3");
 	

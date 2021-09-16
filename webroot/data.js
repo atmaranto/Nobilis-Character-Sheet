@@ -782,4 +782,47 @@
 			]
 		}
 	];
+	
+	nobilisData.aspectLevels = [
+		{
+			"name": "Of Mortal Form",
+			"description": "For some Powers, their Commencement is a joy. For others, it is very much <i>not</i>. Powers with Aspect 0, by a mistake of Commencement, are of mortal form, and" +
+						   " they must use a miracle point to even bypasssimple obstacles, such as a locked door. These characters might even lose their heads in an emergency, even if their" +
+						   " player does not."
+		},
+		{
+			"name": "Metahuman",
+			"description": "You are one step beyond human, possessing formidable physical and mental faculties in every field. On occasion, you may perform wondrous feats of body and mind. This" +
+						   " is a common level taken amongst Powers who govern high, flighty, or ethereal things such as Thought, Emotion, Knowledge, or Love."
+		},
+		{
+			"name": "Legendary",
+			"description": "You compare favorably with the greatest heroes and villians of legend. You rank, without effort, among the best human savants and athletes, and you can go significantly" +
+						   " beyond human capabilities if pushed."
+		},
+		{
+			"name": "Inhuman",
+			"description": "You inhabit a body empowered by the magic that suffuses your being. You are no longer simply flesh and bone; rather, you are ether, astral energy. At this level of" +
+						   " Aspect, you have perfect self-possession, discipline, artistic ability, scientific ability, and supercomputer-like speed when solving formal problems. You are forever" +
+						   " distanced from most normal humans."
+		},
+		{
+			"name": "Celestial",
+			"description": "You are touched with divine; your essence echoes with the purest everlasting primal power, burning with an everlasting flame. You resist all efforts to addict, hypnotize," +
+						   " or psychically dominate you."
+		},
+		{
+			"name": "Exemplar",
+			"description": "Yu blur the line between rule over your Domain and your own personal power. You integrate divine essence and use it to the utmost extent. Your fists can split mountains;" +
+						   " your breath can blow away armies; you can wound the sun with an arrow. Please don't."
+		},
+		{
+			"name": "Imperial",
+			"description": "How did you pick this?"
+		},
+		{
+			"name": "Imperial",
+			"description": "How did you pick this?"
+		}
+	];
 })(this)
