@@ -26,9 +26,9 @@
  Create a configuration file in the main directory called `config.key`. Populate it with the following values:
  ```json
  {
-	"PORT": <80 or your preferred port>,
-	"CONNECT_STRING": <your MongoDB connect string>,
-	"MAX_READ_SIZE": <33554432 or another number but not really used>
+	"PORT": 80 or your preferred port,
+	"CONNECT_STRING": your MongoDB connect string,
+	"MAX_READ_SIZE": 33554432 or another number but not really used
  }
 ```
 
