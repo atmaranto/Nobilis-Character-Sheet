@@ -684,12 +684,13 @@
 		},
 	];
 	
-	nobilisData.limitDescriptionText = "<p><b>Limits</b> are constant restrictions to your features and abilities. They grand character points upon acquisition rather than any miracle points" +
-									   " during play; they are assumed to always affect your character. For instance, you might be hated in your Chancel, despite having a high Realm, or" +
-									   " you might be unable to fully control your Anchors, forcing you to work with them more as equals. Click for more examples.</p>";
+	nobilisData.limitDescriptionText = "<p><b>Limits</b> are constant restrictions to your features and abilities. They grant character points (normally permanent miracle points, but" +
+									   " we're doing this differently for now) upon acquisition rather than any miracle points during play; they are assumed to always affect your" +
+									   " character. For instance, you might be hated in your Chancel, despite having a high Realm, or you might be unable to fully control your Anchors," +
+									   " forcing you to work with them more as equals. Click for more examples.</p>";
 	nobilisData.limitExamples = [
 		"<b>Dead</b> <i>3 points</i> - The PC is dead or otherwise bodiless and can only act through their Anchors. They can create new Anchors using an established Anchor's blood or" +
-		" tear. If they lose all of their Anchors, however, they fade away. Acting through their anchors means they must pay additional SMP to cast Aspect miracles.",
+		" tears. If they lose all of their Anchors, however, they fade away. Acting through their anchors means they must pay additional SMP to cast Aspect miracles.",
 		"<b>Disabled</b> <i>1-2 points</i> - The PC is disabled in some way. They could be blind, lame, one-handed, psychotic, etc. In this way, their Aspect-based abilities are" +
 		" limited. A minor disability like anosmia (inability to smell) might grant 1CP, but more major disabilities like blindness might grant 2CP.",
 		"<b>Focus</b> <i>1 point per 3 cp invested</i> - This is a very common limit. Some of the Power's abilities (attribute levels, miracle points, Gifts, etc.) are bound in a" +

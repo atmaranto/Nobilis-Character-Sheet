@@ -110,7 +110,8 @@ let initializeSheet = (window, sheetID) => {
 	};
 	
 	setupAttributeSliderDescription(aspectSlider, window.nobilisData.aspectLevels);
-	// TODO: The other three
+	setupAttributeSliderDescription(domainSlider, window.domainData.aspectLevels);
+	// TODO: The other two
 	
 	factory.startSection("Miracle Points", "h3");
 	
