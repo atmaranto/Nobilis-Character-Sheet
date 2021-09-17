@@ -25,9 +25,9 @@
  Create a configuration file in the main directory called `config.key`. Populate it with the following values:
  ```json
  {
-	"PORT": 80 or your preferred port,
-	"CONNECT_STRING": your MongoDB connect string,
-	"MAX_READ_SIZE": 33554432 or another number but not really used
+	"PORT": 80,
+	"CONNECT_STRING": "your MongoDB connect string",
+	"MAX_READ_SIZE": 33554432
  }
 ```
 
@@ -47,7 +47,7 @@
  ```bash
  node index.js
  ```
- And the server will start up. You can then navigate to `http://localhost:<port>/` and see the fruits of your labor: an error screen. This is because you haven't created a sheet. To do so,
+ And the server will start up. You can then navigate to `http://localhost:port/` and see the fruits of your labor: an error screen. This is because you haven't created a sheet. To do so,
  run:
  ```bash
  node new_sheet.js
