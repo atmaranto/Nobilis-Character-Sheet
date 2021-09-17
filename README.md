@@ -2,7 +2,6 @@
  A character sheet for the game "Nobilis" that can be viewed in conventional browsers. It's specifically meant for a slightly altered version of 2e.
  
 ## To-Do
- - Add a sticky sidebar that allows jumping to any section (maybe as an editor function -- Editor.createTableOfContents?) 
  - (Eventually) Make a more easily-configurable server system (and a more easily-configurable client-side API)
  
 ## Changes from Standard 2E
