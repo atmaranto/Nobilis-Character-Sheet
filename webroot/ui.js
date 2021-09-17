@@ -1,3 +1,5 @@
+/* (c) 2021 Anthony Maranto */
+
 (() => {
 	window.UI = {};
 	UI = window.UI;

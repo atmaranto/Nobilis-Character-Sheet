@@ -1,3 +1,9 @@
+/* 
+(c) 2002 Jenna Katerin Moran (used with permission)
+Collected in javascript by Anthony Maranto.
+*/
+
+
 ((window) => {
 	let nobilisData = window.nobilisData = {};
 	

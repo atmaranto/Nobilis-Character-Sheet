@@ -1,4 +1,4 @@
-/* (c) 2020 Anthony Maranto*/
+/* (c) 2021 Anthony Maranto*/
 
 let initializeSheet = (window, sheetID) => {
 	console.log("Loading...");
