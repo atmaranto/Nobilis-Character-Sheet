@@ -213,6 +213,8 @@ let initializeSheet = (window, sheetID) => {
 				obj.temp.prop("max", maxTemporaryMPs);
 			});
 		}
+		
+		characteristics.tempPermSync = enableSliderSync;
 	};
 	
 	factory.attachStandalone(
@@ -221,6 +223,7 @@ let initializeSheet = (window, sheetID) => {
 				.append($("<label for='tempPermSync' class='noselect'>Enable synchronization with Permanent Miracle Points: </label>"))
 				.append(
 					$("<input id='tempPermSync' type='checkbox' />")
+						.prop("checked", characteristics.tempPermSync == true)
 						.click(() => {
 							installTempPermSync($("#tempPermSync").prop("checked"));
 						})
