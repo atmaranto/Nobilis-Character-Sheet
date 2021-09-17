@@ -56,6 +56,36 @@
  "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE". Once you have this, navigate to http://localhost:<port>/?id=AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE. Finally, you have your sheet! The settings don't
  (currently) work, but saving and loading does.
 
+# License
+ Most files I created (models/\*, index.js, new_sheet.js, new_sheet.py, and everything under webroot except data.js and images/\*) are licensed under the MIT License:
+ 
+ ```
+MIT License
+
+Copyright (c) 2020 Anthony Maranto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ ```
+ 
+ I do not hold the copyright for many of the strings in data.js; rather, they are used with permission from Jenna Katerin Moran.
+ The SVG files in webroot/images are licensed as described in the acknowledgements below.
+
 # Acknowledgements
  This project uses NodeJS ([MIT license here](https://raw.githubusercontent.com/nodejs/node/master/LICENSE)), expressjs ([MIT license here](https://github.com/expressjs/express/blob/master/LICENSE)),
  mongoose (I don't have a link, but also the MIT license as above), and JQuery (also the [MIT license](https://tldrlegal.com/license/mit-license)). Finally, the icons in the `images` directory are
