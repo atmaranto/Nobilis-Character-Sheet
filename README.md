@@ -9,8 +9,8 @@
   - I incorporated the Estate Properties feature, which I believe is only found in 3e. It seemed nice.
 
 # To Run
- The character sheet itself will work with any compatible server backend, with saving and loading mechanisms described in the first and last sections of `sheet.js` respectively. The
- packaged server system is based on Node, ExpressJS, and Mongoose. To install and run it, follow these steps:
+ The character sheet itself will work with any compatible server backend (although it may require a bit of effort to set up a compatible endpoint), with saving and loading mechanisms
+ in the first and last sections of `sheet.js` respectively. The packaged server system is based on Node, ExpressJS, and Mongoose. To install and run it, follow these steps:
  
 ### A Warning
  The default server interface is *ridiculously* basic. It doesn't even have a UI-based method to create or delete character sheets, or any method for sheet deletion at all beyond
