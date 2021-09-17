@@ -88,7 +88,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.add().append($("<td><span id='attributeSum' class='secretnoselect'>Loading...</span></td>").ready(attributeUpdate));
 	
-	factory.startSection("Attributes", "h3");
+	factory.startSection("Attributes", "h2");
 	let aspectSlider = factory.attachSlider("aspect", "<b>Aspect</b> (body and mind)", {min: 0, max: 5}, 0)
 		.addClass("attribute").on("input change", attributeUpdate);
 	let domainSlider = factory.attachSlider("domain", "<b><i>Primary</i> Domain</b> (control over Estate)", {min: 0, max: 5}, 0)
@@ -140,9 +140,9 @@ let initializeSheet = (window, sheetID) => {
 	);
 	spiritSlider.parent().prev().children().first().addClass("lookslikelink").click(() => (spiritInfoWindow.show()));
 	
-	factory.startSection("Miracle Points", "h3");
+	factory.startSection("Miracle Points", "h2");
 	
-	factory.startSection("Permanent Miracle Points", "h4");
+	factory.startSection("Permanent Miracle Points", "h3");
 	
 	let lockUnlockButton = $("<div id='lockunlockbutton' title='Lock or Unlock Permanent Miracle Points' class='unlockbutton lockunlockbutton'></div>");
 	
@@ -171,7 +171,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	lockUnlockButton.click(lockUnlockHandler);
 	
-	factory.startSection("Temporary Miracle Points", "h4");
+	factory.startSection("Temporary Miracle Points", "h3");
 	
 	let maxTemporaryMPs = 25;
 	
@@ -233,7 +233,7 @@ let initializeSheet = (window, sheetID) => {
 		)
 	);
 	
-	factory.startSection("Domains", "h3");
+	factory.startSection("Domains", "h2");
 	
 	let createAttributeMiracleTable = (attribute, slider, onComplete) => {
 		/* 
@@ -358,10 +358,10 @@ let initializeSheet = (window, sheetID) => {
 		let secondaryDomain = false;
 		
 		if(i == 0) {
-			section = attributeFactory.startSection("Primary Domain", "h4");
+			section = attributeFactory.startSection("Primary Domain", "h3");
 		}
 		else {
-			section = attributeFactory.startSection("Secondary Domain", "h4");
+			section = attributeFactory.startSection("Secondary Domain", "h3");
 			secondaryDomain = true;
 		}
 		
@@ -457,7 +457,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.attachList("domains", createDomainSection, {min: 1, max: 5});
 	
-	factory.startSection("Wound Levels and Aspect Miracles", "h3");
+	factory.startSection("Wound Levels and Aspect Miracles", "h2");
 	
 	// factory.attachParagraph("You have the following wound levels:");
 	let woundLevelTable = $("<table class='woundleveltable'></table>");
@@ -545,6 +545,17 @@ let initializeSheet = (window, sheetID) => {
 		deadlyWoundSlider.val(Math.min(parseInt(deadlyWoundSlider.val()), deadlyLevels)).trigger("input");
 	};
 	
+	let riteOfHolyFireWindow = new UI.ElementWindow(
+		$("<p></p>").html(window.nobilisData.riteOfHolyFireExplanation),
+		"Rite of Holy Fire Info"
+	);
+	
+	factory.attachCheckbox("riteOfHolyFire", "")
+		.parent().prev().children()
+		.html("Protected by <b>Rite of Holy Fire</b>")
+		.addClass("lookslikelink noselect")
+		.click(() => (riteOfHolyFireWindow.show()));
+	
 	factory.attachStandalone($("<p>Maximum wound levels:</p>"));
 	factory.attachStandalone(woundLevelTable);
 	
@@ -561,7 +572,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	updateAspectTable();
 	
-	factory.startSection("Realm Miracles", "h3");
+	factory.startSection("Realm Miracles", "h2");
 	
 	factory.attachParagraph("Realm miracle table:");
 	
@@ -573,7 +584,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	updateRealmTable();
 	
-	factory.startSection("Gifts", "h3");
+	factory.startSection("Gifts", "h2");
 	let giftMiracleExampleWindow = new UI.ElementWindow(
 		$("<p>Gift miracles could include:</p>")
 			.append(
@@ -708,7 +719,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.attachList("gifts", createGiftSection, {min: 0, max: 5});
 	
-	factory.startSection("Character Traits", "h3");
+	factory.startSection("Character Traits", "h2");
 	
 	let createRestriction = (i, object) => {
 		object = object || {};
@@ -738,7 +749,7 @@ let initializeSheet = (window, sheetID) => {
 		"Restriction Examples"
 	);
 	
-	let restrictionSection = factory.startSection("Restrictions", "h4").addClass("lookslikelink")
+	let restrictionSection = factory.startSection("Restrictions", "h3").addClass("lookslikelink")
 		.click(() => (restrictionExamples.show()));
 	
 	UI.addHoverInfo(
@@ -777,7 +788,7 @@ let initializeSheet = (window, sheetID) => {
 		"Limit Examples"
 	);
 	
-	let limitSection = factory.startSection("Limits", "h4").addClass("lookslikelink")
+	let limitSection = factory.startSection("Limits", "h3").addClass("lookslikelink")
 		.click(() => (limitExamples.show()));
 	
 	UI.addHoverInfo(
@@ -809,7 +820,7 @@ let initializeSheet = (window, sheetID) => {
 		"Virtue Examples"
 	);
 	
-	let virtueSection = factory.startSection("Virtues", "h4").addClass("lookslikelink")
+	let virtueSection = factory.startSection("Virtues", "h3").addClass("lookslikelink")
 		.click(() => (virtueExamples.show()));
 	
 	UI.addHoverInfo(
@@ -820,7 +831,7 @@ let initializeSheet = (window, sheetID) => {
 	factory.attachList("virtues", createVirtue, {min: 0, max:10});
 	
 	UI.addHoverInfo(
-		factory.startSection("Affiliation", "h4"),
+		factory.startSection("Affiliation", "h3"),
 		$("<p><b>Affiliations</b> are a character's code of ethics. Think of them like alignments.</p>").css("font-weight", "initial")
 	)
 	
@@ -853,7 +864,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.attachStandalone(affiliationDescription);
 	
-	factory.startSection("Bonds and Anchors", "h3");
+	factory.startSection("Bonds and Anchors", "h2");
 	
 	let anchors = factory.attachTextArea("anchors");
 	let anchorsMax = $("<i> (Loading...)</i>").appendTo(anchors.prev());
@@ -882,7 +893,7 @@ let initializeSheet = (window, sheetID) => {
 		  " probably be allocated more than one point; just make sure the allocation is proportional to the importance.</p>")
 	);
 	
-	factory.startSection("Chancel and Imperator Details", "h3");
+	factory.startSection("Chancel and Imperator Details", "h2");
 	factory.attachTextArea("chancelInformation");
 	factory.attachTextArea("imperatorInformation");
 	

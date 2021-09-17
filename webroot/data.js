@@ -958,6 +958,22 @@
 		}
 	];
 	
+	nobilisData.riteOfHolyFireExplanation = "This rite allows Powers to immunize themselves against mundane attacks - even major ones. It involves a full night of ritual during which the Nobilis is vulnerable," +
+											" but it protects against many different types of attacks depending on the Noble's Spirit level. Surprisingly, attacks that are more dangerous are actually easier to" +
+											" protect against, as they're more obviously an insult to the Noble's miraculous status. <b>Note that this <i>only</i> works against assault by the mundane; even a" +
+											" single Aspect 0 gunshot is sufficient to pierce this Rite, although it can defend against a non-miraculous nuclear explosion easily." +
+					"<table>" +
+						"<tr><th>Spirit Level</th><th>Lethality Protected Against</th><th>Time Before Rite Must Be Renewed</th></tr>" +
+						"<tr><td>0</td><td>Almost unsurvivable: ground zero of a nuclear explosion, loss of hull integrity on an undersea dome</td><td>One week</td></tr>" +
+						"<tr><td>1</td><td>Excessive force: tank shells, LAW rockets, massive explosions, collapsing mountainsides, etc.</td><td>Two weeks</td></tr>" +
+						"<tr><td>2</td><td>Overwhelming force: automatic gunfire, clouds of poison gas, major fires, other things requiring miracles to survive</td><td>One month</td></tr>" +
+						"<tr><td>3</td><td>Deadly force: guns, powers of non-miraculous nature spirits and monsters</td><td>Three months</td></tr>" +
+						"<tr><td>4</td><td>Natural weapons: blades, claws, fangs, and other unsophisticated weaponry</td><td>Six months</td></tr>" +
+						"<tr><td>5</td><td>Petty assault: unarmed attacks by humans and small animals, insect bites</td><td>One year</td></tr>" +
+						"<tr><td>6 (Imperators Only)</td><td>Verbal abuse: offensive language, insults, overt defiance</td><td>Five years</td></tr>" +
+						"<tr><td>7 (Imperators Only)</td><td>Social assault: starting nasty rumors, failing to show respect, omitting courtesies</td><td>Ten years</td></tr>" +
+					"</table>";
+	
 	nobilisData.attributeDescriptions = {
 		"aspect": "In general, Aspect is how refined your body and mind are. Level 0 is human, and any level above that represents some high-human or superhuman abilities, thanks to your status as a Noble." +
 				  "<ul>" +
@@ -1029,21 +1045,7 @@
 													" Excrucians.</li>" +
 					"<li><b>The Rite of Rescue</b> - An Imperator sometimes dies in a way that leaves their Powers alive, even retaining his soul shard. This is exceedingly rare, but when it transpires, one of a handful" +
 												   " of Imperators designated as \"rescuers\" adopts these Nobles as their own.</li>" +
-					"<li><b>The Rite of Holy Fire</b> - This rite allows Powers to immunize themselves against mundane attacks - even major ones. It involves a full night of ritual during which the Nobilis is vulnerable," +
-													  " and it protects against different types of attacks depending on the Noble's Spirit level. Surprisingly, attacks that are more dangerous are actually easier to" +
-													  " protect against, as they're more obviously an insult to the Noble's miraculous status. <b>Note that this <i>only</i> works against assault by the mundane; even a" +
-													  " single Aspect 0 gunshot is sufficient to pierce this Rite, although it can defend against a non-miraculous explosion easily." +
-					"<table>" +
-						"<tr><th>Spirit Level</th><th>Lethality Protected Against</th><th>Time Before Rite Must Be Renewed</th></tr>" +
-						"<tr><td>0</td><td>Almost unsurvivable: ground zero of a nuclear explosion, loss of hull integrity on an undersea dome</td><td>One week</td></tr>" +
-						"<tr><td>1</td><td>Excessive force: tank shells, LAW rockets, massive explosions, collapsing mountainsides, etc.</td><td>Two weeks</td></tr>" +
-						"<tr><td>2</td><td>Overwhelming force: automatic gunfire, clouds of poison gas, major fires, other things requiring miracles to survive</td><td>One month</td></tr>" +
-						"<tr><td>3</td><td>Deadly force: guns, powers of non-miraculous nature spirits and monsters</td><td>Three months</td></tr>" +
-						"<tr><td>4</td><td>Natural weapons: blades, claws, fangs, and other unsophisticated weaponry</td><td>Six months</td></tr>" +
-						"<tr><td>5</td><td>Petty assault: unarmed attacks by humans and small animals, insect bites</td><td>One year</td></tr>" +
-						"<tr><td>6 (Imperators Only)</td><td>Verbal abuse: offensive language, insults, overt defiance</td><td>Five years</td></tr>" +
-						"<tr><td>7 (Imperators Only)</td><td>Social assault: starting nasty rumors, failing to show respect, omitting courtesies</td><td>Ten years</td></tr>" +
-					"</table>" +
+					"<li><b>The Rite of Holy Fire</b> - " + nobilisData.riteOfHolyFireExplanation +
 					"</li>" +
 				"</ul>"
 	};

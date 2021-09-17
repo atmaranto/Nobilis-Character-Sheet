@@ -90,7 +90,7 @@
 			let settings = utils.cookie.get("settings");
 			
 			if(settings) {
-				settings = JSON.load(settings);
+				settings = JSON.parse(settings);
 				
 				let keys = Object.keys(settings);
 				for(var i = 0; i < keys.length; i++) { //Trying for-in loops

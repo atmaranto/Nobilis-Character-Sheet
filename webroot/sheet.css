@@ -58,7 +58,8 @@ a.tocItem:visited {
 	margin-left: 5px;
 }
 
-.attributeInfoWindow table, .attributeInfoWindow th, .attributeInfoWindow td {
+/* Ehh, I'll just do it for all windows */
+.windowcontent table, .windowcontent th, .windowcontent td {
 	border: 1px solid black;
 }
 
