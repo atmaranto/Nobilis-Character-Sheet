@@ -148,6 +148,8 @@
 		utils.updateCSSStyle("div.windowcontent", "max-height", value+"px");
 	});
 	
+	let _editorIDCounter = 0;
+	
 	UI.EditorFactory = function(object, containerClass, container) {
 		this.object = object;
 		
@@ -156,6 +158,10 @@
 		
 		this.container = container || $("<div></div");
 		this.container.className = containerClass || "";
+		
+		this.sections = [];
+		this.sectionAnchors = [];
+		this.editorID = _editorIDCounter++;
 	}
 	
 	UI.EditorFactory.prototype = {
@@ -198,6 +204,12 @@
 					container.append($(heading).addClass("secretnoselect"));
 				}
 			}
+			
+			let anchorID = this.editorID.toString() + "_" + this.sections.length.toString() + $(heading).text().replace(/\W/g, "");
+			container.append($("<a></a>").attr("name", anchorID));
+			
+			this.sections.push({"heading": $(heading).text(), "importance": headingStyle});
+			this.sectionAnchors.push(anchorID);
 			
 			this.fragments.push(container);
 			this.pushTable();
@@ -549,6 +561,29 @@
 			});
 			
 			return this.container.css("display", "inline");
+		},
+		
+		createTableOfContents: function() {
+			let toc = $("<div class='tableOfContents'></div>");
+			let topList = $("<ul></ul>").appendTo(toc);
+			let curList = topList;
+			let level = 0;
+			
+			for(let i = 0; i < this.sections.length; i++) {
+				let thisLevel = parseInt(this.sections[i].importance.substring(1)) - 1;
+				while(thisLevel < level) {
+					curList = curList.parent();
+					level--;
+				}
+				while(thisLevel > level) {
+					curList = $("<ul></ul>").appendTo(curList);
+					level++;
+				}
+				
+				$("<a class='tocItem'></a>").attr("href", "#" + this.sectionAnchors[i]).text(this.sections[i].heading).appendTo($("<li></li>").appendTo(curList));
+			}
+			
+			return toc.append(topList);
 		}
 	};
 	

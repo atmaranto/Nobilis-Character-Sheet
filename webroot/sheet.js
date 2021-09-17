@@ -14,7 +14,7 @@ let initializeSheet = (window, sheetID) => {
 		.append(
 			"<div id='sheet'></div>"
 		)
-		.children().last();
+		.children().last().wrap($("<div class='sheetContainer'></div>"));
 	
 	let characteristics = window.characteristics;
 	
@@ -46,7 +46,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	let factory = new UI.EditorFactory(characteristics);
 	
-	factory.startSection("Nobilis Character", "h2");
+	factory.startSection("Nobilis Character", "h1");
 	factory.attachText("characterName", "Character Name");
 	factory.attachText("playerName", "Player Name");
 	
@@ -99,7 +99,7 @@ let initializeSheet = (window, sheetID) => {
 		.addClass("attribute").on("input change", attributeUpdate);
 	
 	let setupAttributeSliderDescription = (slider, data) => {
-		let title = $("<p class='attributeTitle'></p>").appendTo(slider.parent().parent());
+		let title = $("<p class='attributeTitle noselect'></p>").appendTo(slider.parent().parent());
 		let description = $("<p class='attributeDescription'></p>");
 		let updateDescription = () => {
 			let level = data[parseInt(slider.val())];
@@ -886,9 +886,10 @@ let initializeSheet = (window, sheetID) => {
 	factory.attachTextArea("chancelInformation");
 	factory.attachTextArea("imperatorInformation");
 	
-	factory.startSection("Other Character Details");
+	factory.startSection("Other Character Details", "h2");
 	factory.attachTextArea("genericCharacterDetails", "Anything else you want to add");
 	
+	sheet.parent().append(factory.createTableOfContents());
 	sheet.append(factory.create());
 	
 	console.log("Loaded.");

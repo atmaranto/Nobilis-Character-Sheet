@@ -10,7 +10,14 @@ div#sheet {
 	margin-top: 10px;
 	padding: 10px;
 	/* max-width: 100%; */
-	max-width: 1000px;
+	min-width: 1000px;
+	flex-shrink: 0;
+}
+
+div.sheetContainer {
+	display: flex;
+	flex-direction: row;
+	align-items: baseline;
 }
 
 /* General settings */
@@ -26,6 +33,21 @@ div#sheet {
 .secretnoselect span, .secretnoselect p, .secretnoselect label,
 span.secretnoselect, p.secretnoselect, label.secretnoselect {
 	cursor: text;
+}
+
+/* Table of contents */
+
+div.tableOfContents {
+	border: 2px solid grey;
+	position: sticky;
+	top: 10px;
+	left: 10px;
+	padding: 5px;
+	background-color: #eeeeee;
+}
+
+a.tocItem:visited {
+	color: blue;
 }
 
 /* Attribute titles/descriptions */
