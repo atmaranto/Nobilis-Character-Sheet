@@ -565,6 +565,7 @@
 		
 		createTableOfContents: function() {
 			let toc = $("<div class='tableOfContents'></div>");
+			toc.append($("<p>Table of Contents</p>").css("font-weight", "bold").css("font-size", "15px"));
 			let topList = $("<ul></ul>").appendTo(toc);
 			let curList = topList;
 			let level = 0;
