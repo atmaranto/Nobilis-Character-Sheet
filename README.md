@@ -60,4 +60,4 @@
  This project uses NodeJS ([MIT license here](https://raw.githubusercontent.com/nodejs/node/master/LICENSE)), expressjs ([MIT license here](https://github.com/expressjs/express/blob/master/LICENSE)),
  mongoose (I don't have a link, but also the MIT license as above), and JQuery (also the [MIT license](https://tldrlegal.com/license/mit-license)).
  This game also contains snippets of text and paraphrasing from [*Nobilis: The Game of Soverign Powers*](https://www.drivethrurpg.com/product/141424/Nobilis-the-Game-of-Sovereign-Powers-2002-Edition)
- by Jenna Katerin Moran, 2002/Hogshead edition. Used with permission (at least, I asked and she said it was okay to make this public, so hopefully this works).
+ by Jenna Katerin Moran, 2002/Hogshead edition. Used with permission.
