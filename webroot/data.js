@@ -957,4 +957,94 @@
 			"description": "How did you pick this?"
 		}
 	];
+	
+	nobilisData.attributeDescriptions = {
+		"aspect": "In general, Aspect is how refined your body and mind are. Level 0 is human, and any level above that represents some high-human or superhuman abilities, thanks to your status as a Noble." +
+				  "<ul>" +
+				      "<li><b>The Mountain Laurel Law</b>: If a human can do something, Aspect can do it a thousand times better." +
+					  "<ul>" +
+					      "<li>Humans can jump; Aspect covers jumping over a wall.</li>" +
+					      "<li>Humans can compose; Aspect covers composing great songs.</li>" +
+					      "<li>Humans can swim; Aspect covers swimming across the Atlantic.</li>" +
+					      "<li>Humans can break things by hitting them; Aspect covers breaking hills.</li>" +
+					      "<li>Humans can make fire with tools; Aspect making fire with tools... even <b>big</b> fires.</li>" +
+					      "<li>Humans can fly with a plane; Aspect covers flying with a plane, even stunt aerobatics.</li>" +
+					      "<li>Humans can perform surgery with a surgical kit; Aspect covers performing surgery with tools... even poor tools.</li>" +
+					  "</ul>" +
+					  "</li>" +
+					  "<li><b>The Primrose Law</b>: If a mythical character can do something without magic, Aspect can do it." +
+					  "<ul>" +
+					      "<li>Hercules, Theseus, and Sherlock Holmes are low-powered examples.</li>" +
+					      "<li>Others would include heroes who rescue the sun and the moon, or the modern day redneck who shoots down a star with his trusty shotgun.</li>" +
+					      "<li>Æsculapius, the greatest human doctor who ever was, could raise the dead with lots of work. He could not, however, heal with a touch.</li>" +
+					  "</ul>" +
+					  "</li>" +
+					  "<li><b>The Nasturtium Law</b>: If it makes a good myth, and it fits Aspect's style, then Aspect can do it.</li>" +
+				  "</ul>",
+		"domain": "This is your primary domain; you may have secondary domains, which are described in the \"Domains\" section below. Your Domain is your level of control over your Estate, the concept you have" +
+				  " been tasked with governing. At level 0, it controls <i>you</i> -- you can sense danger to it, but it is slippery and difficult at best. At higher levels, you excersie greater and greater control" +
+				  " until you essentially become a living representation of your Estate.",
+		"realm":  "This represents how much control you have over your Chancel, in a divine sense. At level 0, you are nothing but an ordinary citizen with a title. At higher levels, you are esentially a god within" +
+				  " your domain. Realm is like Domain for <i>everything</i> inside your Chancel. If you want to create an army, you could perform a Major Creation of Armed Forces as a level-7 Realm miracle, even if" +
+				  " your Estate has nothing to do with \"Armed Forces.\"<br />" +
+				  "Realm also determines how well-respected you are by other Nobilis, as it is the most direct correlation with how well-defended your home is (and how well you care for it).",
+		"spirit": "Spirit represents how well-tuned your mortal and divine souls are. At level 0, you are spiritually mortal and transcient; at level 5, you have a force of personality that rivals even Imperators." +
+				  " Spirit determines your <b>Auctoritas</b>, which is how difficult it is to perform miracles within your space (a couple meters every direction). When casting a miracle, you can specify a" +
+				  " Penetration level that determines what level of Spirit you wish to affect. A Minor Creation of Fire with Penetration 2 would be able to affect the space within a Nobilis of a Spirit level two or" +
+				  " less. However, the Penetration level is added to the miracle level, so it would be effectively a level 6 miracle rather than a level 4 (which is the normal level for a Minor Creation).<br />" +
+				  "Additionally, Spirit determines your competence with the Simple Rites, rituals that invoke discrete effects:" +
+				  "<ul>" +
+					"<li><b>The Servant's Rite</b> - Claim someone you love or hate as an Anchor. You must voluntarily give them some of your blood or tears for them to ingest. They don't have to know about this.</li>" +
+					"<li><b>The Witch Hunt Rite</b> - Miracles leave traces. These traces can identify the Power that caused them, or at least their general nature. This is actually a recent innovation - only a few" +
+													 " centuries old. In essence, the Witch Hunt Rite allows one to subtract their Spirit level from the Miracle level and/or Penetration required to detect these traces.</li>" +
+					"<li><b>The Redtooth Rite</b> - Consuming a dead Power's heart captures some of their power. Capturing their Estate is forbidden (and dangerous), but this Rite can also yield a few miracle points in" +
+												   " a pinch.</li>" +
+					"<li><b>The Rite of Last Trump</b> - Through great cost and pain, a Power can move miracle points from one attribute to another. This Rite is quick, and can be combined with other actions. It requires" +
+					" that a certain number of miracle points of other types be spent for each point they wish to have of a particular attribute." +
+						"<table>" +
+							"<tr><th>Spirit Level</th><th>Miracle Points of Other Types Spent</th></tr>" +
+							"<tr><td>0-1</td><td>4</td></tr>" +
+							"<tr><td>2-3</td><td>3</td></tr>" +
+							"<tr><td>4-5</td><td>2</td></tr>" +
+							"<tr><td>6-7</td><td>1</td></tr>" +
+						"</table></li>" +
+					"<li><b>The Rite of Passage</b> - A Power looking through a broken crystal sees a faint glow in the direction of a road between worlds or a road into a Chancel. One can also perform this trick with a" +
+													" touch of brandy splashed in the eye. Even mortals can use this version, although it is not nearly as effective.</li>" +
+					"<li><b>The Nettle Rite</b> - This is the most important of the Simple Rites. It does enormous damage to the peaceful relationships among Powers, but it has quite possibly saved the world several" +
+												 " times over. It allows Powers to take away miraculous power from another Noble, Imperator, or Excrucian. The Nettler must build a channel through mundane events - by" +
+												 " taking something important to the target (one of their Bonds) and bringing it into the Nettler's control." +
+						"<ul>" +
+							"<li><b>Trivial Damage</b> would include getting a Noble's friend into a fistfight, which they lose without serious injury. It also includes killing or destroying something, as murder is a" +
+							" poor way to show control.</li>" +
+							"<li><b>Minor Damage</b> would include getting a Noble's friend sentenced to a 1-2 year prison term; something utterly humiliating to the victim, abandoning an important object in the worst" +
+							" part of town This disrupts the victim's life and makes them very unhappy, at least for the moment.</li>" +
+							"<li><b>Normal Damage</b> would include destroying a naive friend's innocence by convicing them to commit murder; giving a slow-healing victim severe burns; infesting an important object with" +
+							" psychic parasites. The nettler must spend a reasonable amount of time, and the victim's life must become a darker thing.</li>" +
+							"<li><b>Devastating Damage</b> utterly and dramatically ruins the Bond, with malicious glee, or turns it firmly against the Noble. One could subvert the spirit of an imporant person or object" +
+							" (everything has its price) and turn it against the Noble; convincing the victim's lover that they are a servant of Hell. If the effects endure for a significant time, the nettle rite succeeds.</li>" +
+						"</ul>" +
+					"</li>" +
+					"<li><b>The Rite of the Fallen</b> - Ruins a Sovereign of one's own Familia. It is not pleasant.</li>" +
+					"<li><b>The Rite of Anguish</b> - Traditionally performed by Excrucians (although Nobles can do it), this Rite drains away the power of a dead Imperator and converts it to the negative energy of the" +
+													" Excrucians.</li>" +
+					"<li><b>The Rite of Rescue</b> - An Imperator sometimes dies in a way that leaves their Powers alive, even retaining his soul shard. This is exceedingly rare, but when it transpires, one of a handful" +
+												   " of Imperators designated as \"rescuers\" adopts these Nobles as their own.</li>" +
+					"<li><b>The Rite of Holy Fire</b> - This rite allows Powers to immunize themselves against mundane attacks - even major ones. It involves a full night of ritual during which the Nobilis is vulnerable," +
+													  " and it protects against different types of attacks depending on the Noble's Spirit level. Surprisingly, attacks that are more dangerous are actually easier to" +
+													  " protect against, as they're more obviously an insult to the Noble's miraculous status. <b>Note that this <i>only</i> works against assault by the mundane; even a" +
+													  " single Aspect 0 gunshot is sufficient to pierce this Rite, although it can defend against a non-miraculous explosion easily." +
+					"<table>" +
+						"<tr><th>Spirit Level</th><th>Lethality Protected Against</th><th>Time Before Rite Must Be Renewed</th></tr>" +
+						"<tr><td>0</td><td>Almost unsurvivable: ground zero of a nuclear explosion, loss of hull integrity on an undersea dome</td><td>One week</td></tr>" +
+						"<tr><td>1</td><td>Excessive force: tank shells, LAW rockets, massive explosions, collapsing mountainsides, etc.</td><td>Two weeks</td></tr>" +
+						"<tr><td>2</td><td>Overwhelming force: automatic gunfire, clouds of poison gas, major fires, other things requiring miracles to survive</td><td>One month</td></tr>" +
+						"<tr><td>3</td><td>Deadly force: guns, powers of non-miraculous nature spirits and monsters</td><td>Three months</td></tr>" +
+						"<tr><td>4</td><td>Natural weapons: blades, claws, fangs, and other unsophisticated weaponry</td><td>Six months</td></tr>" +
+						"<tr><td>5</td><td>Petty assault: unarmed attacks by humans and small animals, insect bites</td><td>One year</td></tr>" +
+						"<tr><td>6 (Imperators Only)</td><td>Verbal abuse: offensive language, insults, overt defiance</td><td>Five years</td></tr>" +
+						"<tr><td>7 (Imperators Only)</td><td>Social assault: starting nasty rumors, failing to show respect, omitting courtesies</td><td>Ten years</td></tr>" +
+					"</table>" +
+					"</li>" +
+				"</ul>"
+	};
 })(this)

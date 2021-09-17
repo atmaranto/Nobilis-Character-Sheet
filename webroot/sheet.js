@@ -1,3 +1,5 @@
+/* (c) 2020 Anthony Maranto*/
+
 let initializeSheet = (window, sheetID) => {
 	console.log("Loading...");
 	
@@ -113,7 +115,30 @@ let initializeSheet = (window, sheetID) => {
 	setupAttributeSliderDescription(domainSlider, window.nobilisData.domainLevels);
 	setupAttributeSliderDescription(realmSlider, window.nobilisData.realmLevels);
 	setupAttributeSliderDescription(spiritSlider, window.nobilisData.spiritLevels);
-	// TODO: The other two
+	
+	let aspectInfoWindow = new UI.ElementWindow(
+		$("<p></p>").addClass("attributeInfoWindow").html(window.nobilisData.attributeDescriptions.aspect),
+		"Aspect Info"
+	);
+	aspectSlider.parent().prev().children().first().addClass("lookslikelink").click(() => (aspectInfoWindow.show()));
+	
+	let domainInfoWindow = new UI.ElementWindow(
+		$("<p></p>").addClass("attributeInfoWindow").html(window.nobilisData.attributeDescriptions.domain),
+		"Domain Info"
+	);
+	domainSlider.parent().prev().children().first().addClass("lookslikelink").click(() => (domainInfoWindow.show()));
+	
+	let realmInfoWindow = new UI.ElementWindow(
+		$("<p></p>").addClass("attributeInfoWindow").html(window.nobilisData.attributeDescriptions.realm),
+		"Realm Info"
+	);
+	realmSlider.parent().prev().children().first().addClass("lookslikelink").click(() => (realmInfoWindow.show()));
+	
+	let spiritInfoWindow = new UI.ElementWindow(
+		$("<p></p>").addClass("attributeInfoWindow").html(window.nobilisData.attributeDescriptions.spirit),
+		"Spirit Info"
+	);
+	spiritSlider.parent().prev().children().first().addClass("lookslikelink").click(() => (spiritInfoWindow.show()));
 	
 	factory.startSection("Miracle Points", "h3");
 	
@@ -469,13 +494,13 @@ let initializeSheet = (window, sheetID) => {
 		  "prioritizing less major wounds when allocating extra points. The system should automatically use<br />" +
 		  "your Aspect to calculate your maximum wound levels for you.</p>").css("font-style", "italic"));
 	
-	let surfaceWoundSlider = factory.attachSlider("surfaceWounds", "Surface Wounds Remaining", {min: 0, max: 5}, 0)
+	let surfaceWoundSlider = factory.attachSlider("surfaceWounds", "Surface Wounds Sustained", {min: 0, max: 5}, 0)
 			.addClass("surfaceWounds wounds");
 	UI.addHoverInfo(surfaceWoundSlider.parent(), surfaceWoundExplanation);
-	let seriousWoundSlider = factory.attachSlider("seriousWounds", "Serious Wounds Remaining", {min: 0, max: 5}, 0)
+	let seriousWoundSlider = factory.attachSlider("seriousWounds", "Serious Wounds Sustained", {min: 0, max: 5}, 0)
 			.addClass("seriousWounds wounds");
 	UI.addHoverInfo(seriousWoundSlider.parent(), seriousWoundExplanation);
-	let deadlyWoundSlider = factory.attachSlider("deadlyWounds", "Deadly Wounds Remaining", {min: 0, max: 5}, 0)
+	let deadlyWoundSlider = factory.attachSlider("deadlyWounds", "Deadly Wounds Sustained", {min: 0, max: 5}, 0)
 			.addClass("deadlyWounds wounds");
 	UI.addHoverInfo(deadlyWoundSlider.parent(), deadlyWoundExplanation);
 	

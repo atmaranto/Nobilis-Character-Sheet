@@ -36,6 +36,10 @@ span.secretnoselect, p.secretnoselect, label.secretnoselect {
 	margin-left: 5px;
 }
 
+.attributeInfoWindow table, .attributeInfoWindow th, .attributeInfoWindow td {
+	border: 1px solid black;
+}
+
 /* Miracle settings */
 
 .miracleName:hover {
