@@ -266,7 +266,7 @@
 	utils.cookie = cookie;
 	
 	cookie.set = function(key, value, maxAge) {
-		console.log(key + " = " + value);
+		//console.log(key + " = " + value);
 		
 		key = encodeURIComponent(key);
 		var expiryString = "";

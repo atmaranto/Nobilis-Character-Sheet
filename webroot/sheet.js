@@ -908,8 +908,16 @@ let initializeSheet = (window, sheetID) => {
 
 ((window) => {
 	let parameters = utils.getParameters();
+	let id = parameters.id;
 	
 	if(parameters.id === undefined) {
+		let lastSheetId = utils.cookie.get("last-sheet-id");
+		if(lastSheetId != undefined) {
+			let url = new URL(location.href);
+			url.searchParams.set("id", lastSheetId);
+			window.location.assign(url);
+		}
+		
 		$(document).ready(() => {
 			$("#container").addClass("uhoh").text("No id parameter found (consult the README -- you need to generate a character sheet first!)");
 		});
@@ -918,6 +926,7 @@ let initializeSheet = (window, sheetID) => {
 		$.ajax("/api/sheetData?id=" + encodeURIComponent(parameters.id))
 			.done((data, text, xhr) => {
 				window.characteristics = data;
+				utils.cookie.set("last-sheet-id", parameters.id);
 				initializeSheet(window, parameters.id);
 			})
 			.fail((xhr, text, err) => {
