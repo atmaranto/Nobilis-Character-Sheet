@@ -78,8 +78,7 @@ a.tocItem:visited {
 
 .attributeTitle {
 	font-style: italic;
-	margin-top: 5px;
-	margin-left: 5px;
+	margin: 5px;
 }
 
 /* Ehh, I'll just do it for all windows */
