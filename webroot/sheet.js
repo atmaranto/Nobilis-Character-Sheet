@@ -264,7 +264,9 @@ let initializeSheet = (window, sheetID) => {
 		)
 	);
 	
-	installTempPermSync(characteristics.tempPermSync == true);
+	if(characteristics.tempPermSync == true) {
+		installTempPermSync();
+	}
 	
 	factory.startSection("Domains", "h2");
 	
