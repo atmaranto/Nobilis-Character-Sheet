@@ -257,6 +257,8 @@ let initializeSheet = (window, sheetID) => {
 		)
 	);
 	
+	installTempPermSync(characteristics.tempPermSync == true);
+	
 	factory.startSection("Domains", "h2");
 	
 	let createAttributeMiracleTable = (attribute, slider, onComplete) => {
