@@ -104,8 +104,15 @@ let initializeSheet = (window, sheetID) => {
 			attributeSum.append(
 				$("<span></span>")
 					.css("color", "red")
-					.css("text-style", "italic")
+					.css("font-style", "italic")
 					.text(" (above maximum of " + max.toString() + " points by " + (_s - max).toString() + ", only possible by adding more Limits)")
+			);
+		}
+		else {
+			attributeSum.append(
+				$("<span></span>")
+					.css("font-style", "italic")
+					.text(" (maximum of " + max.toString() + ")")
 			);
 		}
 	};
