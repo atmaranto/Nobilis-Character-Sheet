@@ -1065,4 +1065,16 @@ SOFTWARE.
 					"</li>" +
 				"</ul>"
 	};
+	
+	nobilisData.SMPExplanation = "Spirit Miracle Points (SMPs) can be used on any miracle worked through an Anchor (although Anchors can only use local Domain and Realm miracles, and Aspect miracles are rather difficult to work through them).";
+	
+	nobilisData.anchorInfo = {
+		"text": "Rules for Anchors are as follows:",
+		"rules": [
+			"You can have a number of Anchors equal to your Spirit + 1.",
+			"Anchors can use only \"local\" Domain and Realm miracles.",
+			"Casting Aspect miracles through Anchors costs an extra (5 - Spirit Level) miracles points.",
+			"SMP can be used to replace any other miracle point for miracles cast through Anchors."
+		]
+	};
 })(this)

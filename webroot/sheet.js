@@ -189,6 +189,11 @@ let initializeSheet = (window, sheetID) => {
 	let permanentSMPSlider = factory.attachSlider("permanentSMP", "<b>Spirit</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
 	
+	UI.addHoverInfo(
+		permanentSMPSlider,
+		$("<p></p>").html(window.nobilisData.SMPExplanation)
+	);
+	
 	let lockUnlockHandler = () => {
 		if($(".lockunlockbutton").hasClass("unlockbutton")) {
 			$(".attributePermanentPoint").removeAttr("disabled");
@@ -908,8 +913,19 @@ let initializeSheet = (window, sheetID) => {
 		anchors.prev(),
 		$("<p><b>Anchors</b> are mortals (typically humans) who Nobles have made into their allies by the Rite of Servitude. They will loyally serve" +
 		  " their Soverign's cause, even if they work against the Noble they serve. Anchors can only be created through bonds of Love or Hate." +
-		  " You can have a number of them equal to your Spirit + 1.</p>")
+		  " You can have a number of them equal to your Spirit + 1. Click for rules on Anchors.</p>")
 	);
+	
+	let anchorsInfoWindow = new UI.ElementWindow(
+		$("<p></p>").html(window.nobilisData.anchorInfo.text)
+			.append(
+				$("<ul></ul>").append(
+					window.nobilisData.anchorInfo.rules.map((text) => ($("<li></li>").html(text)))
+				)
+			),
+		"Anchor Info"
+	);
+	anchors.prev().addClass("noselect lookslikelink").css("cursor", "pointer").click(() => (anchorsInfoWindow.show()));
 	
 	let updateAnchorMax = () => {
 		anchorsMax.text(" (up to " + (parseInt(spiritSlider.val()) + 1).toString() + ")");
