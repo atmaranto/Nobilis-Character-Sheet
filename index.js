@@ -90,6 +90,11 @@ app.route("/api/sheetData")
 
 app.use("/", express.static("webroot"));
 
-app.listen(config.PORT, () => {
-	console.log("Serving indefinitely on port", config.PORT);
-});
+if(require.main === module) {
+	app.listen(config.PORT, () => {
+		console.log("Serving indefinitely on port", config.PORT);
+	});
+}
+else {
+	module.exports = app;
+}
