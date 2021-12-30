@@ -28,6 +28,7 @@ var express = require("express"),
 	mongoose = require("mongoose"),
 	config = require("./config"),
 	crypto = require("crypto"),
+	path = require("path"),
 	CharacterSheet = require("./models/characterSheetModel");
 
 function main(app) {
@@ -87,7 +88,7 @@ function main(app) {
 			});
 		});
 
-	app.use("/", express.static("webroot"));
+	app.use("/", express.static(path.join(__dirname, "webroot")));
 	return app;
 }
 
