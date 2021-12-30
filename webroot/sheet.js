@@ -24,6 +24,11 @@ SOFTWARE.
 
 */
 
+let STRIPPED_PATHNAME = window.location.pathname;
+if(STRIPPED_PATHNAME.endsWith("/")) {
+	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substr(0, STRIPPED_PATHNAME.length - 1);
+}
+
 let initializeSheet = (window, sheetID) => {
 	console.log("Loading...");
 	
@@ -46,7 +51,7 @@ let initializeSheet = (window, sheetID) => {
 		$("#saveSheet").attr("disabled", true);
 		
 		$.ajax({
-			"url": "/api/sheetData?id=" + encodeURIComponent(sheetID),
+			"url": STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID),
 			"data": JSON.stringify(characteristics),
 			"method": "PUT",
 			//"dataType": "text"
@@ -974,7 +979,7 @@ let initializeSheet = (window, sheetID) => {
 		});
 	}
 	else {
-		$.ajax("/api/sheetData?id=" + encodeURIComponent(parameters.id))
+		$.ajax(STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(parameters.id))
 			.done((data, text, xhr) => {
 				window.characteristics = data;
 				utils.cookie.set("last-sheet-id", parameters.id);
