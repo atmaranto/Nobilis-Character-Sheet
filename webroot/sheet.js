@@ -265,7 +265,7 @@ let initializeSheet = (window, sheetID) => {
 				.append(
 					$("<input id='tempPermSync' type='checkbox' />")
 						.prop("checked", characteristics.tempPermSync == true)
-						.click(() => {
+						.change(() => {
 							installTempPermSync($("#tempPermSync").prop("checked"));
 						})
 				),
@@ -275,7 +275,7 @@ let initializeSheet = (window, sheetID) => {
 	);
 	
 	if(characteristics.tempPermSync == true) {
-		installTempPermSync();
+		installTempPermSync(characteristics.tempPermSync);
 	}
 	
 	factory.startSection("Domains", "h2");
