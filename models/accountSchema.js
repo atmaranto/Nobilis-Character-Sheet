@@ -1,8 +1,8 @@
-'''
+/*
 
 MIT License
 
-Copyright (c) 2020 Anthony Maranto
+Copyright (c) 2021 Anthony Maranto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,51 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-'''
+*/
 
-import argparse
+const mongoose = require("mongoose"),
+	  randomUUID = require("crypto").randomUUID;
 
-ap = argparse.ArgumentParser(description="Requests a new sheet from the server")
-
-ap.add_argument("url", nargs="?", default="localhost", help="The URL or domain of the server to connect to")
-
-args = ap.parse_args()
-
-from urllib.request import Request, urlopen
-from urllib.parse import urljoin, urlparse
-
-print("Requesting...")
-
-r = Request(args.url + "/api/sheetData", method="POST")
-response = urlopen(r)
-
-print("Response:", response.read())
+module.exports = new mongoose.Schema({
+	email: {
+		type: String,
+		required: "Each account must have an email",
+		index: true,
+		unique: true
+	},
+	
+	created: {
+		type: Date,
+		default: Date.now
+	},
+	
+	passwordHash: {
+		type: String,
+		required: "Each account must have a password"
+	},
+	
+	passwordSalt: {
+		type: Buffer,
+		required: "Each account must have a randomly-generated password salt"
+	},
+	
+	name: {
+		type: String,
+		required: "Each account must have a common name"
+	},
+	
+	isAdmin: {
+		type: Boolean,
+		default: false
+	},
+	
+	sessionKey: {
+		type: String,
+		default: null
+	},
+	
+	sessionDate: {
+		type: Date,
+		default: Date.now
+	}
+});

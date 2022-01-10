@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2020 Anthony Maranto
+Copyright (c) 2021 Anthony Maranto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,10 @@ SOFTWARE.
 
 */
 
-const Schema = require("mongoose").Schema,
+const mongoose = require("mongoose"),
 	  randomUUID = require("crypto").randomUUID;
 
-module.exports = new Schema({
+module.exports = new mongoose.Schema({
 	uuid: {
 		type: String,
 		default: () => (randomUUID()),
@@ -47,5 +47,16 @@ module.exports = new Schema({
 	sheetData: {
 		type: String,
 		default: null
+	},
+	
+	sheetName: {
+		type: String,
+		default: null
+	},
+	
+	owner: {
+		type: mongoose.ObjectId,
+		default: null,
+		required: false
 	}
 });

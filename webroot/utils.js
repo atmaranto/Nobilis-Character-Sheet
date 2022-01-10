@@ -541,6 +541,22 @@ SOFTWARE.
 		return params;
 	};
 	
+	utils.zealousGet = (attr) => {
+		return utils.cookie.get(attr) || localStorage.getItem(attr) || sessionStorage.getItem(attr);
+	};
+
+	utils.zealousSet = (attr, value) => {
+		utils.cookie.set(attr, value);
+		localStorage.setItem(attr, value);
+		sessionStorage.setItem(attr, value);
+	};
+	
+	utils.zealousDelete = (attr) => {
+		utils.cookie.delete(attr);
+		localStorage.removeItem(attr);
+		sessionStorage.removeItem(attr);
+	};
+	
 	if(this.exports) {
 		this.exports = utils;
 	}
