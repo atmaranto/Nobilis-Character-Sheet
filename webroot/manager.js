@@ -51,9 +51,31 @@ let deleteSheet = (uuid, after) => {
 			setTimeout(() => (errorText.fadeOut()), 5000);
 		})
 		.always(() => {
-			$(".pageButton").removeAttr("disabled");
+			
 		});
-}
+};
+
+let duplicateSheet = (uuid, after) => {
+	$.ajax({
+		"url": "../api/duplicateSheet",
+		"data": {"id": uuid},
+		"method": "POST"
+	})
+		.done((data, text, xhr) => {
+			if(after) {
+				after(true);
+			}
+		})
+		.fail((xhr, text, err) => {
+			let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while duplicating sheet: " + xhr.responseText);
+			errorText.appendTo(container);
+			
+			setTimeout(() => (errorText.fadeOut()), 5000);
+		})
+		.always(() => {
+			
+		});
+};
 
 let createSheetList = (sheets, container, currentPage) => {
 	let table = $("<table></table>").appendTo(container.html(""));
@@ -72,6 +94,8 @@ let createSheetList = (sheets, container, currentPage) => {
 			.contextmenu((e) => {
 				e.preventDefault();
 				
+				$("#cmenu").remove(); // Remove any remaining context menus
+				
 				let menu = $("<div id='cmenu' class='context-menu'></div>")
 					.append(
 						$("<ul></ul>")
@@ -79,6 +103,13 @@ let createSheetList = (sheets, container, currentPage) => {
 								$("<li><a href='#'>Open Sheet</a></li>").click(
 									() => {
 										openSheet(sheet.uuid);
+									}
+								)
+							)
+							.append(
+								$("<li><a href='#'>Duplicate Sheet</a></li>").click(
+									() => {
+										duplicateSheet(sheet.uuid, () => refreshSheet(container, currentPage));
 									}
 								)
 							)
@@ -98,7 +129,7 @@ let createSheetList = (sheets, container, currentPage) => {
 					top: e.pageY + "px"
 				});
 				
-				$(document).one("click", () => menu.remove());
+				$(document).on("click", () => menu.remove());
 			})
 			.css({
 				"cursor": "pointer"
@@ -109,7 +140,20 @@ let createSheetList = (sheets, container, currentPage) => {
 	// console.log(sheets);
 };
 
+let _REQUESTING_REFRESH = false;
+let _RFID = 0;
+
 let refreshSheet = (container, currentPage) => {
+	let _this_rfid = ++_RFID;
+	if(_REQUESTING_REFRESH) {
+		setTimeout(() => {
+			if(_REQUESTING_REFRESH == false && _RFID <= _this_rfid) {
+				refreshSheet(container, currentPage);
+			}
+		}, 800);
+	}
+	_REQUESTING_REFRESH = true;
+	
 	$(".pageFeature").attr("disabled", true);
 	let message = {
 		page: currentPage.toString(),
@@ -117,15 +161,17 @@ let refreshSheet = (container, currentPage) => {
 		sessionKey: utils.zealousGet("sessionKey")
 	};
 	
-	let sheetName = $("#sheetName").val().trim();
-	if(sheetName.length > 0) {
-		message.sheetName = sheetName;
+	let searchName = $("#sheetName").val().trim();
+	if(searchName.length > 0) {
+		message.searchName = searchName;
 	}
 	
-	let sheetOwner = $("#sheetOwner").val().trim();
-	if(sheetOwner.length > 0) {
-		message.sheetOwner = sheetOwner;
+	let searchOwner = $("#sheetOwner").val().trim();
+	if(searchOwner.length > 0) {
+		message.searchOwner = searchOwner;
 	}
+	
+	console.log(message);
 	
 	$.ajax({
 		"url": "../api/account/listSheets",
@@ -150,6 +196,7 @@ let refreshSheet = (container, currentPage) => {
 		})
 		.always(() => {
 			$(".pageButton").removeAttr("disabled");
+			_REQUESTING_REFRESH = false;
 		});
 };
 
@@ -188,7 +235,7 @@ let initializeManager = () => {
 		refreshSheet(container, currentPage);
 	});
 	
-	$(".searchFeature").on("change", () => (refreshSheet(container, currentPage)));
+	$(".searchFeature").on("input", () => (refreshSheet(container, currentPage)));
 	
 	let accountControls = $("#accountControls");
 	if(loggedIn) {

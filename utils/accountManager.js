@@ -198,16 +198,17 @@ function installAccountManager(app) {
 		});
 	});
 	
+	// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+	function escapeRegExp(string) {
+		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+	}
+	
 	app.post("/api/account/listSheets", (req, res) => {
 		const PAGE_LENGTH = 20;
 		
 		let page = (typeof req.body.page === "string") ? parseInt(req.body.page) : 0;
-		let searchName = (typeof req.body.name === "string") ? req.body.name : null;
-		let searchOwner = (typeof req.body.owner === "string") ? req.body.owner : null;
-		
-		if(searchOwner) {
-			return res.status(400).send("Searching by owner is not currently supported; please keep the owner field blank");
-		}
+		let searchName = (typeof req.body.searchName === "string") ? req.body.searchName : null;
+		let searchOwner = (typeof req.body.searchOwner === "string") ? req.body.searchOwner : null;
 		
 		return validateSession(req, res, (account) => {
 			let query = {};
@@ -216,7 +217,10 @@ function installAccountManager(app) {
 				query.owner = account._id;
 			}
 			if(searchName) {
-				query.sheetName = searchName;
+				query.sheetName = new RegExp(escapeRegExp(searchName), "i");
+			}
+			if(searchOwner) {
+				query.ownerName = new RegExp(escapeRegExp(searchOwner), "i");
 			}
 			
 			CharacterSheet.find(

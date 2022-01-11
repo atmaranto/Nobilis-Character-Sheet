@@ -30,6 +30,7 @@ var express = require("express"),
 	mongoose = require("mongoose"),
 	config = require("./config"),
 	crypto = require("crypto"),
+	randomUUID = require("crypto").randomUUID,
 	path = require("path"),
 	CharacterSheet = require("./models/characterSheetModel"),
 	{installAccountManager, validateSession} = require("./utils/accountManager");
@@ -181,6 +182,62 @@ function main(app) {
 				});
 			});
 		});
+	
+	const nMatcher = /^(.*) \[(\d+)\]$/;
+	app.post("/api/duplicateSheet", (req, res) => {
+		if(!req.body || (typeof req.body.id !== "string")) {
+			return res.status(400).send("No id provided");
+		}
+		
+		validateSession(req, res, (acct) => {
+			let query = {"uuid": req.body.id};
+			
+			if(!acct.isAdmin) {
+				query["owner"] = acct._id;
+			}
+			
+			CharacterSheet.findOne(query, (err, sheet) => {
+				if(err || !sheet) {
+					return res.status(400).send("Invalid id");
+				}
+				
+				let newName = "Untitled [2]";
+				if(typeof sheet.sheetName === "string") {
+					let match = sheet.sheetName.match(nMatcher);
+					if(match === null) {
+						newName = sheet.sheetName + " [2]";
+					}
+					else {
+						let result = parseInt(match[2]);
+						if(result === NaN) {
+							newName = sheet.sheetName + " [2?]";
+						}
+						else {
+							newName = match[1] + " [" + (result + 1).toString() + "]";
+						}
+					}
+				}
+				
+				if(newName.length > 200) {
+					newName = newName.substr(newName.length - 200);
+				}
+				
+				sheet.sheetName = newName;
+				sheet._id = mongoose.Types.ObjectId();
+				sheet.uuid = randomUUID();
+				sheet.isNew = true;
+				
+				sheet.save((err, newSheet) => {
+					if(!newSheet || err) {
+						console.error(err);
+						return res.status(500).send("Internal error");
+					}
+					
+					return res.status(200).send(newSheet._id);
+				});
+			});
+		});
+	});
 	
 	installAccountManager(app);
 
