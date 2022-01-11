@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2021 Anthony Maranto
+Copyright (c) 2020 Anthony Maranto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,43 +25,6 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-	  randomUUID = require("crypto").randomUUID;
+	  AccountSchema = require("./accountSchema")
 
-module.exports = new mongoose.Schema({
-	uuid: {
-		type: String,
-		default: () => (randomUUID()),
-		index: true
-	},
-	
-	created: {
-		type: Date,
-		default: Date.now
-	},
-	
-	lastModified: {
-		type: Date,
-		default: Date.now
-	},
-	
-	sheetData: {
-		type: String,
-		default: null
-	},
-	
-	sheetName: {
-		type: String,
-		default: null
-	},
-	
-	ownerName: {
-		type: String,
-		default: null
-	},
-	
-	owner: {
-		type: mongoose.ObjectId,
-		default: null,
-		required: false
-	}
-});
+module.exports = mongoose.model("account", AccountSchema);

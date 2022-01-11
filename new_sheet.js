@@ -24,14 +24,14 @@ SOFTWARE.
 
 */
 
-const http = require("http");
+const http = require("https");
 
 console.log("USAGE: node new_sheet.js <host [default localhost]> <port [default 80]>");
 
 let options = {
 	"host": process.argv[2] || "localhost",
-	"path": "/api/sheetData",
-	"port": process.argv[3] || "80",
+	"path": "/nobilis/api/sheetData",
+	//"port": process.argv[3] || "80",
 	"method": "POST"
 };
 

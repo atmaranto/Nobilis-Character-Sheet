@@ -28,10 +28,11 @@ const mongoose = require("mongoose"),
 	  randomUUID = require("crypto").randomUUID;
 
 module.exports = new mongoose.Schema({
-	uuid: {
+	email: {
 		type: String,
-		default: () => (randomUUID()),
-		index: true
+		required: "Each account must have an email",
+		index: true,
+		unique: true
 	},
 	
 	created: {
@@ -39,29 +40,33 @@ module.exports = new mongoose.Schema({
 		default: Date.now
 	},
 	
-	lastModified: {
+	passwordHash: {
+		type: String,
+		required: "Each account must have a password"
+	},
+	
+	passwordSalt: {
+		type: Buffer,
+		required: "Each account must have a randomly-generated password salt"
+	},
+	
+	name: {
+		type: String,
+		required: "Each account must have a common name"
+	},
+	
+	isAdmin: {
+		type: Boolean,
+		default: false
+	},
+	
+	sessionKey: {
+		type: String,
+		default: null
+	},
+	
+	sessionDate: {
 		type: Date,
 		default: Date.now
-	},
-	
-	sheetData: {
-		type: String,
-		default: null
-	},
-	
-	sheetName: {
-		type: String,
-		default: null
-	},
-	
-	ownerName: {
-		type: String,
-		default: null
-	},
-	
-	owner: {
-		type: mongoose.ObjectId,
-		default: null,
-		required: false
 	}
 });

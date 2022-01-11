@@ -804,7 +804,7 @@ SOFTWARE.
 		{
 			"name": "Of Mortal Form",
 			"description": "For some Powers, their Commencement is a joy. For others, it is very much <i>not</i>. Powers with Aspect 0, by a mistake of Commencement, are of mortal form, and" +
-						   " they must use a miracle point to even bypasssimple obstacles, such as a locked door. These characters might even lose their heads in an emergency, even if their" +
+						   " they must use a miracle point to bypass even simple obstacles, such as a locked door. These characters might lose their heads in an emergency, even if their" +
 						   " player does not."
 		},
 		{
@@ -977,7 +977,7 @@ SOFTWARE.
 	nobilisData.riteOfHolyFireExplanation = "This rite allows Powers to immunize themselves against mundane attacks - even major ones. It involves a full night of ritual during which the Nobilis is vulnerable," +
 											" but it protects against many different types of attacks depending on the Noble's Spirit level. Surprisingly, attacks that are more dangerous are actually easier to" +
 											" protect against, as they're more obviously an insult to the Noble's miraculous status. <b>Note that this <i>only</i> works against assault by the mundane; even a" +
-											" single Aspect 0 gunshot is sufficient to pierce this Rite, although it can defend against a non-miraculous nuclear explosion easily." +
+											" single Aspect 0 gunshot is sufficient to pierce this Rite, although it can defend against a non-miraculous nuclear explosion easily.</b>" +
 					"<table>" +
 						"<tr><th>Spirit Level</th><th>Lethality Protected Against</th><th>Time Before Rite Must Be Renewed</th></tr>" +
 						"<tr><td>0</td><td>Almost unsurvivable: ground zero of a nuclear explosion, loss of hull integrity on an undersea dome</td><td>One week</td></tr>" +

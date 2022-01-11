@@ -232,7 +232,7 @@ SOFTWARE.
 			}
 			
 			let anchorID = this.editorID.toString() + "_" + this.sections.length.toString() + $(heading).text().replace(/\W/g, "");
-			container.append($("<a></a>").attr("name", anchorID));
+			container.prepend($("<a></a>").attr("name", anchorID));
 			
 			this.sections.push({"heading": $(heading).text(), "importance": headingStyle});
 			this.sectionAnchors.push(anchorID);

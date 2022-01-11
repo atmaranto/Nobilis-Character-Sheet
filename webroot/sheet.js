@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2020 Anthony Maranto
+Copyright (c) 2021 Anthony Maranto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,14 +50,22 @@ let initializeSheet = (window, sheetID) => {
 	window.saveSheet = () => {
 		$("#saveSheet").attr("disabled", true);
 		
+		let message = {
+			sheetData: JSON.stringify(characteristics),
+			email: utils.zealousGet("email"),
+			sessionKey: utils.zealousGet("sessionKey"),
+			playerName: characteristics.playerName,
+			characterName: characteristics.characterName
+		};
+		
 		$.ajax({
 			"url": STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID),
-			"data": JSON.stringify(characteristics),
+			"data": message,
 			"method": "PUT",
-			//"dataType": "text"
+			/* "dataType": "text"
 			"headers": {
 				"Content-Type": "text/plain"
-			}
+			} */
 		})
 			.done((data, text, xhr) => {
 				$("#saveStatus").text("Successfully saved sheet.");
@@ -75,7 +83,50 @@ let initializeSheet = (window, sheetID) => {
 	
 	let factory = new UI.EditorFactory(characteristics);
 	
-	factory.startSection("Nobilis Character", "h1");
+	let considerOwner = (element) => {
+		let owningMessage = (element || $("#ownershipMessageLocation"));
+		
+		if(window.sheetOwner) {
+			owningMessage.html("This sheet is owned by ").append($("<span style='color: green; font-style: italic'></span>").text(window.sheetOwner));
+		}
+		else {
+			owningMessage.html("This sheet is owned by <span style='color: red; font-style: italic'>nobody</span>. ")
+				.append($("<button id='claimSheetButton'>Claim sheet?</button>")
+					.click(() => {
+						$("#claimSheetButton").attr("disabled", true);
+						
+						let message = {
+							sheet: sheetID,
+							email: utils.zealousGet("email"),
+							sessionKey: utils.zealousGet("sessionKey")
+						};
+						
+						$.ajax({
+							"url": STRIPPED_PATHNAME + "/api/account/claimSheet",
+							"data": message,
+							"method": "POST"
+						})
+							.done((data, text, xhr) => {
+								window.sheetOwner = utils.zealousGet("email");
+								
+								considerOwner();
+							})
+							.fail((xhr, text, err) => {
+								window._xhr = xhr;
+								$("#claimSheetButton").removeAttr("disabled").text("Failed: " + xhr.responseText + ". Click to try again.");
+							})
+							.always(() => {
+								
+							});
+					})
+				);
+		}
+	}
+	
+	let owningMessage = $("<p id='ownershipMessageLocation'></p>");
+	factory.startSection("Nobilis Character", "h1").after(owningMessage);
+	considerOwner(owningMessage);
+	
 	factory.attachText("characterName", "Character Name");
 	factory.attachText("playerName", "Player Name");
 	
@@ -184,6 +235,10 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.add($("<label for='lockunlockbutton' class='noselect'>Lock/Unlock Permanent Miracle Points:  </label>"))
 		.append($("<td></td>").append(lockUnlockButton));
+	
+	// Preload lock/unlock images
+	let imgLock = $("<img src='images/lock.svg' />");
+	let imgUnlock = $("<img src='images/unlock.svg' />");
 	
 	let permanentAMPSlider = factory.attachSlider("permanentAMP", "<b>Aspect</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
@@ -502,7 +557,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.attachList("domains", createDomainSection, {min: 1, max: 5});
 	
-	factory.startSection("Wound Levels and Aspect Miracles", "h2");
+	factory.startSection("Aspect and Wound Levels", "h2");
 	
 	// factory.attachParagraph("You have the following wound levels:");
 	let woundLevelTable = $("<table class='woundleveltable'></table>");
@@ -981,13 +1036,23 @@ let initializeSheet = (window, sheetID) => {
 	else {
 		$.ajax(STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(parameters.id))
 			.done((data, text, xhr) => {
-				window.characteristics = data;
+				window.characteristics = JSON.parse(data.sheetData);
+				window.sheetOwner = data.sheetOwner;
 				utils.cookie.set("last-sheet-id", parameters.id);
+				
+				// Add sheet to recent sheets
+				let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
+				if(recentSheets.indexOf(parameters.id) !== -1) {
+					recentSheets.splice(recentSheets.indexOf(parameters.id), 1);
+				}
+				recentSheets.splice(0, 0, parameters.id);
+				(localStorage || sessionStorage).setItem("recentSheets", JSON.stringify(recentSheets))
+				
 				initializeSheet(window, parameters.id);
 			})
 			.fail((xhr, text, err) => {
 				console.error(err);
-				$("#container").addClass("uhoh").text("Failed to request sheet data: " + text);
+				$("#container").addClass("uhoh").text("Failed to request sheet data: " + xhr.responseText);
 			});
 	}
 })(this);
