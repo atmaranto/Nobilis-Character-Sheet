@@ -69,7 +69,7 @@ function main(app) {
 				
 				if(sheet.owner !== null) {
 					validateSession(req, res, (acct) => {
-						if(!sheet.owner || sheet.owner == acct._id || acct.isAdmin) {
+						if(!sheet.owner || acct._id.equals(sheet.owner)  || acct.isAdmin) {
 							return resolveSheet();
 						}
 						else {

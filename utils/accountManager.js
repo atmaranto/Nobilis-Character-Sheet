@@ -45,7 +45,7 @@ const sessionDuration = config.SESSION_LENGTH || 1000 * 60 * 60 * 24 * 7;
 
 const enableAccountCreation = config.ACCOUNT_CREATION_DISABLED != true;
 
-const emailRegex = /^\w\@([\w\-]+\.)+(\w+)$/;
+const emailRegex = /^\w+\@([\w\-]+\.)+(\w+)$/;
 
 function newSession() {
 	return (Buffer.from(crypto.randomBytes(sessionKeyLength))).toString("hex");

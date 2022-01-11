@@ -285,7 +285,6 @@ let initializeManager = () => {
 							setTimeout(() => (errorText.fadeOut()), 5000);
 						})
 						.always(() => {
-							utils.zealousDelete("sessionKey");
 							//$(".pageButton").removeAttr("disabled");
 						});
 				})
