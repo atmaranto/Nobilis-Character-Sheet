@@ -63,7 +63,7 @@ function main(app) {
 					return res.status(200).set({
 						"Content-Type": "text/json",
 						"Content-Length": sheetData.length.toString()
-					}).send({sheetData: sheetData, sheetOwner: sheet.owner});
+					}).send({sheetData: sheetData, sheetName: sheet.sheetName, sheetOwner: sheet.owner, ownerName: sheet.ownerName});
 				};
 				
 				if(sheet.owner !== null) {
@@ -135,7 +135,17 @@ function main(app) {
 					}
 				}
 				
-				CharacterSheet.findOneAndUpdate(query, {"sheetData": updateData, "lastModified": Date.now()}, (err, sheet) => {
+				let newData = {"sheetData": updateData, "lastModified": Date.now()};
+				
+				if(typeof req.body.playerName === "string" && req.body.playerName.length < 100) {
+					newData.ownerName = req.body.playerName;
+				}
+				
+				if(typeof req.body.characterName === "string" && req.body.characterName.length < 100) {
+					newData.sheetName = req.body.characterName;
+				}
+				
+				CharacterSheet.findOneAndUpdate(query, newData, (err, sheet) => {
 					if(err || !sheet) {
 						return res.status(400).send("Invalid id");
 					}
@@ -148,6 +158,27 @@ function main(app) {
 				updateSheet(acct);
 			}, (failureMessage) => {
 				updateSheet();
+			});
+		})
+		.delete((req, res) => {
+			if(!req.body || (typeof req.body.id !== "string")) {
+				return res.status(400).send("No id provided");
+			}
+			
+			validateSession(req, res, (acct) => {
+				let query = {"uuid": req.body.id};
+				
+				if(!acct.isAdmin) {
+					query["owner"] = acct._id;
+				}
+				
+				CharacterSheet.findOneAndDelete(query, {lean: true}, (err, sheet) => {
+					if(err || !sheet) {
+						return res.status(400).send("Invalid id");
+					}
+					
+					return res.status(200).send("Deleted");
+				});
 			});
 		});
 	

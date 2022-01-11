@@ -5,3 +5,44 @@ table {
 tr,td,th {
 	border: 1px solid black;
 }
+
+.context-menu-link {
+	display: block;
+	padding: 20px;
+	background: #ececec;
+}
+
+.context-menu {
+	position: absolute;
+}
+
+.context-menu ul, #context-menu li {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	background: white;
+}
+
+.context-menu {
+	border: 1px solid #CCC;
+}
+
+.context-menu li {
+	border-bottom: 1px solid #CCC;
+}
+
+.context-menu li:last-child {
+	border: none;
+}
+
+.context-menu li a {
+	display: block;
+	padding: 5px 10px;
+	text-decoration: none;
+	color: black;
+}
+
+.context-menu li a:hover {
+	background: blue;
+	color: #FFF;
+}

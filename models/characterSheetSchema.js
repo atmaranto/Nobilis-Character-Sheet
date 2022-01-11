@@ -54,6 +54,11 @@ module.exports = new mongoose.Schema({
 		default: null
 	},
 	
+	ownerName: {
+		type: String,
+		default: null
+	},
+	
 	owner: {
 		type: mongoose.ObjectId,
 		default: null,

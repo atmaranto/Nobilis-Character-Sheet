@@ -230,7 +230,7 @@ function installAccountManager(app) {
 					}
 					
 					let sheetData = sheets.map((sheet) => {
-						return {lastModified: sheet.lastModified, uuid: sheet.uuid, owner: "Unknown", sheetName: sheet.sheetName};
+						return {lastModified: sheet.lastModified, uuid: sheet.uuid, owner: "Unknown", sheetName: sheet.sheetName, ownerName: sheet.ownerName};
 					});
 					
 					res.status(200).json(sheetData);

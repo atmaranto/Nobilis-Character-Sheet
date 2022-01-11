@@ -29,6 +29,32 @@ if(STRIPPED_PATHNAME.endsWith("/")) {
 	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substr(0, STRIPPED_PATHNAME.length - 1);
 }
 
+let openSheet = (uuid) => {
+	window.open("../?id=" + encodeURIComponent(uuid));
+};
+
+let deleteSheet = (uuid, after) => {
+	$.ajax({
+		"url": "../api/sheetData",
+		"data": {"id": uuid},
+		"method": "DELETE"
+	})
+		.done((data, text, xhr) => {
+			if(after) {
+				after(true);
+			}
+		})
+		.fail((xhr, text, err) => {
+			let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while deleting sheet: " + xhr.responseText);
+			errorText.appendTo(container);
+			
+			setTimeout(() => (errorText.fadeOut()), 5000);
+		})
+		.always(() => {
+			$(".pageButton").removeAttr("disabled");
+		});
+}
+
 let createSheetList = (sheets, container, currentPage) => {
 	let table = $("<table></table>").appendTo(container.html(""));
 	
@@ -36,20 +62,51 @@ let createSheetList = (sheets, container, currentPage) => {
 		.html("<tr><th>Sheet Name</th><th>Owner</th><th>Last Modified</th></tr>")
 		.css({"user-select": "none"});
 	sheets.forEach((sheet) => {
-		table.append($("<tr></tr>")
-			.append($("<td></td>").text(sheet.name))
-			.append($("<td></td>").text(sheet.owner))
+		let rowEntry = $("<tr></tr>")
+			.append($("<td></td>").text(sheet.name || sheet.sheetName))
+			.append($("<td></td>").text(sheet.ownerName || sheet.owner))
 			.append($("<td></td>").text(sheet.lastModified))
-			.click(() => {
-				window.location = "../?id=" + encodeURIComponent(sheet.uuid);
+			.click((e) => {
+				openSheet(sheet.uuid);
+			})
+			.contextmenu((e) => {
+				e.preventDefault();
+				
+				let menu = $("<div id='cmenu' class='context-menu'></div>")
+					.append(
+						$("<ul></ul>")
+							.append(
+								$("<li><a href='#'>Open Sheet</a></li>").click(
+									() => {
+										openSheet(sheet.uuid);
+									}
+								)
+							)
+							.append(
+								$("<li><a href='#'>Delete Sheet</a></li>").click(
+									() => {
+										if(window.confirm("Really delete this sheet?")) {
+											deleteSheet(sheet.uuid, () => rowEntry.remove());
+										}
+									}
+								)
+							)
+					);
+				
+				menu.appendTo($("#container")).css({
+					left: e.pageX + "px",
+					top: e.pageY + "px"
+				});
+				
+				$(document).one("click", () => menu.remove());
 			})
 			.css({
 				"cursor": "pointer"
-			})
-		);
+			});
+		table.append(rowEntry);
 	});
 	
-	console.log(sheets);
+	// console.log(sheets);
 };
 
 let refreshSheet = (container, currentPage) => {
@@ -78,10 +135,15 @@ let refreshSheet = (container, currentPage) => {
 		.done((data, text, xhr) => {
 			let sheets = typeof data === "string" ? JSON.parse(data) : data;
 			console.log(data);
+			
+			sheets.forEach((sheet) => {
+				// Convert lastModified dates into the local timezone
+				sheet.lastModified = new Date(sheet.lastModified).toString();
+			});
 			createSheetList(sheets, container, currentPage);
 		})
 		.fail((xhr, text, err) => {
-			let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while requesting sheets: " + xhr.statusText);
+			let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while requesting sheets: " + xhr.responseText);
 			errorText.appendTo(container);
 			
 			setTimeout(() => (errorText.fadeOut()), 5000);
@@ -138,7 +200,7 @@ let initializeManager = () => {
 				};
 				
 				$.ajax({
-					"url": STRIPPED_PATHNAME + "/api/account/logout",
+					"url": "../api/account/logout",
 					"data": message,
 					"method": "POST"
 				})
@@ -146,7 +208,7 @@ let initializeManager = () => {
 						window.location.reload();
 					})
 					.fail((xhr, text, err) => {
-						let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while logging out: " + xhr.statusText);
+						let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while logging out: " + xhr.responseText);
 						errorText.appendTo(container);
 						
 						setTimeout(() => (errorText.fadeOut()), 5000);
@@ -156,6 +218,30 @@ let initializeManager = () => {
 						//$(".pageButton").removeAttr("disabled");
 					});
 			})
+		);
+		
+		$("#sheetCreation").append(
+			$("<button>Create New Sheet</button>")
+				.click(() => {
+					$.ajax({
+						"url": "../api/sheetData",
+						"method": "POST"
+					})
+						.done((data, text, xhr) => {
+							openSheet(data);
+							refreshSheet(container, currentPage);
+						})
+						.fail((xhr, text, err) => {
+							let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while creating sheet: " + xhr.responseText);
+							errorText.appendTo(container);
+							
+							setTimeout(() => (errorText.fadeOut()), 5000);
+						})
+						.always(() => {
+							utils.zealousDelete("sessionKey");
+							//$(".pageButton").removeAttr("disabled");
+						});
+				})
 		);
 	}
 	else {
@@ -180,7 +266,7 @@ let initializeManager = () => {
 							window.location.reload();
 						})
 						.fail((xhr, text, err) => {
-							let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while logging in: " + xhr.statusText);
+							let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while logging in: " + xhr.responseText);
 							errorText.appendTo(container);
 							
 							setTimeout(() => (errorText.fadeOut()), 5000);
@@ -216,7 +302,7 @@ let initializeManager = () => {
 							window.location.reload();
 						})
 						.fail((xhr, text, err) => {
-							let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while creating account: " + xhr.statusText);
+							let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while creating account: " + xhr.responseText);
 							errorText.appendTo(container);
 							
 							setTimeout(() => (errorText.fadeOut()), 5000);

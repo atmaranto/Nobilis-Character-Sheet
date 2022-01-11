@@ -53,7 +53,9 @@ let initializeSheet = (window, sheetID) => {
 		let message = {
 			sheetData: JSON.stringify(characteristics),
 			email: utils.zealousGet("email"),
-			sessionKey: utils.zealousGet("sessionKey")
+			sessionKey: utils.zealousGet("sessionKey"),
+			playerName: characteristics.playerName,
+			characterName: characteristics.characterName
 		};
 		
 		$.ajax({
