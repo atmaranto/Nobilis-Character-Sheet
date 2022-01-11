@@ -30,12 +30,12 @@ if(STRIPPED_PATHNAME.endsWith("/")) {
 }
 
 let openSheet = (uuid) => {
-	window.open("../?id=" + encodeURIComponent(uuid));
+	window.open("./?id=" + encodeURIComponent(uuid));
 };
 
 let deleteSheet = (uuid, after) => {
 	$.ajax({
-		"url": "../api/sheetData",
+		"url": "./api/sheetData",
 		"data": {"id": uuid},
 		"method": "DELETE"
 	})
@@ -57,7 +57,7 @@ let deleteSheet = (uuid, after) => {
 
 let duplicateSheet = (uuid, after) => {
 	$.ajax({
-		"url": "../api/duplicateSheet",
+		"url": "./api/duplicateSheet",
 		"data": {"id": uuid},
 		"method": "POST"
 	})
@@ -174,7 +174,7 @@ let refreshSheet = (container, currentPage) => {
 	console.log(message);
 	
 	$.ajax({
-		"url": "../api/account/listSheets",
+		"url": "./api/account/listSheets",
 		"data": message,
 		"method": "POST"
 	})
@@ -247,7 +247,7 @@ let initializeManager = () => {
 				};
 				
 				$.ajax({
-					"url": "../api/account/logout",
+					"url": "./api/account/logout",
 					"data": message,
 					"method": "POST"
 				})
@@ -271,7 +271,7 @@ let initializeManager = () => {
 			$("<button>Create New Sheet</button>")
 				.click(() => {
 					$.ajax({
-						"url": "../api/sheetData",
+						"url": "./api/sheetData",
 						"method": "POST"
 					})
 						.done((data, text, xhr) => {
@@ -301,7 +301,7 @@ let initializeManager = () => {
 					};
 					
 					$.ajax({
-						"url": "../api/account",
+						"url": "./api/account",
 						"data": message,
 						"method": "POST"
 					})
@@ -337,7 +337,7 @@ let initializeManager = () => {
 					};
 					
 					$.ajax({
-						"url": "../api/account",
+						"url": "./api/account",
 						"data": message,
 						"method": "PUT"
 					})
