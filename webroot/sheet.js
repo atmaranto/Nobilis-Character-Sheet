@@ -152,6 +152,13 @@ let initializeSheet = (window, sheetID) => {
 		$(".limitCPs").each((index, item) => {
 			max += parseInt($(item).val());
 		});
+		$(".rawCPs").each((index, item) => {
+			let raw = $(item).val();
+			if(typeof raw === "string") {
+				raw = parseInt(raw);
+			}
+			max += raw;
+		});
 		
 		let attributeSum = $("#attributeSum")
 			.html("").text(_s.toString() + " character points");
@@ -1004,6 +1011,25 @@ let initializeSheet = (window, sheetID) => {
 		  " probably be allocated more than one point; just make sure the allocation is proportional to the importance.</p>")
 	);
 	
+	factory.startSection("Additional Character Points", h2);
+	
+	let addAdditionalCPSection = (i, sectionData) => {
+		sectionData = sectionData || {};
+		let sectionFactory = new UI.EditorFactory(sectionData);
+		
+		factory.attachText("rawCPs", "Raw Character Points Granted").addClass("rawCPs").attr("type", "number");
+		factory.attachTextArea("cpSource", "Source of Character Points");
+		
+		return {"element": sectionFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": sectionData};
+	};
+	
+	factory.attachList("additionalCPs", addAdditionalCPSection, {min: 0});
+		"Here, you can document any additional character points you receive, alongwith their sources (ex. start of game bonus, story reward, etc.)."
+	);
+	
+	let addCPSection = ()
+	factory.attachText("rawCPs", "Raw Character Points").addClass("rawCPs").attr("type", "number");
+	
 	factory.startSection("Chancel and Imperator Details", "h2");
 	factory.attachTextArea("chancelInformation");
 	factory.attachTextArea("imperatorInformation");
@@ -1030,7 +1056,8 @@ let initializeSheet = (window, sheetID) => {
 		}
 		
 		$(document).ready(() => {
-			$("#container").addClass("uhoh").text("No id parameter found (consult the README -- you need to generate a character sheet first!)");
+			//$("#container").addClass("uhoh").text("No id parameter found. Redirecting you to the sheet manager...");
+			window.location.assign("./manager.html");
 		});
 	}
 	else {
