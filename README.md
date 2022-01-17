@@ -3,6 +3,15 @@
  
 ## To-Do
  - (Eventually) Make a more easily-configurable server system (and a more easily-configurable client-side API)
+  * Partially fulfilled with the flexible ability to `require()` the main file in order to "add" the character sheet system to a modular server
+ - Make a websocket-compliant update system for the Character Sheets. This will sync the character sheet's state across tabs.
+  * As part of this, I could also add the ability to make character sheet updates (via the endpoint) more specific, with only the necessary attributes updated. However, I would need
+    to combine this with the below in order to do so.
+ - Change the character sheet specification to include the full breadth of what one can do with a character sheet, meaning it will be stored in MongoDB as
+   an object rather than as a string. This should make it easier to search for character sheets by their attributes.
+  * Additionally, I should restructure the CharacterSheet to be a subitem of Account so that they can be querried together more easily (and more atomically)
+ - (*Maybe* eventually, but this is beyond the scope of the current project) Make the character sheet server shardable, so that I can host it across several servers on a
+   reasonable payment model.
  
 ## Changes from Standard 2E
   - Rather than granting a MP, limits grant a CP. I thought this would add a bit of flexibility. I might regret it.
@@ -13,8 +22,8 @@
  in the first and last sections of `sheet.js` respectively. The packaged server system is based on Node, ExpressJS, and Mongoose. To install and run it, follow these steps:
  
 ### A Warning
- The default server interface is *ridiculously* basic. It doesn't even have a UI-based method to create or delete character sheets, or any method for sheet deletion at all beyond
- manually editing server values. Sheets are public, hidden only by their UUID (which doesn't mean much since all requests go over http). TL;DR, the server is *not* a secure system by
+ The default server interface is *ridiculously* basic.
+ Sheets are public by default, hidden only by their UUID (which doesn't mean much since all requests go over http). TL;DR, the server is *not* a secure system by
  any means, and if you want to host this for anything more than a few friends on a hard-to-guess IP address and port, you should probably create your own server system and use the
  character sheet as you will.
  

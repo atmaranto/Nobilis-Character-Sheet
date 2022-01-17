@@ -1077,4 +1077,10 @@ SOFTWARE.
 			"SMP can be used to replace any other miracle point for miracles cast through Anchors."
 		]
 	};
+	
+	nobilisData.giftInfo = "<b>Gifts</b> define some of the most unique aspects of the Noble Powers. These include flight, firebreathing, appearances that inspire awe or horror," +
+						   " gazes that turn people to stone, and practically anything that could be accomplished with some sort of miracle. To create a gift, define what you" +
+						   " want it to do (for instance, read the thoughts of any human). Next, frame it as a miracle of some sort (Simple Divination of Thought). Note that it" +
+						   " doesn't matter if you have this particular Estate; gifts are special abilities often unrelated to your Estate(s). Next, fill out the other parts of" +
+						   " the gift form to establish its cost. Gifts that are more flexible, are easier to use, and have a larger range are all more expensive.";
 })(this)
