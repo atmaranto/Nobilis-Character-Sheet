@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2021 Anthony Maranto
+Copyright (c) 2022 Anthony Maranto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -124,10 +124,21 @@ let initializeSheet = (window, sheetID) => {
 	}
 	
 	let owningMessage = $("<p id='ownershipMessageLocation'></p>");
-	factory.startSection("Nobilis Character", "h1").after(owningMessage);
+	
+	const nobilisDefaultName = "Nobilis Character";
+	let nobilisCharacterTitle = factory.startSection(characteristics.characterName || nobilisDefaultName, "h1").after(owningMessage);
 	considerOwner(owningMessage);
 	
-	factory.attachText("characterName", "Character Name");
+	factory.attachText("characterName", "Character Name").addClass("characterName")
+		.on("input change", () => {
+			let name = $(".characterName").val();
+			
+			if(name.length == 0) {
+				name = nobilisDefaultName;
+			}
+			
+			$(nobilisCharacterTitle).text(name);
+		});
 	factory.attachText("playerName", "Player Name");
 	
 	let attributeUpdate = () => {
@@ -145,7 +156,7 @@ let initializeSheet = (window, sheetID) => {
 		});
 		$(".giftcost").each((index, item) => {
 			let result = parseInt($(item).text());
-			if(result !== NaN) {
+			if(!isNaN(result)) {
 				_s += result;
 			}
 		});
@@ -153,11 +164,10 @@ let initializeSheet = (window, sheetID) => {
 			max += parseInt($(item).val());
 		});
 		$(".rawCPs").each((index, item) => {
-			let raw = $(item).val();
-			if(typeof raw === "string") {
-				raw = parseInt(raw);
+			let raw = parseInt($(item).val());
+			if(!isNaN(raw)) {
+				max += raw;
 			}
-			max += raw;
 		});
 		
 		let attributeSum = $("#attributeSum")
@@ -691,7 +701,14 @@ let initializeSheet = (window, sheetID) => {
 	
 	updateRealmTable();
 	
-	factory.startSection("Gifts", "h2");
+	let giftInfoWindow = new UI.ElementWindow(
+		$("<p></p>").html(window.nobilisData.giftInfo),
+		"Gift Information"
+	);
+	factory.startSection("Gifts", "h2")
+		.addClass("lookslikelink noselect")
+		.click(() => (giftInfoWindow.show()));;
+	
 	let giftMiracleExampleWindow = new UI.ElementWindow(
 		$("<p>Gift miracles could include:</p>")
 			.append(
@@ -740,7 +757,7 @@ let initializeSheet = (window, sheetID) => {
 		let giftAOEType = giftFactory.attachSelection("giftAOEType", "Area of Effect", [
 			"Almost anywhere (+1)",
 			"Local things only (-1)",
-			"One person - you or a nearby moratal (-2)",
+			"One person - you or a nearby mortal (-2)",
 			"Only oneself (-3)"
 		]);
 		UI.addHoverInfo(
@@ -781,6 +798,8 @@ let initializeSheet = (window, sheetID) => {
 		
 		let giftCostCalculation = $("<p><span class='giftcost'>Loading...</span><span class='giftcostaddendum'></span></p>");
 		giftFactory.add($("<p class='secretnoselect'>Gift cost</p>")).append($("<td></td>").append(giftCostCalculation));
+		
+		let giftDescription = giftFactory.attachTextArea("giftDescription", "Gift Description");
 		
 		let recalculateCost = () => {
 			let cost = parseInt(miracleLevel.val());
@@ -971,6 +990,22 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.attachStandalone(affiliationDescription);
 	
+	factory.startSection("Additional Character Points", "h2");
+	factory.attachParagraph("Here, you can document any additional character points you receive, alongwith their sources (ex. start of game bonus, story reward, etc.).");
+	
+	let addAdditionalCPSection = (i, sectionData) => {
+		sectionData = sectionData || {};
+		let sectionFactory = new UI.EditorFactory(sectionData);
+		
+		sectionFactory.attachText("rawCPs", "Raw Character Points Granted").addClass("rawCPs").attr("type", "number")
+			.on("input change", attributeUpdate);
+		sectionFactory.attachTextArea("cpSource", "Source of Character Points");
+		
+		return {"element": sectionFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": sectionData};
+	};
+	
+	factory.attachList("additionalCPs", addAdditionalCPSection, {min: 0});
+	
 	factory.startSection("Bonds and Anchors", "h2");
 	
 	let anchors = factory.attachTextArea("anchors");
@@ -1010,25 +1045,6 @@ let initializeSheet = (window, sheetID) => {
 		  " poorly-regarded it is, or how well it is kept), an important friendship or rivalry, or any objects that are important to you. Many of your Bonds will" +
 		  " probably be allocated more than one point; just make sure the allocation is proportional to the importance.</p>")
 	);
-	
-	factory.startSection("Additional Character Points", h2);
-	
-	let addAdditionalCPSection = (i, sectionData) => {
-		sectionData = sectionData || {};
-		let sectionFactory = new UI.EditorFactory(sectionData);
-		
-		factory.attachText("rawCPs", "Raw Character Points Granted").addClass("rawCPs").attr("type", "number");
-		factory.attachTextArea("cpSource", "Source of Character Points");
-		
-		return {"element": sectionFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": sectionData};
-	};
-	
-	factory.attachList("additionalCPs", addAdditionalCPSection, {min: 0});
-		"Here, you can document any additional character points you receive, alongwith their sources (ex. start of game bonus, story reward, etc.)."
-	);
-	
-	let addCPSection = ()
-	factory.attachText("rawCPs", "Raw Character Points").addClass("rawCPs").attr("type", "number");
 	
 	factory.startSection("Chancel and Imperator Details", "h2");
 	factory.attachTextArea("chancelInformation");
