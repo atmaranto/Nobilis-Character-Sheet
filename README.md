@@ -3,13 +3,13 @@
  
 ## To-Do
  - (Eventually) Make a more easily-configurable server system (and a more easily-configurable client-side API)
-  * Partially fulfilled with the flexible ability to `require()` the main file in order to "add" the character sheet system to a modular server
+   * Partially fulfilled with the flexible ability to `require()` the main file in order to "add" the character sheet system to a modular server
  - Make a websocket-compliant update system for the Character Sheets. This will sync the character sheet's state across tabs.
-  * As part of this, I could also add the ability to make character sheet updates (via the endpoint) more specific, with only the necessary attributes updated. However, I would need
-    to combine this with the below in order to do so.
+   * As part of this, I could also add the ability to make character sheet updates (via the endpoint) more specific, with only the necessary attributes updated. However, I would need
+     to combine this with the below in order to do so.
  - Change the character sheet specification to include the full breadth of what one can do with a character sheet, meaning it will be stored in MongoDB as
    an object rather than as a string. This should make it easier to search for character sheets by their attributes.
-  * Additionally, I should restructure the CharacterSheet to be a subitem of Account so that they can be querried together more easily (and more atomically)
+   * Additionally, I should restructure the CharacterSheet to be a subitem of Account so that they can be querried together more easily (and more atomically)
  - (*Maybe* eventually, but this is beyond the scope of the current project) Make the character sheet server shardable, so that I can host it across several servers on a
    reasonable payment model.
  
@@ -36,7 +36,15 @@
  {
 	"PORT": 80,
 	"CONNECT_STRING": "your MongoDB connect string",
-	"MAX_READ_SIZE": 33554432
+	"MAX_READ_SIZE": 33554432,
+	"MAX_PW_LENGTH": 72,
+	"MIN_PW_LENGTH": 6,
+	"MAX_NAME_LENGTH": 128,
+	"KEYGEN_ITERATIONS": 20000,
+	"SESSION_LENGTH": 30758400000,
+	"SESSION_KEY_LENGTH": 40,
+	"ACCOUNT_CREATION_DISABLED": false,
+	"ENABLE_ANONYMOUS_SHEET_CREATION": false
  }
 ```
 
@@ -63,7 +71,8 @@
  ```
  in a separate window (optionally with the server IP and the port you specified). If the connection succeeded, the simple `new_sheet.js` script should return a UUID in the form
  "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE". Once you have this, navigate to http://localhost:<port>/?id=AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE. Finally, you have your sheet! The settings don't
- (currently) work, but saving and loading does.
+ (currently) work, but saving and loading does. You can now also create a sheet at http://localhost/manager.html, which allows one to create an account and log in through a very basic
+ interface.
 
 # License
  Most files I created (models/\*, index.js, new_sheet.js, new_sheet.py, and everything under webroot except data.js and images/\*) are licensed under the MIT License:
