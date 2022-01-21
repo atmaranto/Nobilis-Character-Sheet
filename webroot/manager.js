@@ -29,6 +29,13 @@ if(STRIPPED_PATHNAME.endsWith("/")) {
 	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substr(0, STRIPPED_PATHNAME.length - 1);
 }
 
+let showError = (text, color) => {
+	let errorText = $("<p style='color: " + (color || "red") + "; font-weight: bold;'></p>").text(text);
+	errorText.appendTo($("#container"));
+	
+	setTimeout(() => (errorText.fadeOut()), 5000);
+};
+
 let openSheet = (uuid) => {
 	window.open("./?id=" + encodeURIComponent(uuid));
 };
@@ -45,10 +52,7 @@ let deleteSheet = (uuid, after) => {
 			}
 		})
 		.fail((xhr, text, err) => {
-			let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while deleting sheet: " + xhr.responseText);
-			errorText.appendTo(container);
-			
-			setTimeout(() => (errorText.fadeOut()), 5000);
+			showError("Error while deleting sheet: " + xhr.responseText);
 		})
 		.always(() => {
 			
@@ -67,10 +71,7 @@ let duplicateSheet = (uuid, after) => {
 			}
 		})
 		.fail((xhr, text, err) => {
-			let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while duplicating sheet: " + xhr.responseText);
-			errorText.appendTo(container);
-			
-			setTimeout(() => (errorText.fadeOut()), 5000);
+			showError("Error while duplicating sheet: " + xhr.responseText);
 		})
 		.always(() => {
 			
@@ -189,10 +190,14 @@ let refreshSheet = (container, currentPage) => {
 			createSheetList(sheets, container, currentPage);
 		})
 		.fail((xhr, text, err) => {
-			let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while requesting sheets: " + xhr.responseText);
-			errorText.appendTo(container);
+			console.log(xhr);
+			if(xhr.status === 401) {
+				utils.zealousDelete("sessionKey");
+				sessionStorage.set("justLoggedOut", true);
+				return;
+			}
 			
-			setTimeout(() => (errorText.fadeOut()), 5000);
+			showError("Error while requesting sheets: " + xhr.responseText);
 		})
 		.always(() => {
 			$(".pageButton").removeAttr("disabled");
@@ -203,6 +208,11 @@ let refreshSheet = (container, currentPage) => {
 let initializeManager = () => {
 	let container = $("#container");
 	let currentPage = 0;
+	
+	if(sessionStorage.getItem("justLoggedOut")) {
+		sessionStorage.removeItem("justLoggedOut");
+		showError("Warning: Your session expired, so you were logged out", "yellow");
+	}
 	
 	let loggedIn = utils.zealousGet("sessionKey");
 	if(!loggedIn) {
@@ -255,10 +265,7 @@ let initializeManager = () => {
 						window.location.reload();
 					})
 					.fail((xhr, text, err) => {
-						let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while logging out: " + xhr.responseText);
-						errorText.appendTo(container);
-						
-						setTimeout(() => (errorText.fadeOut()), 5000);
+						showError("Error while logging out: " + xhr.responseText);
 					})
 					.always(() => {
 						utils.zealousDelete("sessionKey");
@@ -279,10 +286,7 @@ let initializeManager = () => {
 							refreshSheet(container, currentPage);
 						})
 						.fail((xhr, text, err) => {
-							let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while creating sheet: " + xhr.responseText);
-							errorText.appendTo(container);
-							
-							setTimeout(() => (errorText.fadeOut()), 5000);
+							showError("Error while creating sheet: " + xhr.responseText);
 						})
 						.always(() => {
 							//$(".pageButton").removeAttr("disabled");
@@ -294,7 +298,7 @@ let initializeManager = () => {
 		accountControls
 			.append($("<div><h3>Log In</h3><label for='email'>Email: </label><input type='text' id='email' /><br /><label for='password'>Password: </label><input type='password' id='password' /></div>"))
 			.append(
-				$("<button>Log In</button>").click(() => {
+				$("<button id='loginbutton'>Log In</button>").click(() => {
 					let message = {
 						"email": $("#email").val(),
 						"password": $("#password").val()
@@ -312,16 +316,18 @@ let initializeManager = () => {
 							window.location.reload();
 						})
 						.fail((xhr, text, err) => {
-							let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while logging in: " + xhr.responseText);
-							errorText.appendTo(container);
-							
-							setTimeout(() => (errorText.fadeOut()), 5000);
+							showError("Error while logging in: " + xhr.responseText);
 						})
 						.always(() => {
 							//$(".pageButton").removeAttr("disabled");
 						});
 				})
-			);
+			)
+			.find("#email,#password").keydown((evt) => {
+				if(evt.keyCode === 13) {
+					$("#loginbutton").click();
+				}
+			});
 		
 		$("#email").val(utils.zealousGet("email") || "");
 		
@@ -329,7 +335,7 @@ let initializeManager = () => {
 			.append($("<div><h3>Create Account</h3><br /><label for='registerEmail'>Email: </label><input type='text' id='registerEmail' /><br /><label for='registerPassword'>Password: </label><input type='password' id='registerPassword' />" +
 					  "<br /><label for='registerName'>Name</label><input type='text' id='registerName' /></div>"))
 			.append(
-				$("<button>Create Account</button>").click(() => {
+				$("<button id='registerbutton'>Create Account</button>").click(() => {
 					let message = {
 						"email": $("#registerEmail").val(),
 						"password": $("#registerPassword").val(),
@@ -348,16 +354,17 @@ let initializeManager = () => {
 							window.location.reload();
 						})
 						.fail((xhr, text, err) => {
-							let errorText = $("<p style='color: red; font-weight: bold;'></p>").text("Error while creating account: " + xhr.responseText);
-							errorText.appendTo(container);
-							
-							setTimeout(() => (errorText.fadeOut()), 5000);
+							showError("Error while creating account: " + xhr.responseText);
 						})
 						.always(() => {
 							//$(".pageButton").removeAttr("disabled");
 						});
 				})
-			);
+			).find("#registerEmail,#registerPassword").keydown((evt) => {
+				if(evt.keyCode === 13) {
+					$("#registerbutton").click();
+				}
+			});;
 		
 		$("#email").val(utils.zealousGet("email") || "");
 	}

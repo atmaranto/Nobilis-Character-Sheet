@@ -57,7 +57,7 @@ function validateSession(req, res, callback, failureCallback) {
 			return failureCallback(message);
 		}
 		else {
-			return res.status(400).send(message);
+			return res.status(401).send(message);
 		}
 	};
 	
