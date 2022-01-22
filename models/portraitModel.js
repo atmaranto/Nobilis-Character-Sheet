@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2022 Anthony Maranto
+Copyright (c) 2020 Anthony Maranto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,6 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-	  CharacterSheetSchema = require("./characterSheetSchema")
+	  PortraitSchema = require("./portraitSchema")
 
-module.exports = mongoose.model("characterSheet", CharacterSheetSchema);
+module.exports = mongoose.model("portrait", PortraitSchema);

@@ -25,6 +25,22 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-	  CharacterSheetSchema = require("./characterSheetSchema")
+	  randomUUID = require("crypto").randomUUID;
 
-module.exports = mongoose.model("characterSheet", CharacterSheetSchema);
+module.exports = new mongoose.Schema({
+	uuid: {
+		type: String,
+		default: () => (randomUUID()),
+		index: true
+	},
+	
+	mimeType: {
+		type: String,
+		required: true
+	},
+	
+	data: {
+		type: Buffer,
+		required: true
+	}
+});
