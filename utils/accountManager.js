@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2021 Anthony Maranto
+Copyright (c) 2022 Anthony Maranto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,7 @@ function validateSession(req, res, callback, failureCallback) {
 			return failureCallback(message);
 		}
 		else {
-			return res.status(400).send(message);
+			return res.status(401).send(message);
 		}
 	};
 	

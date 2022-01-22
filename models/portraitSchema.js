@@ -1,4 +1,4 @@
-'''
+/*
 
 MIT License
 
@@ -22,22 +22,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-'''
+*/
 
-import argparse
+const mongoose = require("mongoose"),
+	  randomUUID = require("crypto").randomUUID;
 
-ap = argparse.ArgumentParser(description="Requests a new sheet from the server")
-
-ap.add_argument("url", nargs="?", default="localhost", help="The URL or domain of the server to connect to")
-
-args = ap.parse_args()
-
-from urllib.request import Request, urlopen
-from urllib.parse import urljoin, urlparse
-
-print("Requesting...")
-
-r = Request(args.url + "/api/sheetData", method="POST")
-response = urlopen(r)
-
-print("Response:", response.read())
+module.exports = new mongoose.Schema({
+	uuid: {
+		type: String,
+		default: () => (randomUUID()),
+		index: true
+	},
+	
+	mimeType: {
+		type: String,
+		required: true
+	},
+	
+	data: {
+		type: Buffer,
+		required: true
+	}
+});

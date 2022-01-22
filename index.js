@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2020 Anthony Maranto
+Copyright (c) 2022 Anthony Maranto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,14 @@ SOFTWARE.
 var express = require("express"),
 	bodyParser = require("body-parser"),
 	cookieParser = require("cookie-parser"),
+	multer = require("multer"),
 	mongoose = require("mongoose"),
 	config = require("./config"),
 	crypto = require("crypto"),
 	randomUUID = require("crypto").randomUUID,
 	path = require("path"),
 	CharacterSheet = require("./models/characterSheetModel"),
+	Portrait = require("./models/portraitModel"),
 	{installAccountManager, validateSession} = require("./utils/accountManager");
 
 function main(app) {
@@ -182,6 +184,128 @@ function main(app) {
 				});
 			});
 		});
+	
+	let upload = multer({storage: multer.memoryStorage({limits: {fileSize: "1MB", "files": 1}})});
+	let legalUploads = ["image/png", "image/jpg", "image/jpeg", "image/bmp"];
+	let maxUploadSize = config.MAX_PORTRAIT_UPLOAD_SIZE_MB || 1;
+	app.route("/api/sheetImage")
+		.get((req, res) => {
+			if(!req.query || (typeof req.query.id !== "string")) {
+				return res.status(400).send("No id provided");
+			}
+			
+			CharacterSheet.findOne({"uuid": req.query.id}, (err, sheet) => {
+				if(err || !sheet) {
+					return res.status(404).send("Invalid id");
+				}
+				
+				let resolveSheet = () => {
+					Portrait.findOne({"uuid": req.query.id}, (err, portrait) => {
+						if(err || !portrait) {
+							return res.status(404).send("No portrait");
+						}
+						
+						return res.status(200).set({
+							"Content-Type": portrait.mimeType,
+							"Content-Length": portrait.data.length.toString()
+						}).send(portrait.data);
+					});
+				};
+				
+				if(sheet.owner !== null) {
+					validateSession(req, res, (acct) => {
+						if(!sheet.owner || acct._id.equals(sheet.owner)  || acct.isAdmin) {
+							return resolveSheet();
+						}
+						else {
+							return res.status(404).send("Invalid id");
+						}
+					});
+				}
+				else {
+					return resolveSheet();
+				}
+			});
+		})
+		.put(upload.single("portrait"), (req, res) => {
+			if(!req.query || (typeof req.query.id !== "string")) {
+				return res.status(400).send("No id provided");
+			}
+			if(!req.file) {
+				return res.status(400).send("Missing portrait upload");
+			}
+			if(!legalUploads.indexOf(req.file.mimetype.toLowerCase()) == -1) {
+				return res.stauts(400).send("Invalid file mime type");
+			}
+			if(req.file.size > maxUploadSize * 1024 * 1024) {
+				return res.status(400).send("Portrait too large");
+			}
+			
+			CharacterSheet.findOne({"uuid": req.query.id}, (err, sheet) => {
+				if(err || !sheet) {
+					return res.status(404).send("Invalid id");
+				}
+				
+				let resolveSheet = () => {
+					Portrait.updateOne({"uuid": req.query.id}, {"data": req.file.buffer, "mimeType": req.file.mimetype}, {upsert: true}, (err, result) => {
+						if(err || !result) {
+							return res.status(404).send("Portrait not found");
+						}
+						
+						return res.status(200).send("");
+					});
+				};
+				
+				if(sheet.owner !== null) {
+					validateSession(req, res, (acct) => {
+						if(!sheet.owner || acct._id.equals(sheet.owner)  || acct.isAdmin) {
+							return resolveSheet();
+						}
+						else {
+							return res.status(404).send("Invalid id");
+						}
+					});
+				}
+				else {
+					return resolveSheet();
+				}
+			});
+		})
+		.delete((req, res) => {
+			if(!req.query || (typeof req.query.id !== "string")) {
+				return res.status(400).send("No id provided");
+			}
+			
+			CharacterSheet.findOne({"uuid": req.query.id}, (err, sheet) => {
+				if(err || !sheet) {
+					return res.status(404).send("Invalid id");
+				}
+				
+				let resolveSheet = () => {
+					Portrait.deleteOne({"uuid": req.query.id}, (err, deleted) => {
+						if(err || deleted.deleteCount < 1) {
+							return res.status(404).send("No portrait found");
+						}
+						
+						return res.status(200).send("");
+					});
+				};
+				
+				if(sheet.owner !== null) {
+					validateSession(req, res, (acct) => {
+						if(!sheet.owner || acct._id.equals(sheet.owner)  || acct.isAdmin) {
+							return resolveSheet();
+						}
+						else {
+							return res.status(404).send("Invalid id");
+						}
+					});
+				}
+				else {
+					return resolveSheet();
+				}
+			});
+		})
 	
 	const nMatcher = /^(.*) \[(\d+)\]$/;
 	app.post("/api/duplicateSheet", (req, res) => {

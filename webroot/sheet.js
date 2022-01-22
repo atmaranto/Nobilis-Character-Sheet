@@ -37,7 +37,7 @@ let initializeSheet = (window, sheetID) => {
 		.append(
 			"<button id='openSettings' onclick='UI.createSettingsWindow().show()'>Open Settings</button>" +
 			"<button id='saveSheet' onclick='window.saveSheet()'>Save Sheet</button>" +
-			"<p id='saveStatus'></p>" +
+			"<p id='saveStatus' class='noselect saveStatus'>Placeholder</p>" +
 			"<br />"
 		)
 		.append(
@@ -61,20 +61,16 @@ let initializeSheet = (window, sheetID) => {
 		$.ajax({
 			"url": STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID),
 			"data": message,
-			"method": "PUT",
-			/* "dataType": "text"
-			"headers": {
-				"Content-Type": "text/plain"
-			} */
+			"method": "PUT"
 		})
 			.done((data, text, xhr) => {
-				$("#saveStatus").text("Successfully saved sheet.");
+				$("#saveStatus").css('visibility', 'visible').text("Successfully saved sheet.");
 				
-				setTimeout(() => ($("#saveStatus").text("")), 5000);
+				setTimeout(() => ($("#saveStatus").css('visibility', 'hidden')), 5000);
 			})
 			.fail((xhr, text, err) => {
 				console.error(err);
-				$("#saveStatus").text("Error saving sheet: " + text);
+				$("#saveStatus").css('visibility', 'visible').text("Error saving sheet: " + text);
 			})
 			.always(() => {
 				$("#saveSheet").removeAttr("disabled");
@@ -1053,7 +1049,112 @@ let initializeSheet = (window, sheetID) => {
 	factory.startSection("Other Character Details", "h2");
 	factory.attachTextArea("genericCharacterDetails", "Anything else you want to add");
 	
-	sheet.parent().append(factory.createTableOfContents());
+	let toc = $(factory.createTableOfContents());
+	
+	let portraitWidth = 250;
+	let portraitHeight = 250;
+	
+	let reloadPortrait = (file, portrait) => {
+		portrait = (portrait || $("#portrait")).html("");
+		portrait.css({
+			"width": portraitWidth.toString() + "px",
+			"height": portraitHeight.toString() + "px",
+		});
+		if(characteristics.portrait) {
+			let image = $("<img />");
+			
+			image.prop("src", file ? URL.createObjectURL(file) : STRIPPED_PATHNAME + "/api/sheetImage?id=" + encodeURIComponent(sheetID));
+			let borderSize = 5;
+			image.css({"max-width": portraitWidth, "max-height": portraitHeight, "border": borderSize.toString() + "px solid black"});
+			
+			portrait.css({
+				"border": ""
+			});
+			
+			portrait.append(image);
+			let _disabled = false;
+			portrait.append(
+				$("<a title='Remove image' class='removeButton' href='#'>Delete</a>")
+					.click((e) => {
+						e.preventDefault();
+						if(_disabled) return;
+						_disabled = true;
+						
+						$.ajax({
+							url: STRIPPED_PATHNAME + "/api/sheetImage?id=" + encodeURIComponent(sheetID),
+							method: "DELETE",
+						})
+						.done((data, text, xhr) => {
+							characteristics.portrait = false;
+							window.saveSheet();
+							reloadPortrait();
+						})
+						.fail((xhr, text, err) => {
+							let errorText = $("<span style='color: red'><br /></span>").text("Error deleting file: " + xhr.responseText);
+							portrait.append(errorText);
+							
+							setTimeout(() => (errorText.fadeOut()), 5000);
+							_disabled = false;
+						});
+					})
+					.css({"top": ((borderSize).toString() + "px"), "left": ((borderSize).toString() + "px")})
+			);
+		}
+		else {
+			let _disabled = false;
+			let fileDialog = $("<input type='file' style='display: none' accept='image/*' />")
+				.on("change", () => {
+					if(_disabled) return;
+					let files = fileDialog.prop("files");
+					if(files.length > 0 && files[0].type.toLowerCase().startsWith("image/")) {
+						// Upload first file
+						let formData = new FormData();
+						formData.append("portrait", files[0]);
+						_disabled = true;
+						
+						$.ajax({
+							url: STRIPPED_PATHNAME + "/api/sheetImage?id=" + encodeURIComponent(sheetID),
+							method: "PUT",
+							data: formData,
+							processData: false,
+							contentType: false
+						})
+						.done((data, text, xhr) => {
+							characteristics.portrait = true;
+							window.saveSheet();
+							reloadPortrait(files[0]);
+						})
+						.fail((xhr, text, err) => {
+							let errorText = $("<span style='color: red'><br /></span>").text("Error uploading file: " + xhr.responseText);
+							portrait.append(errorText);
+							
+							setTimeout(() => (errorText.fadeOut()), 5000);
+							_disabled = false;
+						});
+					}
+				});
+			portrait.append(
+				$("<p>No portrait. </p>")
+					.append(
+						$("<a href='#'>Upload one?</a>")
+							.click((e) => {
+								e.preventDefault();
+								fileDialog.click();
+							})
+					)
+					.append(fileDialog)
+			);
+		}
+	};
+	
+	let portrait = $("<div id='portrait'></div>");
+	reloadPortrait(undefined, portrait);
+	
+	let sidebar = $("<div class='sidebar'></div>");
+	sidebar.append(toc);
+	sidebar.append(portrait);
+	
+	sheet.parent().append(sidebar);
 	sheet.append(factory.create());
 	
 	console.log("Loaded.");
