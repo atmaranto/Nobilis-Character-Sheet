@@ -194,6 +194,7 @@ let refreshSheet = (container, currentPage) => {
 			if(xhr.status === 401) {
 				utils.zealousDelete("sessionKey");
 				sessionStorage.setItem("justLoggedOut", true);
+				window.location.reload();
 				return;
 			}
 			

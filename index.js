@@ -180,7 +180,14 @@ function main(app) {
 						return res.status(400).send("Invalid id");
 					}
 					
-					return res.status(200).send("Deleted");
+					Portrait.findOneAndDelete({"uuid": req.body.id}, {lean: true}, (err, portrait) => {
+						if(err || !portrait) {
+							// We'll assume the error is just because there's no portrait associated with this sheet
+							return res.status(200).send("Deleted sheet");
+						}
+						
+						return res.status(200).send("Deleted sheet and portrait");
+					});
 				});
 			});
 		});
@@ -357,7 +364,31 @@ function main(app) {
 						return res.status(500).send("Internal error");
 					}
 					
-					return res.status(200).send(newSheet._id);
+					if(typeof sheet.sheetData.portrait === "string") {
+						Portrait.findOne({"uuid": req.body.id}, (err, portrait) => {
+							if(!portrait || err) {
+								console.error("Unable to find portrait for character sheet id", sheet.uuid);
+								
+								return res.status(200).send(newSheet._id);
+							}
+							
+							portrait._id = mongoose.Types.ObjectId();
+							portrait.uuid = sheet.uuid;
+							portrait.isNew = true;
+							
+							portrait.save((err, newPortrait) => {
+								if(!newPortrait || err) {
+									// Welp, it duplicated except for the portrait; good enough
+									console.log(err);
+								}
+								
+								return res.status(200).send(newSheet._id);
+							});
+						});
+					}
+					else {
+						return res.status(200).send(newSheet._id);
+					}
 				});
 			});
 		});

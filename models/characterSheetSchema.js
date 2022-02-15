@@ -25,7 +25,8 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-	  randomUUID = require("crypto").randomUUID;
+	  randomUUID = require("crypto").randomUUID,
+	  sheetData = require("./sheetData");
 
 module.exports = new mongoose.Schema({
 	uuid: {
@@ -45,8 +46,8 @@ module.exports = new mongoose.Schema({
 	},
 	
 	sheetData: {
-		type: String,
-		default: null
+		type: sheetData,
+		default: () => {}
 	},
 	
 	sheetName: {

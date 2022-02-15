@@ -37,6 +37,7 @@ let initializeSheet = (window, sheetID) => {
 		.append(
 			"<button id='openSettings' onclick='UI.createSettingsWindow().show()'>Open Settings</button>" +
 			"<button id='saveSheet' onclick='window.saveSheet()'>Save Sheet</button>" +
+			"<button id='gotoManager' onclick='window.gotoManager()'>Go To Sheet Manager</button>" +
 			"<p id='saveStatus' class='noselect saveStatus'>Placeholder</p>" +
 			"<br />"
 		)
@@ -44,6 +45,10 @@ let initializeSheet = (window, sheetID) => {
 			"<div id='sheet'></div>"
 		)
 		.children().last().wrap($("<div class='sheetContainer'></div>"));
+	
+	window.gotoManager = () => {
+		window.location = "./manager.html";
+	};
 	
 	let characteristics = window.characteristics;
 	
@@ -84,6 +89,7 @@ let initializeSheet = (window, sheetID) => {
 		
 		if(window.sheetOwner) {
 			owningMessage.html("This sheet is owned by ").append($("<span style='color: green; font-style: italic'></span>").text(window.sheetOwner));
+			
 		}
 		else {
 			owningMessage.html("This sheet is owned by <span style='color: red; font-style: italic'>nobody</span>. ")
@@ -286,7 +292,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	let temporaryAMPSlider = factory.attachSlider("temporaryAMP", "<b>Aspect</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
 		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate)
-	let temporaryDMPSlider = factory.attachSlider("temporaryDPP", "<b>Domain</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
+	let temporaryDMPSlider = factory.attachSlider("temporaryDMP", "<b>Domain</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
 		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate);
 	let temporaryRMPSlider = factory.attachSlider("temporaryRMP", "<b>Realm</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
 		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate);
