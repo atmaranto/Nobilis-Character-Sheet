@@ -1073,7 +1073,7 @@ let initializeSheet = (window, sheetID) => {
 			"width": portraitWidth.toString() + "px",
 			"height": portraitHeight.toString() + "px",
 		});
-		if(characteristics.portrait) {
+		if(characteristics.hasPortrait) {
 			let image = $("<img />");
 			
 			image.prop("src", file ? URL.createObjectURL(file) : STRIPPED_PATHNAME + "/api/sheetImage?id=" + encodeURIComponent(sheetID));
@@ -1098,15 +1098,23 @@ let initializeSheet = (window, sheetID) => {
 							method: "DELETE",
 						})
 						.done((data, text, xhr) => {
-							characteristics.portrait = false;
+							characteristics.hasPortrait = false;
 							window.saveSheet();
 							reloadPortrait();
 						})
 						.fail((xhr, text, err) => {
 							let errorText = $("<span style='color: red'><br /></span>").text("Error deleting file: " + xhr.responseText);
 							portrait.append(errorText);
+
+							if(xhr.responseText.indexOf("not found") != -1) {
+								characteristics.hasPortrait = false;
+								window.saveSheet();
+								reloadPortrait();
+							}
 							
-							setTimeout(() => (errorText.fadeOut()), 5000);
+							setTimeout(() => {
+								errorText.fadeOut();
+							}, 5000);
 							_disabled = false;
 						});
 					})
@@ -1133,7 +1141,7 @@ let initializeSheet = (window, sheetID) => {
 							contentType: false
 						})
 						.done((data, text, xhr) => {
-							characteristics.portrait = true;
+							characteristics.hasPortrait = true;
 							window.saveSheet();
 							reloadPortrait(files[0]);
 						})

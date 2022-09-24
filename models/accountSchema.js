@@ -71,22 +71,5 @@ module.exports = new mongoose.Schema({
 	sessionDate: {
 		type: Date,
 		default: Date.now
-	},
-
-	ownedSheets: [{
-		type: characterSheetSchema
-	}],
-
-	sharedSheets: [{
-		permission: {
-			type: String,
-			enum: ["read", "write", "owner"],
-			required: true
-		},
-
-		id: {
-			type: String,
-			required: true
-		}
-	}]
+	}
 });

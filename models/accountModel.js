@@ -27,4 +27,10 @@ SOFTWARE.
 const mongoose = require("mongoose"),
 	  AccountSchema = require("./accountSchema")
 
+AccountSchema.virtual("ownedSheets", {
+	ref: "characterSheet",
+	localField: "_id",
+	foreignField: "owner"
+});
+
 module.exports = mongoose.model("account", AccountSchema);

@@ -33,10 +33,10 @@ module.exports = {
 		type: String,
 		default: ""
 	},
-	
-	portrait: {
-		type: String,
-		default: null
+
+	hasPortrait: {
+		type: Boolean,
+		default: false
 	},
 	
 	characterName: {

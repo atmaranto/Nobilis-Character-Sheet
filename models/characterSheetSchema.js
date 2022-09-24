@@ -36,6 +36,12 @@ module.exports = new mongoose.Schema({
 		required: true
 	},
 	
+	portrait: {
+		type: mongoose.ObjectId,
+		default: null,
+		ref: 'portrait'
+	},
+	
 	created: {
 		type: Date,
 		default: Date.now,
@@ -57,10 +63,29 @@ module.exports = new mongoose.Schema({
 	owner: {
 		type: mongoose.ObjectId,
 		default: null,
-		required: true
+		required: false,
+		ref: 'account'
 	},
 
+	sharedWith: [{
+		user: {
+			type: mongoose.ObjectId,
+			ref: 'account'
+		},
+
+		permission: {
+			type: String,
+			enum: ['read', 'write', 'owner'],
+			default: 'read'
+		}
+	}],
+
 	public: {
+		type: Boolean,
+		default: false
+	},
+
+	publicWritable: {
 		type: Boolean,
 		default: false
 	}

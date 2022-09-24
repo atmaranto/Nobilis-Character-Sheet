@@ -51,7 +51,7 @@ function newSession() {
 	return (Buffer.from(crypto.randomBytes(sessionKeyLength))).toString("hex");
 }
 
-function validateSession(req, res, callback, failureCallback, lean) {
+function validateSession(req, res, callback, failureCallback, lean, populate) {
 	let _fail = (message) => {
 		if(typeof failureCallback === "function") {
 			return failureCallback(message);
@@ -72,9 +72,13 @@ function validateSession(req, res, callback, failureCallback, lean) {
 	let sessionKey = req.body.sessionKey || req.cookies.sessionKey;
 	
 	let query = Account.findOne({email: email, sessionKey: sessionKey, sessionDate: {$gte: Date.now() - sessionDuration}});
-	
+
 	if(lean) {
 		query = query.lean();
+	}
+
+	if(populate) {
+		query = query.populate(populate);
 	}
 
 	return query.exec((err, acct) => {

@@ -1,78 +1,131 @@
-const randomUUID = require("crypto").randomUUID,
+const mongoose = require("mongoose"),
+    randomUUID = require("crypto").randomUUID,
     CharacterSheet = require("../models/characterSheetModel"),
     CharacterSheetData = require("../models/sheetDataModel"),
+    Account = require("../models/accountModel"),
     Portrait = require("../models/portraitModel"),
 	multer = require("multer"),
     {validateSession} = require("../utils/accountManager"),
 	{debug} = require("../utils/log");
 
+let constructReadQuery = (id, acct) => {
+	let query = {
+		uuid: id,
+	};
+
+	if(!acct || !acct.isAdmin) {
+		query.$or = [{public: true}, {publicWritable: true}];
+
+		if(acct) {
+			query.$or.push({owner: acct._id});
+			query.$or.push({
+				sharedWith: {
+					owner: acct._id
+				}
+			});
+		}
+	}
+
+	return query;
+}
+
+let constructWriteQuery = (id, acct) => {
+	let query = {
+		uuid: id
+	};
+
+	if(!acct || !acct.isAdmin) {
+		query.$or = [{publicWritable: true}];
+
+		if(acct) {
+			query.$or.push({owner: acct._id});
+			query.$or.push({
+				sharedWith: {
+					owner: acct._id,
+					permission: {
+						$in: ["write", "owner"]
+					}
+				}
+			});
+		}
+	}
+
+	return query;
+}
+
+let constructDeleteQuery = (id, acct) => {
+	let query = {
+		uuid: id
+	};
+
+	if(!acct || !acct.isAdmin) {
+		query.$or = [
+			{owner: acct._id},
+			{
+				sharedWith: {
+					owner: acct._id,
+					permission: "owner"
+				}
+			}
+		];
+	}
+
+	return query;
+}
+
 module.exports = function(app, config) {
     app.route("/api/sheetData")
 		.get((req, res) => {
+			/* Get a character sheet's data */
 			if(!req.query || (typeof req.query.id !== "string")) {
 				return res.status(400).send("No id provided");
 			}
 
 			let sayInvalid = () => (res.status(404).send("Invalid id"));
-			
-			CharacterSheet.findOne({"uuid": req.query.id}).lean().exec((err, sheet) => {
-				if(err || !sheet) {
-					return sayInvalid();
-				}
 
-				console.log(sheet.owner, sheet.lastModified);
-				
-				let resolveSheet = (permission) => {
+			let doQuery = (acct) => {
+				let query = constructReadQuery(req.query.id, acct);
+
+				CharacterSheet.findOne(query).populate("owner", "name").lean().exec((err, sheet) => {
+					if(err || !sheet) {
+						console.error(err, sheet, query);
+						return sayInvalid();
+					}
+
+					let ownerName = sheet.owner ? sheet.owner.name : undefined;
 					let sheetData = sheet.sheetData;
+					let sharedEntry = (sheet.sharedWith || []).find((share) => (share.owner.equals(acct._id)));
+					let permission = sharedEntry && sharedEntry.permission;
 					
 					return res.status(200).set({
 						"Content-Type": "text/json"
-					}).send({sheetData: sheetData, sheetOwner: sheet.owner, lastModified: sheet.lastModified, permission: permission});
-				};
-				
-				if(sheet.owner !== null && sheet.owner !== undefined && sheet.public !== true) {
-					validateSession(req, res, (acct) => {
-						if(!sheet.owner || acct._id.equals(sheet.owner) || acct.isAdmin) {
-							return resolveSheet();
-						}
-						else {
-							let found = acct.sharedSheets && acct.sharedSheets.find((sharedSheet) => sharedSheet.id.equals(sheet._id));
+					}).send({sheetData: sheetData, sheetOwner: ownerName, lastModified: sheet.lastModified, permission: permission});
+				});
+			};
 
-							if(found) {
-								return resolveSheet(found.permission);
-							}
-							else {
-								return sayInvalid();
-							}
-						}
-					});
-				}
-				else {
-					return resolveSheet();
-				}
-			});
+			validateSession(req, res, (acct) => {
+				doQuery(acct);
+			}, (err) => {
+				doQuery();
+			}, true);
 		})
 		.post((req, res) => {
+			/* Create a new character sheet */
 			let createSheet = (acct) => {
 				let sheet = new CharacterSheet();
+				
+				if(acct !== null && acct !== undefined) {
+					sheet.owner = acct._id;
+				}
 
-				sheet.sheetData = new CharacterSheetData();
-				let callback = (sheet, err) => {
-					if(err || !sheet) {
+				sheet.save().then((results, err) => {
+					if(err || !results) {
 						debug(err);
 						return res.status(500).send("Unable to create new sheet");
 					}
 					
 					return res.status(200).send(sheet.uuid);
-				};
-				
-				if(acct !== null && acct !== undefined) {
-					sheet.owner = acct._id;
-					Account.updateOne({_id: acct._id}, {$addToSet: {ownedSheets: sheet}}).exec((err, result) => callback(result, err));
-				}
-				else {
-					sheet.save().then(callback);
-				}
+				});
 			};
 			
 			return validateSession(req, res, (acct) => {
@@ -98,19 +151,9 @@ module.exports = function(app, config) {
 			let updateData = req.body.sheetData;
 			
 			let updateSheet = (acct) => {
-				let query = {"uuid": req.query.id};
-				
-				if(!acct || !acct.isAdmin) {
-					if(acct) {
-						query["$or"] = [{owner: null}, {owner: acct._id}];
-					}
-					else {
-						query["owner"] = null;
-					}
-				}
+				let query = constructWriteQuery(req.query.id, acct);
 				
 				let newData = {"sheetData": updateData, "lastModified": Date.now()};
-				console.log(newData);
 				
 				CharacterSheet.findOneAndUpdate(query, newData, (err, sheet) => {
 					if(err || !sheet) {
@@ -134,11 +177,7 @@ module.exports = function(app, config) {
 			}
 			
 			validateSession(req, res, (acct) => {
-				let query = {"uuid": req.body.id};
-				
-				if(!acct.isAdmin) {
-					query["owner"] = acct._id;
-				}
+				let query = constructDeleteQuery(req.body.id, acct);
 				
 				CharacterSheet.findOneAndDelete(query, {lean: true}, (err, sheet) => {
 					if(err || !sheet) {
@@ -160,44 +199,33 @@ module.exports = function(app, config) {
 	let upload = multer({storage: multer.memoryStorage({limits: {fileSize: "1MB", "files": 1}})});
 	let legalUploads = ["image/png", "image/jpg", "image/jpeg", "image/bmp"];
 	let maxUploadSize = config.MAX_PORTRAIT_UPLOAD_SIZE_MB || 1;
+
 	app.route("/api/sheetImage")
 		.get((req, res) => {
 			if(!req.query || (typeof req.query.id !== "string")) {
 				return res.status(400).send("No id provided");
 			}
-			
-			CharacterSheet.findOne({"uuid": req.query.id}, (err, sheet) => {
-				if(err || !sheet) {
-					return res.status(404).send("Invalid id");
-				}
-				
-				let resolveSheet = () => {
-					Portrait.findOne({"uuid": req.query.id}, (err, portrait) => {
-						if(err || !portrait) {
-							return res.status(404).send("No portrait");
-						}
-						
-						return res.status(200).set({
-							"Content-Type": portrait.mimeType,
-							"Content-Length": portrait.data.length.toString()
-						}).send(portrait.data);
-					});
-				};
-				
-				if(sheet.owner !== null) {
-					validateSession(req, res, (acct) => {
-						if(!sheet.owner || acct._id.equals(sheet.owner)  || acct.isAdmin) {
-							return resolveSheet();
-						}
-						else {
-							return res.status(404).send("Invalid id");
-						}
-					});
-				}
-				else {
-					return resolveSheet();
-				}
-			});
+
+			let resolveImage = (acct) => {
+				let query = constructReadQuery(req.query.id, acct);
+
+				CharacterSheet.findOne(query).select("portrait").populate("portrait").lean().exec((err, sheet) => {
+					if(err || !sheet || !sheet.portrait) {
+						return res.status(404).send("No portrait");
+					}
+
+					return res.status(200).set({
+						"Content-Type": sheet.portrait.mimeType,
+						"Content-Length": sheet.portrait.data.length().toString()
+					}).send(sheet.portrait.data.buffer);
+				});
+			};
+
+			validateSession(req, res, (acct) => {
+				resolveImage(acct);
+			}, (failureMessage) => {
+				resolveImage();
+			}, true);
 		})
 		.put(upload.single("portrait"), (req, res) => {
 			if(!req.query || (typeof req.query.id !== "string")) {
@@ -212,101 +240,119 @@ module.exports = function(app, config) {
 			if(req.file.size > maxUploadSize * 1024 * 1024) {
 				return res.status(400).send("Portrait too large");
 			}
-			
-			CharacterSheet.findOne({"uuid": req.query.id}, (err, sheet) => {
-				if(err || !sheet) {
-					return res.status(404).send("Invalid id");
-				}
-				
-				let resolveSheet = () => {
-					Portrait.updateOne({"uuid": req.query.id}, {"data": req.file.buffer, "mimeType": req.file.mimetype}, {upsert: true}, (err, result) => {
-						if(err || !result) {
-							return res.status(404).send("Portrait not found");
-						}
-						
-						return res.status(200).send("");
-					});
+
+			let updatePortrait = (acct) => {
+				let query = constructWriteQuery(req.query.id, acct);
+
+				let update = {
+					"mimeType": req.file.mimetype,
+					"data": req.file.buffer
 				};
-				
-				if(sheet.owner !== null) {
-					validateSession(req, res, (acct) => {
-						if(!sheet.owner || acct._id.equals(sheet.owner)  || acct.isAdmin) {
-							return resolveSheet();
-						}
-						else {
-							return res.status(404).send("Invalid id");
-						}
-					});
-				}
-				else {
-					return resolveSheet();
-				}
-			});
+
+				CharacterSheet.findOne(query).lean().exec((err, sheet) => {
+					if(err || !sheet) {
+						return res.status(404).send("Invalid id");
+					}
+
+					if(sheet.portrait) {
+						Portrait.findOneAndUpdate({"_id": sheet.portrait}, update, (err, portrait) => {
+							if(err || !portrait) {
+								return res.status(500).send("Error updating portrait");
+							}
+
+							return res.status(200).send("");
+						});
+					}
+					else {
+						let portrait = new Portrait(update);
+
+						portrait.save((err, portrait) => {
+							if(err || !portrait) {
+								return res.status(500).send("Error saving portrait");
+							}
+
+							// We can simplify the query here
+							CharacterSheet.updateOne({uuid: query.uuid}, {"portrait": portrait._id}, (err, sheet) => {
+								if(err || !sheet) {
+									return res.status(500).send("Error updating sheet");
+								}
+
+								return res.status(200).send("");
+							});
+						});
+					}
+				});
+			};
+
+			validateSession(req, res, (acct) => {
+				updatePortrait(acct);
+			}, (failureMessage) => {
+				updatePortrait();
+			}, true);
 		})
 		.delete((req, res) => {
 			if(!req.query || (typeof req.query.id !== "string")) {
 				return res.status(400).send("No id provided");
 			}
-			
-			CharacterSheet.findOne({"uuid": req.query.id}, (err, sheet) => {
-				if(err || !sheet) {
-					return res.status(404).send("Invalid id");
-				}
-				
-				let resolveSheet = () => {
-					Portrait.deleteOne({"uuid": req.query.id}, (err, deleted) => {
-						if(err || deleted.deleteCount < 1) {
-							return res.status(404).send("No portrait found");
+
+			let deletePortrait = (acct) => {
+				let query = constructWriteQuery(req.query.id, acct);
+
+				let update = {
+					$set: {
+						"portrait": null
+					}
+				};
+
+				CharacterSheet.findOneAndUpdate(query, update).lean().exec((err, sheet) => {
+					if(err || !sheet) {
+						return res.status(404).send("Invalid id");
+					}
+
+					Portrait.deleteOne({"_id": sheet.portrait}, (err, deleted) => {
+						if(err || deleted.deletedCount < 1) {
+							return res.status(500).send("Portrait not found");
 						}
-						
+
 						return res.status(200).send("");
 					});
-				};
-				
-				if(sheet.owner !== null) {
-					validateSession(req, res, (acct) => {
-						if(!sheet.owner || acct._id.equals(sheet.owner)  || acct.isAdmin) {
-							return resolveSheet();
-						}
-						else {
-							return res.status(404).send("Invalid id");
-						}
-					});
-				}
-				else {
-					return resolveSheet();
-				}
-			});
+				});
+			};
+
+			validateSession(req, res, (acct) => {
+				deletePortrait(acct);
+			}, (failureMessage) => {
+				deletePortrait();
+			}, true);
 		})
 	
 	const nMatcher = /^(.*) \[(\d+)\]$/;
+
 	app.post("/api/duplicateSheet", (req, res) => {
 		if(!req.body || (typeof req.body.id !== "string")) {
 			return res.status(400).send("No id provided");
 		}
 		
 		validateSession(req, res, (acct) => {
-			let query = {"uuid": req.body.id};
+			let query = constructReadQuery(req.body.id, acct);
 			
-			if(!acct.isAdmin) {
-				query["owner"] = acct._id;
-			}
-			
-			CharacterSheet.findOne(query, (err, sheet) => {
+			CharacterSheet.findOne(query).populate("portrait").exec((err, sheet) => {
 				if(err || !sheet) {
 					return res.status(400).send("Invalid id");
 				}
 				
+				let sheetName = sheet.sheetData.characterName;
 				let newName = "Untitled [2]";
-				if(typeof sheet.sheetName === "string") {
-					let match = sheet.sheetName.match(nMatcher);
+
+				if(typeof sheetName === "string") {
+					let match = sheetName.match(nMatcher);
 					if(match === null) {
-						newName = sheet.sheetName + " [2]";
+						newName = sheetName + " [2]";
 					}
 					else {
 						let result = parseInt(match[2]);
 						if(result === NaN) {
-							newName = sheet.sheetName + " [2?]";
+							newName = sheetName + " [2?]";
 						}
 						else {
 							newName = match[1] + " [" + (result + 1).toString() + "]";
@@ -315,44 +361,50 @@ module.exports = function(app, config) {
 				}
 				
 				if(newName.length > 200) {
-					newName = newName.substr(newName.length - 200);
+					newName = newName.substring(newName.length - 200);
 				}
+
+				let newSheet = new CharacterSheet();
+				newSheet.sheetData = sheet.sheetData;
+				newSheet._owner = sheet._owner;
 				
-				sheet.sheetName = newName;
-				sheet._id = mongoose.Types.ObjectId();
-				sheet.uuid = randomUUID();
-				sheet.isNew = true;
-				
-				sheet.save((err, newSheet) => {
+				newSheet.save().then((newSheet, err) => {
 					if(!newSheet || err) {
 						console.error(err);
 						return res.status(500).send("Internal error");
 					}
 					
-					if(typeof sheet.sheetData.portrait === "string") {
-						Portrait.findOne({"uuid": req.body.id}, (err, portrait) => {
-							if(!portrait || err) {
-								console.error("Unable to find portrait for character sheet id", sheet.uuid);
-								
-								return res.status(200).send(newSheet._id);
+					let respond = () => {
+						return res.status(200).send(newSheet.uuid);
+					}
+					
+					if(sheet.portrait) {
+						let portrait = new Portrait();
+
+						portrait.mimeType = sheet.portrait.mimeType;
+						portrait.data = sheet.portrait.data;
+						
+						portrait.save().then((newPortrait, err) => {
+							if(!newPortrait || err) {
+								// Welp, it duplicated except for the portrait; good enough
+								console.log(newPortrait, err);
+
+								return respond();
 							}
-							
-							portrait._id = mongoose.Types.ObjectId();
-							portrait.uuid = sheet.uuid;
-							portrait.isNew = true;
-							
-							portrait.save((err, newPortrait) => {
-								if(!newPortrait || err) {
-									// Welp, it duplicated except for the portrait; good enough
-									console.log(err);
-								}
-								
-								return res.status(200).send(newSheet._id);
-							});
+							else {
+								newSheet.portrait = newPortrait._id;
+								newSheet.save().then((newSheet, err) => {
+									if(!newSheet || err) {
+										console.error(err);
+									}
+
+									return respond();
+								});
+							}
 						});
 					}
 					else {
-						return res.status(200).send(newSheet._id);
+						return respond();
 					}
 				});
 			});
