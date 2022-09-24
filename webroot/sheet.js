@@ -26,7 +26,7 @@ SOFTWARE.
 
 let STRIPPED_PATHNAME = window.location.pathname;
 if(STRIPPED_PATHNAME.endsWith("/")) {
-	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substr(0, STRIPPED_PATHNAME.length - 1);
+	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substring(0, STRIPPED_PATHNAME.length - 1);
 }
 
 let initializeSheet = (window, sheetID) => {
@@ -50,23 +50,22 @@ let initializeSheet = (window, sheetID) => {
 		window.location = "./manager.html";
 	};
 	
-	let characteristics = window.characteristics;
+	// let characteristics = window.characteristics;
 	
 	window.saveSheet = () => {
 		$("#saveSheet").attr("disabled", true);
 		
 		let message = {
-			sheetData: JSON.stringify(characteristics),
+			sheetData: characteristics,
 			email: utils.zealousGet("email"),
-			sessionKey: utils.zealousGet("sessionKey"),
-			playerName: characteristics.playerName,
-			characterName: characteristics.characterName
+			sessionKey: utils.zealousGet("sessionKey")
 		};
 		
 		$.ajax({
 			"url": STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID),
-			"data": message,
-			"method": "PUT"
+			"data": JSON.stringify(message),
+			"method": "PUT",
+			"contentType": "application/json"
 		})
 			.done((data, text, xhr) => {
 				$("#saveStatus").css('visibility', 'visible').text("Successfully saved sheet.");
@@ -105,8 +104,10 @@ let initializeSheet = (window, sheetID) => {
 						
 						$.ajax({
 							"url": STRIPPED_PATHNAME + "/api/account/claimSheet",
-							"data": message,
-							"method": "POST"
+							"data": JSON.stringify(message),
+							"method": "POST",
+							"dataType": "json",
+							"contentType": "application/json"
 						})
 							.done((data, text, xhr) => {
 								window.sheetOwner = utils.zealousGet("email");
@@ -999,8 +1000,14 @@ let initializeSheet = (window, sheetID) => {
 		sectionData = sectionData || {};
 		let sectionFactory = new UI.EditorFactory(sectionData);
 		
-		sectionFactory.attachText("rawCPs", "Raw Character Points Granted").addClass("rawCPs").attr("type", "number")
-			.on("input change", attributeUpdate);
+		sectionFactory.attachText("rawCPs", "Raw Character Points Granted")
+			.addClass("rawCPs editorevents")
+			.attr("type", "number")
+			.on("input change", attributeUpdate).on("removed", function() {
+				// Hack to manually remove the provided CPs when this is deleted
+				$(this).val("0");
+				attributeUpdate();
+			});
 		sectionFactory.attachTextArea("cpSource", "Source of Character Points");
 		
 		return {"element": sectionFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": sectionData};
@@ -1186,18 +1193,40 @@ let initializeSheet = (window, sheetID) => {
 	else {
 		$.ajax(STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(parameters.id))
 			.done((data, text, xhr) => {
-				window.characteristics = JSON.parse(data.sheetData);
+				window.characteristics = data.sheetData;
 				window.sheetOwner = data.sheetOwner;
 				utils.cookie.set("last-sheet-id", parameters.id);
 				
-				// Add sheet to recent sheets
-				let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
-				if(recentSheets.indexOf(parameters.id) !== -1) {
-					recentSheets.splice(recentSheets.indexOf(parameters.id), 1);
+				try {
+					// Add sheet to recent sheets
+					let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
+
+					recentSheets = recentSheets.map((item) => {
+						if(typeof item === "string") {
+							return {id: item, lastModified: null, owner: null};
+						}
+
+						return item;
+					})
+
+					let found = recentSheets.find((item) => (item.id === parameters.id));
+					if(found !== undefined) {
+						recentSheets.splice(recentSheets.indexOf(found), 1);
+					}
+
+					let sheet = {
+						id: parameters.id,
+						lastModified: data.lastModified,
+						owner: data.sheetOwner
+					};
+
+					recentSheets.splice(0, 0, sheet);
+					(localStorage || sessionStorage).setItem("recentSheets", JSON.stringify(recentSheets))
 				}
-				recentSheets.splice(0, 0, parameters.id);
-				(localStorage || sessionStorage).setItem("recentSheets", JSON.stringify(recentSheets))
-				
+				catch(e) {
+					console.log("Non-fatal error while trying to add sheet to recent sheets: " + e);
+				}
+
 				initializeSheet(window, parameters.id);
 			})
 			.fail((xhr, text, err) => {

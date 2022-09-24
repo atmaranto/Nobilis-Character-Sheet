@@ -51,7 +51,7 @@ function newSession() {
 	return (Buffer.from(crypto.randomBytes(sessionKeyLength))).toString("hex");
 }
 
-function validateSession(req, res, callback, failureCallback) {
+function validateSession(req, res, callback, failureCallback, lean) {
 	let _fail = (message) => {
 		if(typeof failureCallback === "function") {
 			return failureCallback(message);
@@ -71,7 +71,13 @@ function validateSession(req, res, callback, failureCallback) {
 	let email = req.body.email || req.cookies.email;
 	let sessionKey = req.body.sessionKey || req.cookies.sessionKey;
 	
-	return Account.findOne({email: email, sessionKey: sessionKey, sessionDate: {$gte: Date.now() - sessionDuration}}, (err, acct) => {
+	let query = Account.findOne({email: email, sessionKey: sessionKey, sessionDate: {$gte: Date.now() - sessionDuration}});
+	
+	if(lean) {
+		query = query.lean();
+	}
+
+	return query.exec((err, acct) => {
 		if(err || !acct) {
 			return _fail("Invalid or missing credentials");
 		}

@@ -172,38 +172,76 @@ let refreshSheet = (container, currentPage) => {
 		message.searchOwner = searchOwner;
 	}
 	
-	console.log(message);
+	let loggedIn = utils.zealousGet("sessionKey");
 	
-	$.ajax({
-		"url": "./api/account/listSheets",
-		"data": message,
-		"method": "POST"
-	})
-		.done((data, text, xhr) => {
-			let sheets = typeof data === "string" ? JSON.parse(data) : data;
-			console.log(data);
-			
-			sheets.forEach((sheet) => {
-				// Convert lastModified dates into the local timezone
-				sheet.lastModified = new Date(sheet.lastModified).toString();
-			});
-			createSheetList(sheets, container, currentPage);
+	if(loggedIn) {
+		$.ajax({
+			"url": "./api/account/listSheets",
+			"data": message,
+			"method": "POST"
 		})
-		.fail((xhr, text, err) => {
-			console.log(xhr);
-			if(xhr.status === 401) {
-				utils.zealousDelete("sessionKey");
-				sessionStorage.setItem("justLoggedOut", true);
-				window.location.reload();
-				return;
+			.done((data, text, xhr) => {
+				let sheets = typeof data === "string" ? JSON.parse(data) : data;
+				console.log(data);
+				
+				sheets.forEach((sheet) => {
+					// Convert lastModified dates into the local timezone
+					sheet.lastModified = new Date(sheet.lastModified).toString();
+				});
+				createSheetList(sheets, container, currentPage);
+			})
+			.fail((xhr, text, err) => {
+				console.log(xhr);
+				if(xhr.status === 401) {
+					utils.zealousDelete("sessionKey");
+					sessionStorage.setItem("justLoggedOut", true);
+					window.location.reload();
+					return;
+				}
+				
+				showError("Error while requesting sheets: " + xhr.responseText);
+			})
+			.always(() => {
+				$(".pageButton").removeAttr("disabled");
+				_REQUESTING_REFRESH = false;
+			});
+	} else {
+		let recentSheets = getRecentSheets();
+		let filteredRecentSheets = recentSheets.filter((sheet) => {
+			if(searchName.length > 0 && sheet.name && sheet.name.toLowerCase().indexOf(searchName.toLowerCase()) === -1) {
+				return false;
 			}
 			
-			showError("Error while requesting sheets: " + xhr.responseText);
-		})
-		.always(() => {
-			$(".pageButton").removeAttr("disabled");
-			_REQUESTING_REFRESH = false;
+			if(searchOwner.length > 0 && sheet.owner && sheet.owner.toLowerCase().indexOf(searchOwner.toLowerCase()) === -1) {
+				return false;
+			}
+			
+			return true;
 		});
+
+		createSheetList(filteredRecentSheets, container, currentPage);
+	}
+};
+
+let getRecentSheets = () => {
+	let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
+	
+	return recentSheets.map((sheet) => {
+		let owner;
+		if(sheet.owner === undefined) {
+			owner = "Unclaimed";
+		}
+		else {
+			owner = sheet.ownerName || "Unknown";
+		}
+		
+		return {
+			name: sheet.name || "Recent sheet",
+			owner: owner,
+			lastModified: sheet.lastModified || "Unknown",
+			uuid: sheet.id
+		};
+	});
 };
 
 let initializeManager = () => {
@@ -217,17 +255,10 @@ let initializeManager = () => {
 	
 	let loggedIn = utils.zealousGet("sessionKey");
 	if(!loggedIn) {
-		let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
+		let recentSheets = getRecentSheets();
 		
 		createSheetList(
-			recentSheets.map((sheet) => {
-				return {
-					name: "Recent sheet",
-					owner: "Unknown",
-					lastModified: "Unknown",
-					uuid: sheet
-				};
-			}),
+			recentSheets,
 			container,
 			currentPage
 		);
@@ -243,6 +274,12 @@ let initializeManager = () => {
 	
 	$("#nextPageButton").click(() => {
 		currentPage++;
+		refreshSheet(container, currentPage);
+	});
+
+	$("#clearRecentButton").click(() => {
+		currentPage = 0;
+		(localStorage || sessionStorage).setItem("recentSheets", "[]");
 		refreshSheet(container, currentPage);
 	});
 	

@@ -25,43 +25,6 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-	  randomUUID = require("crypto").randomUUID,
-	  sheetData = require("./sheetData");
+	  CharacterSheetDataSchema = require("./sheetData")
 
-module.exports = new mongoose.Schema({
-	uuid: {
-		type: String,
-		default: () => (randomUUID()),
-		index: true,
-		required: true
-	},
-	
-	created: {
-		type: Date,
-		default: Date.now,
-		required: true
-	},
-	
-	lastModified: {
-		type: Date,
-		default: Date.now,
-		required: true
-	},
-	
-	sheetData: {
-		type: sheetData,
-		default: () => {},
-		required: true
-	},
-	
-	owner: {
-		type: mongoose.ObjectId,
-		default: null,
-		required: true
-	},
-
-	public: {
-		type: Boolean,
-		default: false
-	}
-});
+module.exports = mongoose.model("characterSheetData", CharacterSheetDataSchema);

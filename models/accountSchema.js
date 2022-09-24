@@ -24,7 +24,10 @@ SOFTWARE.
 
 */
 
+const characterSheetSchema = require("./characterSheetSchema");
+
 const mongoose = require("mongoose"),
+	  CharacterSheetSchema = require("./characterSheetSchema"),
 	  randomUUID = require("crypto").randomUUID;
 
 module.exports = new mongoose.Schema({
@@ -68,5 +71,22 @@ module.exports = new mongoose.Schema({
 	sessionDate: {
 		type: Date,
 		default: Date.now
-	}
+	},
+
+	ownedSheets: [{
+		type: characterSheetSchema
+	}],
+
+	sharedSheets: [{
+		permission: {
+			type: String,
+			enum: ["read", "write", "owner"],
+			required: true
+		},
+
+		id: {
+			type: String,
+			required: true
+		}
+	}]
 });

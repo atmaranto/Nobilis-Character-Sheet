@@ -29,13 +29,14 @@ const mongoose = require("mongoose"),
 	  randomUUID = require("crypto").randomUUID;
 
 module.exports = {
-	portrait: {
-		type: String
-	},
-	
 	playerName: {
 		type: String,
 		default: ""
+	},
+	
+	portrait: {
+		type: String,
+		default: null
 	},
 	
 	characterName: {
@@ -106,17 +107,20 @@ module.exports = {
 	domains: [{
 		domain: {
 			type: Number,
-			default: 0
+			default: 0,
+			required: true
 		},
 		
 		domainDescription: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		},
 		
 		estateProperties: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		}
 	}],
 	
@@ -138,88 +142,104 @@ module.exports = {
 	gifts: [{
 		miracleLevel: {
 			type: Number,
-			default: 0
+			default: 0,
+			required: true
 		},
 		
 		isGiftRare: {
 			type: Boolean,
-			default: false
+			default: false,
+			required: true
 		},
 		
 		giftName: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		},
 		
 		giftEstate: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		},
 		
 		giftAOEType: {
 			type: Number,
-			default: 0
+			default: 0,
+			required: true
 		},
 		
 		giftInvocationType: {
 			type: Number,
-			default: 0
+			default: 0,
+			required: true
 		},
 		
 		giftFlexibility: {
 			type: Number,
-			default: 0
+			default: 0,
+			required: true
 		},
 		
 		giftEstateType: {
 			type: Number,
-			default: 0
+			default: 0,
+			required: true
 		}
 	}],
 	
 	restrictions: [{
 		restrictionName: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		},
 		
 		description: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		},
 		
 		mps: {
 			type: Number,
-			default: 1
+			default: 1,
+			required: true
 		}
 	}],
 	
 	limits: [{
 		limitName: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		},
 		
 		description: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		},
 		
 		cps: {
 			type: Number,
-			default: 1
+			default: 1,
+			required: true
 		}
 	}],
 	
 	virtues: [{
 		virtueName: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		},
 		
 		description: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		}
 	}],
 	
@@ -247,17 +267,14 @@ module.exports = {
 	additionalCPs: [{
 		rawCPs: {
 			type: String, // Apparently?
-			default: "0"
+			default: "0",
+			required: true
 		},
 		
 		cpSource: {
 			type: String,
-			default: ""
+			default: "",
+			required: true
 		}
-	}],
-	
-	portrait: {
-		type: Object,
-		default: false
-	}
+	}]
 };
