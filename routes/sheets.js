@@ -31,8 +31,20 @@ module.exports = function(app, config) {
 
 					let ownerName = sheet.owner ? sheet.owner.name : undefined;
 					let sheetData = sheet.sheetData;
-					let sharedEntry = (sheet.sharedWith || []).find((share) => (share.owner.equals(acct._id)));
-					let permission = sharedEntry && sharedEntry.permission;
+					let sharedEntry = acct && (sheet.sharedWith || []).find((share) => (share.user.equals(acct._id)));
+					let permission = {
+						shared: sharedEntry,
+						public: sheet.public,
+						publicWritable: sheet.publicWritable
+					};
+
+					permission.ownerNoAdmin = (acct && sheet.owner && sheet.owner._id.equals(acct._id)) || (sharedEntry && sharedEntry.permission === "owner");
+					permission.writeNoAdmin = permission.ownerNoAdmin || (sharedEntry && sharedEntry.permission === "write") || (permission.public && permission.publicWritable);
+					permission.readNoAdmin = permission.writeNoAdmin || (sharedEntry && sharedEntry.permission === "read") || permission.public;
+
+					permission.owner = permission.ownerNoAdmin || (acct && acct.isAdmin);
+					permission.write = permission.writeNoAdmin || (acct && acct.isAdmin);
+					permission.read = permission.readNoAdmin || (acct && acct.isAdmin);
 					
 					return res.status(200).set({
 						"Content-Type": "text/json"
@@ -356,12 +368,64 @@ module.exports = function(app, config) {
 		}
 		
 		return validateSession(req, res, (account) => {
+			// NOTE: Consider setting publicWritable to false here
 			CharacterSheet.findOneAndUpdate({"uuid": req.body.id, owner: null}, {owner: account._id}).lean().exec((err, sheet) => {
 				if(err || !sheet) {
 					return res.status(400).send(sheetErrorString);
 				}
 				
 				return res.status(200).send("Sheet claimed successfully");
+			});
+		}, (failureMessage) => {
+			return res.status(400).send("You aren't logged in");
+		});
+	});
+	
+	app.post("/api/unclaimSheet", (req, res) => {
+		const sheetErrorString = "Invalid or missing sheet ID";
+		
+		if(typeof req.body.id !== "string") {
+			return res.status(400).send(sheetErrorString);
+		}
+		
+		return validateSession(req, res, (account) => {
+			let query = constructDeleteQuery(req.body.id, account); // Not technically a delete query, but it requires the same permissions
+
+			CharacterSheet.findOneAndUpdate(query, {owner: null, public: true, publicWritable: true}).lean().exec((err, sheet) => {
+				if(err || !sheet) {
+					return res.status(400).send(sheetErrorString);
+				}
+				
+				return res.status(200).send("Sheet unclaimed successfully");
+			});
+		}, (failureMessage) => {
+			return res.status(400).send("You aren't logged in");
+		});
+	});
+
+	app.post("/api/permissions", (req, res) => {
+		const sheetErrorString = "Invalid or missing sheet ID";
+		
+		if(typeof req.body.id !== "string") {
+			return res.status(400).send(sheetErrorString);
+		}
+		if(typeof req.body.public !== "boolean") {
+			return res.status(400).send("Invalid or missing public flag");
+		}
+		if(typeof req.body.publicWritable !== "boolean") {
+			return res.status(400).send("Invalid or missing publicWritable flag");
+		}
+		
+		return validateSession(req, res, (account) => {
+			let query = constructDeleteQuery(req.body.id, account); // Not technically a delete query, but it requires the same permissions
+			let update = {public: req.body.public, publicWritable: req.body.publicWritable};
+
+			CharacterSheet.findOneAndUpdate(query, update).lean().exec((err, sheet) => {
+				if(err || !sheet) {
+					return res.status(400).send(sheetErrorString);
+				}
+				
+				return res.status(200).send("Sheet unclaimed successfully");
 			});
 		}, (failureMessage) => {
 			return res.status(400).send("You aren't logged in");
@@ -451,7 +515,7 @@ module.exports = function(app, config) {
 					if(typeof value !== type) {
 						if(typeof value === "object" && type === "number" && typeof value.value === "number" && ["gt", "lt", "gte", "lte"].indexOf(value.comparison) != -1) {
 							// >,<,>=,<=
-							
+
 							value = {
 								["$" + value.comparison]: value.value
 							};

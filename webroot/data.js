@@ -619,7 +619,7 @@ SOFTWARE.
 			"estate": "Fire, differently",
 			"bonds": [
 				"Fire is always hungry (3 points)",
-				"Fire dstroys that which it consumes (2 points)",
+				"Fire destroys that which it consumes (2 points)",
 				"Fire harms what it touches (2 points)"
 			]
 		},

@@ -150,3 +150,19 @@ div.unlockbutton {
 	background: url("images/unlock.svg");
 	background-size: cover;
 }
+
+/* Permission area */
+
+#permissionAreaContainer {
+	position: absolute;
+	padding: 5px;
+	margin: 5px;
+	text-align: left;
+	width: auto;
+}
+
+#permissionAreaContainer > #permissionArea {
+	position: relative;
+	top: -2em;
+	border: 1px solid grey;
+}

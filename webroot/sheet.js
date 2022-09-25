@@ -46,10 +46,15 @@ let initializeSheet = (window, sheetID) => {
 		)
 		.children().last().wrap($("<div class='sheetContainer'></div>"));
 	
+	if(!sheetPermissions.write) {
+		$("#saveSheet").hide();
+	}
+	
 	window.gotoManager = () => {
 		window.location = "./manager.html";
 	};
 	
+	// For now, we'll just index the window's attribute directly.
 	// let characteristics = window.characteristics;
 	
 	window.saveSheet = () => {
@@ -83,12 +88,41 @@ let initializeSheet = (window, sheetID) => {
 	
 	let factory = new UI.EditorFactory(characteristics);
 	
-	let considerOwner = (element) => {
-		let owningMessage = (element || $("#ownershipMessageLocation"));
-		
+	let permissionArea = $("<div id='permissionArea'></div>");
+	let owningMessage = $("<p id='ownershipMessageLocation'></p>");
+	
+	let considerOwner = () => {
 		if(window.sheetOwner) {
 			owningMessage.html("This sheet is owned by ").append($("<span style='color: green; font-style: italic'></span>").text(window.sheetOwner));
-			
+
+			if(sheetPermissions.write) {
+				owningMessage
+					.append(" (you) ")
+					.append($("<button id='unclaimSheetButton'>Unclaim sheet?</button>").click(() => {
+						$("#unclaimSheetButton").attr("disabled", true);
+
+						let message = {
+							id: sheetID,
+							email: utils.zealousGet("email"),
+							sessionKey: utils.zealousGet("sessionKey")
+						};
+
+						$.ajax({
+							"url": STRIPPED_PATHNAME + "/api/unclaimSheet",
+							"data": JSON.stringify(message),
+							"method": "POST",
+							"contentType": "application/json"
+						})
+							.done((data, text, xhr) => {
+								window.sheetOwner = null;
+								considerOwner();
+							})
+							.fail((xhr, text, err) => {
+								console.error(err);
+								$("#unclaimSheetButton").removeAttr("disabled");
+							});
+					}));
+			}
 		}
 		else {
 			owningMessage.html("This sheet is owned by <span style='color: red; font-style: italic'>nobody</span>. ")
@@ -97,7 +131,7 @@ let initializeSheet = (window, sheetID) => {
 						$("#claimSheetButton").attr("disabled", true);
 						
 						let message = {
-							sheet: sheetID,
+							id: sheetID,
 							email: utils.zealousGet("email"),
 							sessionKey: utils.zealousGet("sessionKey")
 						};
@@ -106,7 +140,6 @@ let initializeSheet = (window, sheetID) => {
 							"url": STRIPPED_PATHNAME + "/api/claimSheet",
 							"data": JSON.stringify(message),
 							"method": "POST",
-							"dataType": "json",
 							"contentType": "application/json"
 						})
 							.done((data, text, xhr) => {
@@ -115,22 +148,120 @@ let initializeSheet = (window, sheetID) => {
 								considerOwner();
 							})
 							.fail((xhr, text, err) => {
+								console.log(err);
 								window._xhr = xhr;
 								$("#claimSheetButton").removeAttr("disabled").text("Failed: " + xhr.responseText + ". Click to try again.");
-							})
-							.always(() => {
-								
 							});
 					})
 				);
 		}
+
+		permissionArea.empty();
+
+		const noDesc = {
+			"read": "cannot read (??)",
+			"write": "cannot write to",
+			"owner": "do not own"
+		};
+
+		const yesDesc = {
+			"read": "can read",
+			"write": "can write to",
+			"owner": "own"
+		};
+		
+		// Fill the permissions area with "read", "write", and "owner" colored green if the user has that permission
+		// and red if they don't.
+		["read", "write", "owner"].forEach((permission) => {
+			let color;
+			let description;
+
+			if(sheetPermissions[permission]) {
+				if(!sheetPermissions[permission + "NoAdmin"]) {
+					color = "orange";
+					description = "You " + yesDesc[permission] + " this sheet (because you're an admin).";
+				}
+				else {
+					color = "green";
+					description = "You " + yesDesc[permission] + " this sheet.";
+				}
+			}
+			else {
+				color = "red";
+				description = "You " + noDesc[permission] + " this sheet.";
+			}
+
+			permissionArea.append(
+				$("<span style='color: " + color + "; font-style: italic'></span>")
+					.text(permission + " ")
+					.attr("title", description)
+			);
+		});
+
+		permissionArea.append($("<br>"));
+		
+		// If the user can write to the sheet, show them a checkbox to mark it as public.
+		if(sheetPermissions.owner) {
+			let publicCheckbox = $("<input type='checkbox' id='publicCheckbox'>").prop("checked", sheetPermissions.public);
+			let publicWritableCheckbox = $("<input type='checkbox' id='publicWritableCheckbox'>").prop("checked", sheetPermissions.publicWritable);
+
+			let updatePermissions = () => {
+				let checked1 = publicCheckbox.prop("checked");
+				let checked2 = publicWritableCheckbox.prop("checked");
+
+				let message = {
+					id: sheetID,
+					email: utils.zealousGet("email"),
+					sessionKey: utils.zealousGet("sessionKey"),
+					public: checked1,
+					publicWritable: checked2
+				};
+				
+				$.ajax({
+					"url": STRIPPED_PATHNAME + "/api/permissions",
+					"data": JSON.stringify(message),
+					"method": "POST",
+					"contentType": "application/json"
+				})
+					.done((data, text, xhr) => {
+						sheetPermissions.public = checked1;
+						sheetPermissions.publicWritable = checked2;
+					})
+					.fail((xhr, text, err) => {
+						console.error(err);
+
+						publicCheckbox.prop("checked", sheetPermissions.public);
+						publicWritableCheckbox.prop("checked", sheetPermissions.publicWritable);
+
+						let errorText = $("<span><br /></span>")
+							.append(
+								$("<span style='color: red'></span>")
+									.text("Error updating permissions: " + xhr.responseText)
+							);
+						
+						permissionArea.append(errorText);
+						
+						setTimeout(() => (errorText.fadeOut()), 5000);
+					});
+			};
+
+			publicCheckbox.change(updatePermissions);
+			
+			permissionArea.append(publicCheckbox).append(" Public");
+
+			// Show them another checkbox to make it publicWritable.
+			publicWritableCheckbox.change(updatePermissions);
+
+			permissionArea.append(publicWritableCheckbox).append(" Public Writable");
+		}
 	}
-	
-	let owningMessage = $("<p id='ownershipMessageLocation'></p>");
-	
+
 	const nobilisDefaultName = "Nobilis Character";
-	let nobilisCharacterTitle = factory.startSection(characteristics.characterName || nobilisDefaultName, "h1").after(owningMessage);
-	considerOwner(owningMessage);
+	let nobilisCharacterTitle = factory.startSection(characteristics.characterName || nobilisDefaultName, "h1")
+		.after(owningMessage)
+		.after($("<div id='permissionAreaContainer'></div>").append(permissionArea));
+	
+	considerOwner();
 	
 	factory.attachText("characterName", "Character Name").addClass("characterName")
 		.on("input change", () => {
@@ -1203,6 +1334,7 @@ let initializeSheet = (window, sheetID) => {
 			.done((data, text, xhr) => {
 				window.characteristics = data.sheetData;
 				window.sheetOwner = data.sheetOwner;
+				window.sheetPermissions = data.permission;
 				utils.cookie.set("last-sheet-id", parameters.id);
 				
 				try {
