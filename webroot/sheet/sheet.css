@@ -142,12 +142,12 @@ div.lockunlockbutton {
 }
 
 div.lockbutton {
-	background: url("images/lock.svg");
+	background: url("../images/lock.svg");
 	background-size: cover;
 }
 
 div.unlockbutton {
-	background: url("images/unlock.svg");
+	background: url("../images/unlock.svg");
 	background-size: cover;
 }
 
