@@ -1,0 +1,5 @@
+# This file won't be indexed, but the hope is it'll get catapulted up to the root
+
+User-agent: *
+Disallow: /api
+
