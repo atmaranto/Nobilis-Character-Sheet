@@ -26,7 +26,7 @@ SOFTWARE.
 
 let STRIPPED_PATHNAME = window.location.pathname;
 if(STRIPPED_PATHNAME.endsWith("/")) {
-	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substr(0, STRIPPED_PATHNAME.length - 1);
+	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substring(0, STRIPPED_PATHNAME.length - 1);
 }
 
 let initializeSheet = (window, sheetID) => {
@@ -37,6 +37,7 @@ let initializeSheet = (window, sheetID) => {
 		.append(
 			"<button id='openSettings' onclick='UI.createSettingsWindow().show()'>Open Settings</button>" +
 			"<button id='saveSheet' onclick='window.saveSheet()'>Save Sheet</button>" +
+			"<button id='gotoManager' onclick='window.gotoManager()'>Go To Sheet Manager</button>" +
 			"<p id='saveStatus' class='noselect saveStatus'>Placeholder</p>" +
 			"<br />"
 		)
@@ -45,23 +46,31 @@ let initializeSheet = (window, sheetID) => {
 		)
 		.children().last().wrap($("<div class='sheetContainer'></div>"));
 	
-	let characteristics = window.characteristics;
+	if(!sheetPermissions.write) {
+		$("#saveSheet").hide();
+	}
+	
+	window.gotoManager = () => {
+		window.location = "./manager.html";
+	};
+	
+	// For now, we'll just index the window's attribute directly.
+	// let characteristics = window.characteristics;
 	
 	window.saveSheet = () => {
 		$("#saveSheet").attr("disabled", true);
 		
 		let message = {
-			sheetData: JSON.stringify(characteristics),
+			sheetData: characteristics,
 			email: utils.zealousGet("email"),
-			sessionKey: utils.zealousGet("sessionKey"),
-			playerName: characteristics.playerName,
-			characterName: characteristics.characterName
+			sessionKey: utils.zealousGet("sessionKey")
 		};
 		
 		$.ajax({
 			"url": STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID),
-			"data": message,
-			"method": "PUT"
+			"data": JSON.stringify(message),
+			"method": "PUT",
+			"contentType": "application/json"
 		})
 			.done((data, text, xhr) => {
 				$("#saveStatus").css('visibility', 'visible').text("Successfully saved sheet.");
@@ -79,11 +88,41 @@ let initializeSheet = (window, sheetID) => {
 	
 	let factory = new UI.EditorFactory(characteristics);
 	
-	let considerOwner = (element) => {
-		let owningMessage = (element || $("#ownershipMessageLocation"));
-		
+	let permissionArea = $("<div id='permissionArea'></div>");
+	let owningMessage = $("<p id='ownershipMessageLocation'></p>");
+	
+	let considerOwner = () => {
 		if(window.sheetOwner) {
 			owningMessage.html("This sheet is owned by ").append($("<span style='color: green; font-style: italic'></span>").text(window.sheetOwner));
+
+			if(sheetPermissions.write) {
+				owningMessage
+					.append(" (you) ")
+					.append($("<button id='unclaimSheetButton'>Unclaim sheet?</button>").click(() => {
+						$("#unclaimSheetButton").attr("disabled", true);
+
+						let message = {
+							id: sheetID,
+							email: utils.zealousGet("email"),
+							sessionKey: utils.zealousGet("sessionKey")
+						};
+
+						$.ajax({
+							"url": STRIPPED_PATHNAME + "/api/unclaimSheet",
+							"data": JSON.stringify(message),
+							"method": "POST",
+							"contentType": "application/json"
+						})
+							.done((data, text, xhr) => {
+								window.sheetOwner = null;
+								considerOwner();
+							})
+							.fail((xhr, text, err) => {
+								console.error(err);
+								$("#unclaimSheetButton").removeAttr("disabled");
+							});
+					}));
+			}
 		}
 		else {
 			owningMessage.html("This sheet is owned by <span style='color: red; font-style: italic'>nobody</span>. ")
@@ -92,15 +131,16 @@ let initializeSheet = (window, sheetID) => {
 						$("#claimSheetButton").attr("disabled", true);
 						
 						let message = {
-							sheet: sheetID,
+							id: sheetID,
 							email: utils.zealousGet("email"),
 							sessionKey: utils.zealousGet("sessionKey")
 						};
 						
 						$.ajax({
-							"url": STRIPPED_PATHNAME + "/api/account/claimSheet",
-							"data": message,
-							"method": "POST"
+							"url": STRIPPED_PATHNAME + "/api/claimSheet",
+							"data": JSON.stringify(message),
+							"method": "POST",
+							"contentType": "application/json"
 						})
 							.done((data, text, xhr) => {
 								window.sheetOwner = utils.zealousGet("email");
@@ -108,22 +148,120 @@ let initializeSheet = (window, sheetID) => {
 								considerOwner();
 							})
 							.fail((xhr, text, err) => {
+								console.log(err);
 								window._xhr = xhr;
 								$("#claimSheetButton").removeAttr("disabled").text("Failed: " + xhr.responseText + ". Click to try again.");
-							})
-							.always(() => {
-								
 							});
 					})
 				);
 		}
+
+		permissionArea.empty();
+
+		const noDesc = {
+			"read": "cannot read (??)",
+			"write": "cannot write to",
+			"owner": "do not own"
+		};
+
+		const yesDesc = {
+			"read": "can read",
+			"write": "can write to",
+			"owner": "own"
+		};
+		
+		// Fill the permissions area with "read", "write", and "owner" colored green if the user has that permission
+		// and red if they don't.
+		["read", "write", "owner"].forEach((permission) => {
+			let color;
+			let description;
+
+			if(sheetPermissions[permission]) {
+				if(!sheetPermissions[permission + "NoAdmin"]) {
+					color = "orange";
+					description = "You " + yesDesc[permission] + " this sheet (because you're an admin).";
+				}
+				else {
+					color = "green";
+					description = "You " + yesDesc[permission] + " this sheet.";
+				}
+			}
+			else {
+				color = "red";
+				description = "You " + noDesc[permission] + " this sheet.";
+			}
+
+			permissionArea.append(
+				$("<span style='color: " + color + "; font-style: italic'></span>")
+					.text(permission + " ")
+					.attr("title", description)
+			);
+		});
+
+		permissionArea.append($("<br>"));
+		
+		// If the user can write to the sheet, show them a checkbox to mark it as public.
+		if(sheetPermissions.owner) {
+			let publicCheckbox = $("<input type='checkbox' id='publicCheckbox'>").prop("checked", sheetPermissions.public);
+			let publicWritableCheckbox = $("<input type='checkbox' id='publicWritableCheckbox'>").prop("checked", sheetPermissions.publicWritable);
+
+			let updatePermissions = () => {
+				let checked1 = publicCheckbox.prop("checked");
+				let checked2 = publicWritableCheckbox.prop("checked");
+
+				let message = {
+					id: sheetID,
+					email: utils.zealousGet("email"),
+					sessionKey: utils.zealousGet("sessionKey"),
+					public: checked1,
+					publicWritable: checked2
+				};
+				
+				$.ajax({
+					"url": STRIPPED_PATHNAME + "/api/permissions",
+					"data": JSON.stringify(message),
+					"method": "POST",
+					"contentType": "application/json"
+				})
+					.done((data, text, xhr) => {
+						sheetPermissions.public = checked1;
+						sheetPermissions.publicWritable = checked2;
+					})
+					.fail((xhr, text, err) => {
+						console.error(err);
+
+						publicCheckbox.prop("checked", sheetPermissions.public);
+						publicWritableCheckbox.prop("checked", sheetPermissions.publicWritable);
+
+						let errorText = $("<span><br /></span>")
+							.append(
+								$("<span style='color: red'></span>")
+									.text("Error updating permissions: " + xhr.responseText)
+							);
+						
+						permissionArea.append(errorText);
+						
+						setTimeout(() => (errorText.fadeOut()), 5000);
+					});
+			};
+
+			publicCheckbox.change(updatePermissions);
+			
+			permissionArea.append(publicCheckbox).append(" Public");
+
+			// Show them another checkbox to make it publicWritable.
+			publicWritableCheckbox.change(updatePermissions);
+
+			permissionArea.append(publicWritableCheckbox).append(" Public Writable");
+		}
 	}
-	
-	let owningMessage = $("<p id='ownershipMessageLocation'></p>");
-	
+
 	const nobilisDefaultName = "Nobilis Character";
-	let nobilisCharacterTitle = factory.startSection(characteristics.characterName || nobilisDefaultName, "h1").after(owningMessage);
-	considerOwner(owningMessage);
+	let nobilisCharacterTitle = factory.startSection(characteristics.characterName || nobilisDefaultName, "h1")
+		.after(owningMessage)
+		.after($("<div id='permissionAreaContainer'></div>").append(permissionArea));
+	
+	considerOwner();
 	
 	factory.attachText("characterName", "Character Name").addClass("characterName")
 		.on("input change", () => {
@@ -255,7 +393,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	let permanentAMPSlider = factory.attachSlider("permanentAMP", "<b>Aspect</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
-	let permanentDMPSlider = factory.attachSlider("permanentDPP", "<b>Domain</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
+	let permanentDMPSlider = factory.attachSlider("permanentDMP", "<b>Domain</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
 	let permanentRMPSlider = factory.attachSlider("permanentRMP", "<b>Realm</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
@@ -286,7 +424,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	let temporaryAMPSlider = factory.attachSlider("temporaryAMP", "<b>Aspect</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
 		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate)
-	let temporaryDMPSlider = factory.attachSlider("temporaryDPP", "<b>Domain</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
+	let temporaryDMPSlider = factory.attachSlider("temporaryDMP", "<b>Domain</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
 		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate);
 	let temporaryRMPSlider = factory.attachSlider("temporaryRMP", "<b>Realm</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
 		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate);
@@ -993,8 +1131,14 @@ let initializeSheet = (window, sheetID) => {
 		sectionData = sectionData || {};
 		let sectionFactory = new UI.EditorFactory(sectionData);
 		
-		sectionFactory.attachText("rawCPs", "Raw Character Points Granted").addClass("rawCPs").attr("type", "number")
-			.on("input change", attributeUpdate);
+		sectionFactory.attachText("rawCPs", "Raw Character Points Granted")
+			.addClass("rawCPs editorevents")
+			.attr("type", "number")
+			.on("input change", attributeUpdate).on("removed", function() {
+				// Hack to manually remove the provided CPs when this is deleted
+				$(this).val("0");
+				attributeUpdate();
+			});
 		sectionFactory.attachTextArea("cpSource", "Source of Character Points");
 		
 		return {"element": sectionFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": sectionData};
@@ -1060,7 +1204,7 @@ let initializeSheet = (window, sheetID) => {
 			"width": portraitWidth.toString() + "px",
 			"height": portraitHeight.toString() + "px",
 		});
-		if(characteristics.portrait) {
+		if(characteristics.hasPortrait) {
 			let image = $("<img />");
 			
 			image.prop("src", file ? URL.createObjectURL(file) : STRIPPED_PATHNAME + "/api/sheetImage?id=" + encodeURIComponent(sheetID));
@@ -1085,15 +1229,23 @@ let initializeSheet = (window, sheetID) => {
 							method: "DELETE",
 						})
 						.done((data, text, xhr) => {
-							characteristics.portrait = false;
+							characteristics.hasPortrait = false;
 							window.saveSheet();
 							reloadPortrait();
 						})
 						.fail((xhr, text, err) => {
 							let errorText = $("<span style='color: red'><br /></span>").text("Error deleting file: " + xhr.responseText);
 							portrait.append(errorText);
+
+							if(xhr.responseText.indexOf("not found") != -1) {
+								characteristics.hasPortrait = false;
+								window.saveSheet();
+								reloadPortrait();
+							}
 							
-							setTimeout(() => (errorText.fadeOut()), 5000);
+							setTimeout(() => {
+								errorText.fadeOut();
+							}, 5000);
 							_disabled = false;
 						});
 					})
@@ -1120,7 +1272,7 @@ let initializeSheet = (window, sheetID) => {
 							contentType: false
 						})
 						.done((data, text, xhr) => {
-							characteristics.portrait = true;
+							characteristics.hasPortrait = true;
 							window.saveSheet();
 							reloadPortrait(files[0]);
 						})
@@ -1180,18 +1332,41 @@ let initializeSheet = (window, sheetID) => {
 	else {
 		$.ajax(STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(parameters.id))
 			.done((data, text, xhr) => {
-				window.characteristics = JSON.parse(data.sheetData);
+				window.characteristics = data.sheetData;
 				window.sheetOwner = data.sheetOwner;
+				window.sheetPermissions = data.permission;
 				utils.cookie.set("last-sheet-id", parameters.id);
 				
-				// Add sheet to recent sheets
-				let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
-				if(recentSheets.indexOf(parameters.id) !== -1) {
-					recentSheets.splice(recentSheets.indexOf(parameters.id), 1);
+				try {
+					// Add sheet to recent sheets
+					let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
+
+					recentSheets = recentSheets.map((item) => {
+						if(typeof item === "string") {
+							return {id: item, lastModified: null, owner: null};
+						}
+
+						return item;
+					})
+
+					let found = recentSheets.find((item) => (item.id === parameters.id));
+					if(found !== undefined) {
+						recentSheets.splice(recentSheets.indexOf(found), 1);
+					}
+
+					let sheet = {
+						id: parameters.id,
+						lastModified: data.lastModified,
+						owner: data.sheetOwner
+					};
+
+					recentSheets.splice(0, 0, sheet);
+					(localStorage || sessionStorage).setItem("recentSheets", JSON.stringify(recentSheets))
 				}
-				recentSheets.splice(0, 0, parameters.id);
-				(localStorage || sessionStorage).setItem("recentSheets", JSON.stringify(recentSheets))
-				
+				catch(e) {
+					console.log("Non-fatal error while trying to add sheet to recent sheets: " + e);
+				}
+
 				initializeSheet(window, parameters.id);
 			})
 			.fail((xhr, text, err) => {

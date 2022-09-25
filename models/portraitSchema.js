@@ -24,16 +24,9 @@ SOFTWARE.
 
 */
 
-const mongoose = require("mongoose"),
-	  randomUUID = require("crypto").randomUUID;
+const mongoose = require("mongoose");
 
 module.exports = new mongoose.Schema({
-	uuid: {
-		type: String,
-		default: () => (randomUUID()),
-		index: true
-	},
-	
 	mimeType: {
 		type: String,
 		required: true

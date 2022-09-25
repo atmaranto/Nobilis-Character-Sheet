@@ -78,6 +78,25 @@ let duplicateSheet = (uuid, after) => {
 		});
 };
 
+let updateSheet = (uuid, after) => {
+	$.ajax({
+		"url": "./api/updateSheetVersion",
+		"data": {"id": uuid},
+		"method": "POST"
+	})
+		.done((data, text, xhr) => {
+			if(after) {
+				after(true);
+			}
+		})
+		.fail((xhr, text, err) => {
+			showError("Error while updating sheet: " + xhr.responseText);
+		})
+		.always(() => {
+			
+		});
+};
+
 let createSheetList = (sheets, container, currentPage) => {
 	let table = $("<table></table>").appendTo(container.html(""));
 	
@@ -114,8 +133,15 @@ let createSheetList = (sheets, container, currentPage) => {
 									}
 								)
 							)
+							/* .append(
+								$("<li><a href='#'>Update Sheet Version</a></li>").click(
+									() => {
+										updateSheet(sheet.uuid, () => refreshSheet(container, currentPage));
+									}
+								)
+							) */
 							.append(
-								$("<li><a href='#'>Delete Sheet</a></li>").click(
+								$("<li><a href='#' class='context-menu-delete'>Delete Sheet</a></li>").click(
 									() => {
 										if(window.confirm("Really delete this sheet?")) {
 											deleteSheet(sheet.uuid, () => rowEntry.remove());
@@ -162,47 +188,149 @@ let refreshSheet = (container, currentPage) => {
 		sessionKey: utils.zealousGet("sessionKey")
 	};
 	
-	let searchName = $("#sheetName").val().trim();
-	if(searchName.length > 0) {
-		message.searchName = searchName;
+	if(window.searchCriteria && Array.isArray(window.searchCriteria.criteria) && window.searchCriteria.criteria.length > 0) {
+		message.criteria = {};
+
+		const compRegex = /^([<>]=?)(-?\d+)$/;
+
+		for(let c of window.searchCriteria.criteria) {
+			let path = window.orderedQueryPaths[c.path];
+			let type = validQueryPaths[path];
+			let value = (c.value || "");
+
+			if(value.replaceAll(/\s/g, "").length == 0) {
+				continue;
+			}
+
+			if(type === "number") {
+				let result = value.match(compRegex);
+				let comparison;
+
+				if(result !== null) {
+					if(result[1] == ">") comparison = "gt";
+					else if(result[1] == ">=") comparison = "gte";
+					else if(result[1] == "<") comparison = "lt";
+					else if(result[1] == "<=") comparison = "lte";
+					else {
+						showError("Invalid comparison: " + results[1]);
+						_REQUESTING_REFRESH = false;
+						return;
+					}
+
+					value = parseInt(result[2]);
+				}
+				else {
+					value = parseInt(value);
+				}
+
+				if(isNaN(value)) {
+					showError("Invalid number: " + c.value);
+					_REQUESTING_REFRESH = false;
+					return;
+				}
+
+				if(comparison) {
+					value = { comparison, value };
+				}
+			} else if(type === "boolean") {
+				if(value === "true") {
+					value = true;
+				}
+				else if(value === "false") {
+					value = false;
+				}
+				else {
+					showError("Invalid boolean value: " + value);
+					_REQUESTING_REFRESH = false;
+					return;
+				}
+			}
+
+			message.criteria[path] = value;
+		}
 	}
-	
-	let searchOwner = $("#sheetOwner").val().trim();
-	if(searchOwner.length > 0) {
-		message.searchOwner = searchOwner;
+
+	let stringifiedCriteria = JSON.stringify(message.criteria || {});
+
+	// DO NOT TRY THIS AT HOME
+	if(stringifiedCriteria == window.lastCriteria) {
+		_REQUESTING_REFRESH = false;
+		return;
 	}
+
+	window.lastCriteria = stringifiedCriteria;
 	
-	console.log(message);
+	let loggedIn = utils.zealousGet("sessionKey");
 	
-	$.ajax({
-		"url": "./api/account/listSheets",
-		"data": message,
-		"method": "POST"
-	})
-		.done((data, text, xhr) => {
-			let sheets = typeof data === "string" ? JSON.parse(data) : data;
-			console.log(data);
-			
-			sheets.forEach((sheet) => {
-				// Convert lastModified dates into the local timezone
-				sheet.lastModified = new Date(sheet.lastModified).toString();
-			});
-			createSheetList(sheets, container, currentPage);
+	if(loggedIn) {
+		$.ajax({
+			"url": "./api/listSheets",
+			"data": JSON.stringify(message),
+			"contentType": "application/json",
+			"method": "POST"
 		})
-		.fail((xhr, text, err) => {
-			console.log(xhr);
-			if(xhr.status === 401) {
-				utils.zealousDelete("sessionKey");
-				sessionStorage.setItem("justLoggedOut", true);
-				return;
+			.done((data, text, xhr) => {
+				let sheets = typeof data === "string" ? JSON.parse(data) : data;
+				console.log(data);
+				
+				sheets.forEach((sheet) => {
+					// Convert lastModified dates into the local timezone
+					sheet.lastModified = new Date(sheet.lastModified).toString();
+				});
+				createSheetList(sheets, container, currentPage);
+			})
+			.fail((xhr, text, err) => {
+				console.log(xhr);
+				if(xhr.status === 401) {
+					utils.zealousDelete("sessionKey");
+					sessionStorage.setItem("justLoggedOut", true);
+					window.location.reload();
+					return;
+				}
+				
+				showError("Error while requesting sheets: " + xhr.responseText);
+			})
+			.always(() => {
+				$(".pageButton").removeAttr("disabled");
+				_REQUESTING_REFRESH = false;
+			});
+	} else {
+		let recentSheets = getRecentSheets();
+		let filteredRecentSheets = recentSheets.filter((sheet) => {
+			if(searchName.length > 0 && sheet.name && sheet.name.toLowerCase().indexOf(searchName.toLowerCase()) === -1) {
+				return false;
 			}
 			
-			showError("Error while requesting sheets: " + xhr.responseText);
-		})
-		.always(() => {
-			$(".pageButton").removeAttr("disabled");
-			_REQUESTING_REFRESH = false;
+			if(searchOwner.length > 0 && sheet.owner && sheet.owner.toLowerCase().indexOf(searchOwner.toLowerCase()) === -1) {
+				return false;
+			}
+			
+			return true;
 		});
+
+		createSheetList(filteredRecentSheets, container, currentPage);
+	}
+};
+
+let getRecentSheets = () => {
+	let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
+	
+	return recentSheets.map((sheet) => {
+		let owner;
+		if(sheet.owner === undefined) {
+			owner = "Unclaimed";
+		}
+		else {
+			owner = sheet.ownerName || "Unknown";
+		}
+		
+		return {
+			name: sheet.name || "Recent sheet",
+			owner: owner,
+			lastModified: sheet.lastModified || "Unknown",
+			uuid: sheet.id
+		};
+	});
 };
 
 let initializeManager = () => {
@@ -216,17 +344,10 @@ let initializeManager = () => {
 	
 	let loggedIn = utils.zealousGet("sessionKey");
 	if(!loggedIn) {
-		let recentSheets = JSON.parse((localStorage || sessionStorage).getItem("recentSheets") || "[]");
+		let recentSheets = getRecentSheets();
 		
 		createSheetList(
-			recentSheets.map((sheet) => {
-				return {
-					name: "Recent sheet",
-					owner: "Unknown",
-					lastModified: "Unknown",
-					uuid: sheet
-				};
-			}),
+			recentSheets,
 			container,
 			currentPage
 		);
@@ -244,8 +365,39 @@ let initializeManager = () => {
 		currentPage++;
 		refreshSheet(container, currentPage);
 	});
+
+	$("#clearRecentButton").click(() => {
+		currentPage = 0;
+		(localStorage || sessionStorage).setItem("recentSheets", "[]");
+		refreshSheet(container, currentPage);
+	});
 	
 	$(".searchFeature").on("input", () => (refreshSheet(container, currentPage)));
+
+	window.orderedQueryPaths = Object.keys(validQueryPaths);
+
+	window.searchCriteria = {};
+	let searchFactory = new UI.EditorFactory(window.searchCriteria);
+
+	let createCriteria = (i, object) => {
+		object = object || {};
+
+		let localFactory = new UI.EditorFactory(object);
+
+		localFactory.attachSelection("path", "Sheet Attribute", window.orderedQueryPaths);
+		localFactory.attachText("value", "Value")
+			.addClass("editorevents")
+			.on("input change", () => refreshSheet(container, currentPage))
+			.on("removed", (evt, addCallback) => {
+				addCallback(() => refreshSheet(container, currentPage));
+			});
+
+		return {"element": localFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": object};
+	};
+
+	searchFactory.attachList("criteria", createCriteria);
+
+	$("#criteria").html("").append(searchFactory.create().css("padding-bottom", "30px"));
 	
 	let accountControls = $("#accountControls");
 	if(loggedIn) {

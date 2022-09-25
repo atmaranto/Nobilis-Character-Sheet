@@ -25,43 +25,68 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-	  randomUUID = require("crypto").randomUUID;
+	  randomUUID = require("crypto").randomUUID,
+	  sheetData = require("./sheetData");
 
 module.exports = new mongoose.Schema({
 	uuid: {
 		type: String,
 		default: () => (randomUUID()),
-		index: true
+		index: true,
+		required: true
+	},
+	
+	portrait: {
+		type: mongoose.ObjectId,
+		default: null,
+		ref: 'portrait'
 	},
 	
 	created: {
 		type: Date,
-		default: Date.now
+		default: Date.now,
+		required: true
 	},
 	
 	lastModified: {
 		type: Date,
-		default: Date.now
+		default: Date.now,
+		required: true
 	},
 	
 	sheetData: {
-		type: String,
-		default: null
-	},
-	
-	sheetName: {
-		type: String,
-		default: null
-	},
-	
-	ownerName: {
-		type: String,
-		default: null
+		type: sheetData,
+		default: () => {},
+		required: true
 	},
 	
 	owner: {
 		type: mongoose.ObjectId,
 		default: null,
-		required: false
+		required: false,
+		ref: 'account'
+	},
+
+	sharedWith: [{
+		user: {
+			type: mongoose.ObjectId,
+			ref: 'account'
+		},
+
+		permission: {
+			type: String,
+			enum: ['read', 'write', 'owner'],
+			default: 'read'
+		}
+	}],
+
+	public: {
+		type: Boolean,
+		default: false
+	},
+
+	publicWritable: {
+		type: Boolean,
+		default: false
 	}
 });

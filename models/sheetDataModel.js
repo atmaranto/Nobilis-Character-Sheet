@@ -25,12 +25,6 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-	  AccountSchema = require("./accountSchema")
+	  CharacterSheetDataSchema = require("./sheetData")
 
-AccountSchema.virtual("ownedSheets", {
-	ref: "characterSheet",
-	localField: "_id",
-	foreignField: "owner"
-});
-
-module.exports = mongoose.model("account", AccountSchema);
+module.exports = mongoose.model("characterSheetData", CharacterSheetDataSchema);

@@ -24,7 +24,10 @@ SOFTWARE.
 
 */
 
+const characterSheetSchema = require("./characterSheetSchema");
+
 const mongoose = require("mongoose"),
+	  CharacterSheetSchema = require("./characterSheetSchema"),
 	  randomUUID = require("crypto").randomUUID;
 
 module.exports = new mongoose.Schema({
