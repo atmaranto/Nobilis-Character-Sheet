@@ -28,6 +28,7 @@ let STRIPPED_PATHNAME = window.location.pathname;
 if(STRIPPED_PATHNAME.endsWith("/")) {
 	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substring(0, STRIPPED_PATHNAME.length - 1);
 }
+STRIPPED_PATHNAME = STRIPPED_PATHNAME + "/..";
 
 let initializeSheet = (window, sheetID) => {
 	console.log("Loading...");
@@ -51,7 +52,7 @@ let initializeSheet = (window, sheetID) => {
 	}
 	
 	window.gotoManager = () => {
-		window.location = "./manager.html";
+		window.location = "../";
 	};
 	
 	// For now, we'll just index the window's attribute directly.

@@ -26,7 +26,7 @@ SOFTWARE.
 
 let STRIPPED_PATHNAME = window.location.pathname;
 if(STRIPPED_PATHNAME.endsWith("/")) {
-	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substr(0, STRIPPED_PATHNAME.length - 1);
+	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substring(0, STRIPPED_PATHNAME.length - 1);
 }
 
 let showError = (text, color) => {
