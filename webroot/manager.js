@@ -196,7 +196,7 @@ let refreshSheet = (container, currentPage) => {
 		for(let c of window.searchCriteria.criteria) {
 			let path = window.orderedQueryPaths[c.path];
 			let type = validQueryPaths[path];
-			let value = c.value;
+			let value = (c.value || "");
 
 			if(value.replaceAll(/\s/g, "").length == 0) {
 				continue;
