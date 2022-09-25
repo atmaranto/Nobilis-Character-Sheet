@@ -7,7 +7,8 @@ const mongoose = require("mongoose"),
 	multer = require("multer"),
     {validateSession} = require("../utils/accountManager"),
 	{debug} = require("../utils/log"),
-	{constructReadQuery, constructWriteQuery, constructDeleteQuery} = require("../utils/commonQueries");
+	{constructReadQuery, constructWriteQuery, constructDeleteQuery} = require("../utils/commonQueries"),
+	validQueryPaths = require("../webroot/valid-query-paths.js");
 
 module.exports = function(app, config) {
     app.route("/api/sheetData")
@@ -424,52 +425,6 @@ module.exports = function(app, config) {
 	function escapeRegExp(string) {
 		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 	}
-
-	let validQueryPaths = {
-		"additionalCPs.rawCPs": "number",
-		"additionalCPs.cpSource": "string",
-		"affiliation": "string",
-		"anchors": "string",
-		"aspect": "number",
-		"bondAllocation": "string",
-		"characterName": "string",
-		"deadlyWounds": "number",
-		"domain": "number",
-		"domains.$.domain": "number",
-		"domains.$.domainDescription": "string",
-		"domains.$.estateProperties": "string",
-		"gifts.$.giftAOEType": "number",
-		"gifts.$.giftEstate": "string",
-		"gifts.$.giftEstateType": "number",
-		"gifts.$.giftFlexibility": "number",
-		"gifts.$.giftInvocationType": "number",
-		"gifts.$.giftName": "string",
-		"gifts.$.isGiftRare": "boolean",
-		"gifts.$.miracleLevel": "number",
-		"hasPortrait": "boolean",
-		"limits.$.cps": "number",
-		"limits.$.description": "string",
-		"limits.$.limitName": "string",
-		"permanentAMP": "number",
-		"permanentDMP": "number",
-		"permanentRMP": "number",
-		"permanentSMP": "number",
-		"playerName": "string",
-		"realm": "number",
-		"restrictions.$.description": "string",
-		"restrictions.$.mps": "number",
-		"restrictions.$.restrictionName": "string",
-		"riteOfHolyFire": "boolean",
-		"seriousWounds": "number",
-		"spirit": "number",
-		"surfaceWounds": "number",
-		"temporaryAMP": "number",
-		"temporaryDMP": "number",
-		"temporaryRMP": "number",
-		"temporarySMP": "number",
-		"virtues.$.description": "string",
-		"virtues.$.virtueName": "string"
-	};
 	
 	app.post("/api/listSheets", (req, res) => {
 		const PAGE_LENGTH = 20;
@@ -494,15 +449,26 @@ module.exports = function(app, config) {
 					let value = req.body.criteria[path];
 
 					if(typeof value !== type) {
-						return res.status(400).send("Invalid query value for path " + path + ": " + value);
+						if(typeof value === "object" && type === "number" && typeof value.value === "number" && ["gt", "lt", "gte", "lte"].indexOf(value.comparison) != -1) {
+							// >,<,>=,<=
+							
+							value = {
+								["$" + value.comparison]: value.value
+							};
+						}
+						else {
+							return res.status(400).send("Invalid query value for path " + path + ": " + value);
+						}
 					}
 
+					let alteredPath = "sheetData." + path;
+
 					if(type === "string") {
-						query[path] = new RegExp(escapeRegExp(value), "i");
+						// Enforce fuzzy matching
+						value = new RegExp(escapeRegExp(value), "i");
 					}
-					else {
-						query[path] = value;
-					}
+					
+					query[alteredPath] = value;
 				}
 			}
 			

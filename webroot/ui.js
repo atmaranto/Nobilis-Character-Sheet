@@ -489,12 +489,18 @@ SOFTWARE.
 					.click(function() {
 						if($(this).attr("disabled")) return;
 						checkDisabled();
+
+						let after = [];
 						
-						$(returnedItem).find(".editorevents").trigger("removed");
+						$(returnedItem).find(".editorevents").trigger("removed", after.push.bind(after));
 						wrapper.remove();
 						self.object[property].splice(self.object[property].indexOf(returnedObject));
 						
 						updateButtons();
+
+						after.forEach((callback) => {
+							callback();
+						});
 					});
 				
 				checkDisabled = checkDisabled.bind(removeButton);

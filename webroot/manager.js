@@ -188,22 +188,85 @@ let refreshSheet = (container, currentPage) => {
 		sessionKey: utils.zealousGet("sessionKey")
 	};
 	
-	let searchName = $("#sheetName").val().trim();
-	if(searchName.length > 0) {
-		message.searchName = searchName;
+	if(window.searchCriteria && Array.isArray(window.searchCriteria.criteria) && window.searchCriteria.criteria.length > 0) {
+		message.criteria = {};
+
+		const compRegex = /^([<>]=?)(-?\d+)$/;
+
+		for(let c of window.searchCriteria.criteria) {
+			let path = window.orderedQueryPaths[c.path];
+			let type = validQueryPaths[path];
+			let value = c.value;
+
+			if(value.replaceAll(/\s/g, "").length == 0) {
+				continue;
+			}
+
+			if(type === "number") {
+				let result = value.match(compRegex);
+				let comparison;
+
+				if(result !== null) {
+					if(result[1] == ">") comparison = "gt";
+					else if(result[1] == ">=") comparison = "gte";
+					else if(result[1] == "<") comparison = "lt";
+					else if(result[1] == "<=") comparison = "lte";
+					else {
+						showError("Invalid comparison: " + results[1]);
+						_REQUESTING_REFRESH = false;
+						return;
+					}
+
+					value = parseInt(result[2]);
+				}
+				else {
+					value = parseInt(value);
+				}
+
+				if(isNaN(value)) {
+					showError("Invalid number: " + c.value);
+					_REQUESTING_REFRESH = false;
+					return;
+				}
+
+				if(comparison) {
+					value = { comparison, value };
+				}
+			} else if(type === "boolean") {
+				if(value === "true") {
+					value = true;
+				}
+				else if(value === "false") {
+					value = false;
+				}
+				else {
+					showError("Invalid boolean value: " + value);
+					_REQUESTING_REFRESH = false;
+					return;
+				}
+			}
+
+			message.criteria[path] = value;
+		}
 	}
-	
-	let searchOwner = $("#sheetOwner").val().trim();
-	if(searchOwner.length > 0) {
-		message.searchOwner = searchOwner;
+
+	let stringifiedCriteria = JSON.stringify(message.criteria || {});
+
+	// DO NOT TRY THIS AT HOME
+	if(stringifiedCriteria == window.lastCriteria) {
+		_REQUESTING_REFRESH = false;
+		return;
 	}
+
+	window.lastCriteria = stringifiedCriteria;
 	
 	let loggedIn = utils.zealousGet("sessionKey");
 	
 	if(loggedIn) {
 		$.ajax({
 			"url": "./api/listSheets",
-			"data": message,
+			"data": JSON.stringify(message),
+			"contentType": "application/json",
 			"method": "POST"
 		})
 			.done((data, text, xhr) => {
@@ -310,6 +373,31 @@ let initializeManager = () => {
 	});
 	
 	$(".searchFeature").on("input", () => (refreshSheet(container, currentPage)));
+
+	window.orderedQueryPaths = Object.keys(validQueryPaths);
+
+	window.searchCriteria = {};
+	let searchFactory = new UI.EditorFactory(window.searchCriteria);
+
+	let createCriteria = (i, object) => {
+		object = object || {};
+
+		let localFactory = new UI.EditorFactory(object);
+
+		localFactory.attachSelection("path", "Sheet Attribute", window.orderedQueryPaths);
+		localFactory.attachText("value", "Value")
+			.addClass("editorevents")
+			.on("input change", () => refreshSheet(container, currentPage))
+			.on("removed", (evt, addCallback) => {
+				addCallback(() => refreshSheet(container, currentPage));
+			});
+
+		return {"element": localFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": object};
+	};
+
+	searchFactory.attachList("criteria", createCriteria);
+
+	$("#criteria").html("").append(searchFactory.create().css("padding-bottom", "30px"));
 	
 	let accountControls = $("#accountControls");
 	if(loggedIn) {
