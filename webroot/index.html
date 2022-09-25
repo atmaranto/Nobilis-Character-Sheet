@@ -27,19 +27,36 @@
 	-->
 	
 	<head>
-		<title>Nobilis Character Sheet</title>
+		<title>Nobilis Character Sheet Manager</title>
 		
+		<link rel="stylesheet" href="manager.css" />
 		<link rel="stylesheet" href="ui.css" />
-		<link rel="stylesheet" href="sheet.css" />
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin></script>
 		<script type="text/javascript" src="utils.js"></script>
 		<script type="text/javascript" src="ui.js"></script>
-		<script type="text/javascript" src="data.js"></script>
-		<script type="text/javascript" src="sheet.js"></script>
+		<script type="text/javascript" src="valid-query-paths.js"></script>
+		<script type="text/javascript" src="manager.js"></script>
 	</head>
 	<body>
+		<div id="searchCriteria">
+			<p>
+				Search criteria:
+				<div id="criteria"></div>
+			</p>
+		</div>
 		<div id="container">
 			<h2>Loading...</h2>
+		</div>
+		<div id="sheetCreation">
+		
+		</div>
+		<div id="pageControls">
+			<button id="prevPageButton" class="pageButton">Previous Page</button>
+			<button id="nextPageButton" class="pageButton">Next Page</button>
+			<button id="clearRecentButton" class="pageButton">Clear Recent</button>
+		</div>
+		<div id="accountControls">
+		
 		</div>
 	</body>
 </html>

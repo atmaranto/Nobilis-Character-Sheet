@@ -37,7 +37,7 @@ let showError = (text, color) => {
 };
 
 let openSheet = (uuid) => {
-	window.open("./?id=" + encodeURIComponent(uuid));
+	window.open("./sheet?id=" + encodeURIComponent(uuid));
 };
 
 let deleteSheet = (uuid, after) => {
