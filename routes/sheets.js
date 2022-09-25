@@ -6,72 +6,8 @@ const mongoose = require("mongoose"),
     Portrait = require("../models/portraitModel"),
 	multer = require("multer"),
     {validateSession} = require("../utils/accountManager"),
-	{debug} = require("../utils/log");
-
-let constructReadQuery = (id, acct) => {
-	let query = {
-		uuid: id,
-	};
-
-	if(!acct || !acct.isAdmin) {
-		query.$or = [{public: true}, {publicWritable: true}];
-
-		if(acct) {
-			query.$or.push({owner: acct._id});
-			query.$or.push({
-				sharedWith: {
-					owner: acct._id
-				}
-			});
-		}
-	}
-
-	return query;
-}
-
-let constructWriteQuery = (id, acct) => {
-	let query = {
-		uuid: id
-	};
-
-	if(!acct || !acct.isAdmin) {
-		query.$or = [{publicWritable: true}];
-
-		if(acct) {
-			query.$or.push({owner: acct._id});
-			query.$or.push({
-				sharedWith: {
-					owner: acct._id,
-					permission: {
-						$in: ["write", "owner"]
-					}
-				}
-			});
-		}
-	}
-
-	return query;
-}
-
-let constructDeleteQuery = (id, acct) => {
-	let query = {
-		uuid: id
-	};
-
-	if(!acct || !acct.isAdmin) {
-		query.$or = [
-			{owner: acct._id},
-			{
-				sharedWith: {
-					owner: acct._id,
-					permission: "owner"
-				}
-			}
-		];
-	}
-
-	return query;
-}
+	{debug} = require("../utils/log"),
+	{constructReadQuery, constructWriteQuery, constructDeleteQuery} = require("../utils/commonQueries");
 
 module.exports = function(app, config) {
     app.route("/api/sheetData")
@@ -408,6 +344,189 @@ module.exports = function(app, config) {
 					}
 				});
 			});
+		});
+	});
+	
+	app.post("/api/claimSheet", (req, res) => {
+		const sheetErrorString = "Invalid or missing sheet ID";
+		
+		if(typeof req.body.id !== "string") {
+			return res.status(400).send(sheetErrorString);
+		}
+		
+		return validateSession(req, res, (account) => {
+			CharacterSheet.findOneAndUpdate({"uuid": req.body.id, owner: null}, {owner: account._id}).lean().exec((err, sheet) => {
+				if(err || !sheet) {
+					return res.status(400).send(sheetErrorString);
+				}
+				
+				return res.status(200).send("Sheet claimed successfully");
+			});
+		}, (failureMessage) => {
+			return res.status(400).send("You aren't logged in");
+		});
+	});
+
+	/* app.post("/api/updateSheetVersion", (req, res) => {
+		const sheetErrorString = "Invalid or missing sheet ID";
+		
+		if(typeof req.body.id !== "string") {
+			return res.status(400).send(sheetErrorString);
+		}
+		
+		return validateSession(req, res, (account) => {
+			if(!account.isAdmin) {
+				return res.status(403).send("You don't have permission to do that");
+			}
+
+			CharacterSheet.findOne({"uuid": req.body.id}).exec((err, sheet) => {
+				if(err || !sheet) {
+					return res.status(400).send(sheetErrorString);
+				}
+
+				let updateMessage;
+				if(sheet.sheetData === undefined || sheet.sheetData === null) {
+					sheet.sheetData = {};
+					updateMessage = "Sheet data initialized";
+				}
+				else {
+					if(typeof sheet.sheetData !== "string") {
+						return res.status(500).send("Sheet data already up-to-date");
+					}
+
+					try {
+						let sheetData = JSON.parse(sheet.sheetData);
+						sheet.sheetData = sheetData;
+					}
+					catch(e) {
+						return res.status(500).send("Error parsing sheet data");
+					}
+
+					updateMessage = "Sheet updated successfully";
+				}
+
+				sheet.save().then((sheet, err) => {
+					if(err) {
+						console.error(err);
+						return res.status(500).send("Error updating sheet");
+					}
+					
+					console.log(updateMessage);
+					return res.status(200).send(updateMessage);
+				});
+			});
+		}, (failureMessage) => {
+			return res.status(400).send("You aren't logged in");
+		});
+	}); */
+	
+	// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+	function escapeRegExp(string) {
+		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+	}
+
+	let validQueryPaths = {
+		"additionalCPs.rawCPs": "number",
+		"additionalCPs.cpSource": "string",
+		"affiliation": "string",
+		"anchors": "string",
+		"aspect": "number",
+		"bondAllocation": "string",
+		"characterName": "string",
+		"deadlyWounds": "number",
+		"domain": "number",
+		"domains.$.domain": "number",
+		"domains.$.domainDescription": "string",
+		"domains.$.estateProperties": "string",
+		"gifts.$.giftAOEType": "number",
+		"gifts.$.giftEstate": "string",
+		"gifts.$.giftEstateType": "number",
+		"gifts.$.giftFlexibility": "number",
+		"gifts.$.giftInvocationType": "number",
+		"gifts.$.giftName": "string",
+		"gifts.$.isGiftRare": "boolean",
+		"gifts.$.miracleLevel": "number",
+		"hasPortrait": "boolean",
+		"limits.$.cps": "number",
+		"limits.$.description": "string",
+		"limits.$.limitName": "string",
+		"permanentAMP": "number",
+		"permanentDMP": "number",
+		"permanentRMP": "number",
+		"permanentSMP": "number",
+		"playerName": "string",
+		"realm": "number",
+		"restrictions.$.description": "string",
+		"restrictions.$.mps": "number",
+		"restrictions.$.restrictionName": "string",
+		"riteOfHolyFire": "boolean",
+		"seriousWounds": "number",
+		"spirit": "number",
+		"surfaceWounds": "number",
+		"temporaryAMP": "number",
+		"temporaryDMP": "number",
+		"temporaryRMP": "number",
+		"temporarySMP": "number",
+		"virtues.$.description": "string",
+		"virtues.$.virtueName": "string"
+	};
+	
+	app.post("/api/listSheets", (req, res) => {
+		const PAGE_LENGTH = 20;
+		
+		let page = (typeof req.body.page === "string") ? parseInt(req.body.page) : (typeof req.body.page === "number") ? req.body.page : 0;
+		
+		return validateSession(req, res, (account) => {
+			let query = constructReadQuery(undefined, account);
+			delete query["uuid"]; // We don't actually want to get a specific sheet
+
+			if(req.body.criteria !== null && req.body.criteria !== undefined) {
+				if(typeof req.body.criteria !== "object") {
+					return res.status(400).send("If specified, criteria must be an object");
+				}
+				
+				for(let path in req.body.criteria) {
+					if(typeof path !== "string" || !validQueryPaths.hasOwnProperty(path)) {
+						return res.status(400).send("Invalid query path: " + path);
+					}
+
+					let type = validQueryPaths[path];
+					let value = req.body.criteria[path];
+
+					if(typeof value !== type) {
+						return res.status(400).send("Invalid query value for path " + path + ": " + value);
+					}
+
+					if(type === "string") {
+						query[path] = new RegExp(escapeRegExp(value), "i");
+					}
+					else {
+						query[path] = value;
+					}
+				}
+			}
+			
+			CharacterSheet.find(query).lean().sort("lastModified").skip(page * PAGE_LENGTH).populate("owner", ["name", "email"]).exec((err, sheets) => {
+					if(err || !sheets) {
+						console.error(err);
+						return res.status(500).send("Unable to process request");
+					}
+					
+					let sheetData = sheets.map((sheet) => {
+						return {
+							lastModified: sheet.lastModified,
+							uuid: sheet.uuid,
+							owner: (sheet.owner && sheet.owner.email) ? sheet.owner.email : null,
+							sheetName: sheet.sheetData.characterName || sheet.sheetName,
+							ownerName: sheet.sheetData.playerName,
+							public: sheet.public,
+							publicWritable: sheet.publicWritable
+						};
+					});
+					
+					res.status(200).json(sheetData);
+				}
+			);
 		});
 	});
 }

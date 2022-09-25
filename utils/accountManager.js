@@ -29,6 +29,7 @@ const Account = require("../models/accountModel"),
 	  crypto = require("crypto"),
 	  config = require("../config"),
 	  CharacterSheet = require("../models/characterSheetModel");
+const { constructReadQuery } = require("./commonQueries");
 
 const minPasswordLength = config.MIN_PW_LENGTH || 6;
 const maxPasswordLength = config.MAX_PW_LENGTH || 72;
@@ -185,71 +186,6 @@ function installAccountManager(app) {
 			}
 			
 			return res.status(200).send("Logged out");
-		});
-	});
-	
-	app.post("/api/account/claimSheet", (req, res) => {
-		const sheetErrorString = "Invalid or missing sheet ID";
-		
-		if(typeof req.body.sheet !== "string") {
-			return res.status(400).send(sheetErrorString);
-		}
-		
-		return validateSession(req, res, (account) => {
-			CharacterSheet.findOneAndUpdate({"uuid": req.body.sheet, owner: null}, {owner: account._id}, (err, sheet) => {
-				if(err || !sheet) {
-					return res.status(400).send(sheetErrorString);
-				}
-				
-				return res.status(200).send("Sheet claimed successfully");
-			});
-		}, (failureMessage) => {
-			return res.status(400).send("You aren't logged in");
-		});
-	});
-	
-	// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-	function escapeRegExp(string) {
-		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-	}
-	
-	app.post("/api/account/listSheets", (req, res) => {
-		const PAGE_LENGTH = 20;
-		
-		let page = (typeof req.body.page === "string") ? parseInt(req.body.page) : 0;
-		let searchName = (typeof req.body.searchName === "string") ? req.body.searchName : null;
-		let searchOwner = (typeof req.body.searchOwner === "string") ? req.body.searchOwner : null;
-		
-		return validateSession(req, res, (account) => {
-			let query = {};
-			
-			if(!account.isAdmin) {
-				query.owner = account._id;
-			}
-			if(searchName) {
-				query.sheetName = new RegExp(escapeRegExp(searchName), "i");
-			}
-			if(searchOwner) {
-				query.ownerName = new RegExp(escapeRegExp(searchOwner), "i");
-			}
-			
-			CharacterSheet.find(
-				query,
-				"-sheetData",
-				{lean: true, sort: "lastModified", skip: page * PAGE_LENGTH, limit: PAGE_LENGTH},
-				(err, sheets) => {
-					if(err || !sheets) {
-						console.error(err);
-						return res.status(500).send("Unable to process request");
-					}
-					
-					let sheetData = sheets.map((sheet) => {
-						return {lastModified: sheet.lastModified, uuid: sheet.uuid, owner: "Unknown", sheetName: sheet.sheetName, ownerName: sheet.ownerName};
-					});
-					
-					res.status(200).json(sheetData);
-				}
-			);
 		});
 	});
 }

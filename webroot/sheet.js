@@ -103,7 +103,7 @@ let initializeSheet = (window, sheetID) => {
 						};
 						
 						$.ajax({
-							"url": STRIPPED_PATHNAME + "/api/account/claimSheet",
+							"url": STRIPPED_PATHNAME + "/api/claimSheet",
 							"data": JSON.stringify(message),
 							"method": "POST",
 							"dataType": "json",
@@ -262,7 +262,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	let permanentAMPSlider = factory.attachSlider("permanentAMP", "<b>Aspect</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
-	let permanentDMPSlider = factory.attachSlider("permanentDPP", "<b>Domain</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
+	let permanentDMPSlider = factory.attachSlider("permanentDMP", "<b>Domain</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
 	let permanentRMPSlider = factory.attachSlider("permanentRMP", "<b>Realm</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);

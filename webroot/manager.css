@@ -46,3 +46,7 @@ tr,td,th {
 	background: blue;
 	color: #FFF;
 }
+
+.context-menu-delete {
+	background-color: red;
+}

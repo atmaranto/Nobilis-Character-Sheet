@@ -78,6 +78,25 @@ let duplicateSheet = (uuid, after) => {
 		});
 };
 
+let updateSheet = (uuid, after) => {
+	$.ajax({
+		"url": "./api/updateSheetVersion",
+		"data": {"id": uuid},
+		"method": "POST"
+	})
+		.done((data, text, xhr) => {
+			if(after) {
+				after(true);
+			}
+		})
+		.fail((xhr, text, err) => {
+			showError("Error while updating sheet: " + xhr.responseText);
+		})
+		.always(() => {
+			
+		});
+};
+
 let createSheetList = (sheets, container, currentPage) => {
 	let table = $("<table></table>").appendTo(container.html(""));
 	
@@ -114,8 +133,15 @@ let createSheetList = (sheets, container, currentPage) => {
 									}
 								)
 							)
+							/* .append(
+								$("<li><a href='#'>Update Sheet Version</a></li>").click(
+									() => {
+										updateSheet(sheet.uuid, () => refreshSheet(container, currentPage));
+									}
+								)
+							) */
 							.append(
-								$("<li><a href='#'>Delete Sheet</a></li>").click(
+								$("<li><a href='#' class='context-menu-delete'>Delete Sheet</a></li>").click(
 									() => {
 										if(window.confirm("Really delete this sheet?")) {
 											deleteSheet(sheet.uuid, () => rowEntry.remove());
@@ -176,7 +202,7 @@ let refreshSheet = (container, currentPage) => {
 	
 	if(loggedIn) {
 		$.ajax({
-			"url": "./api/account/listSheets",
+			"url": "./api/listSheets",
 			"data": message,
 			"method": "POST"
 		})
