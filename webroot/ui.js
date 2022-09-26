@@ -458,7 +458,7 @@ SOFTWARE.
 			this.fragments.push(container);
 			this.pushTable();
 
-			return container;
+			return editor;
 		},
 		
 		attachNumber: function(name, text, bounds, defaultValue, attrs) {
