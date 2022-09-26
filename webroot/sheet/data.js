@@ -564,7 +564,7 @@ SOFTWARE.
 				"label": "Major Changes",
 				"text": "Level-9 miracles, Major Changes, can do anything else within a character's Realm, following the other rules regarding miracles of Realm.",
 				"examples": [
-					"<h2>PHENOMINAL COSMIC POWER</h2> <span style='font-size: 8px'>itty-bitty living space</span>."
+					"<h2>PHENOMENAL COSMIC POWER</h2> <span style='font-size: 8px'>itty-bitty living space</span>."
 				]
 			}
 		],
@@ -1073,7 +1073,7 @@ SOFTWARE.
 		"rules": [
 			"You can have a number of Anchors equal to your Spirit + 1.",
 			"Anchors can use only \"local\" Domain and Realm miracles.",
-			"Casting Aspect miracles through Anchors costs an extra (5 - Spirit Level) miracles points.",
+			"Casting Aspect miracles through Anchors costs an extra (5 - Spirit Level) miracle points.",
 			"SMP can be used to replace any other miracle point for miracles cast through Anchors."
 		]
 	};
