@@ -25,8 +25,7 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-      Boolean = mongoose.Schema.Types.Boolean,
-	  randomUUID = require("crypto").randomUUID;
+      Boolean = mongoose.Schema.Types.Boolean;
 
 module.exports = {
 	playerName: {
@@ -276,5 +275,20 @@ module.exports = {
 			default: "",
 			required: true
 		}
-	}]
+	}],
+
+	chancelInformation: {
+		type: String,
+		default: ""
+	},
+
+	imperatorInformation: {
+		type: String,
+		default: ""
+	},
+
+	genericCharacterDetails: {
+		type: String,
+		default: ""
+	}
 };
