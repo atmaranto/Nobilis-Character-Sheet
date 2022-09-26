@@ -25,7 +25,8 @@ SOFTWARE.
 */
 
 const mongoose = require("mongoose"),
-      Boolean = mongoose.Schema.Types.Boolean;
+      Boolean = mongoose.Schema.Types.Boolean,
+	  documentSchema = require("./documentSchema.js");
 
 module.exports = {
 	playerName: {
@@ -117,8 +118,8 @@ module.exports = {
 		},
 		
 		estateProperties: {
-			type: String,
-			default: "",
+			type: documentSchema,
+			default: () => {},
 			required: true
 		}
 	}],
@@ -185,6 +186,12 @@ module.exports = {
 			type: Number,
 			default: 0,
 			required: true
+		},
+
+		giftDescription: {
+			type: documentSchema,
+			default: "",
+			required: true
 		}
 	}],
 	
@@ -196,8 +203,8 @@ module.exports = {
 		},
 		
 		description: {
-			type: String,
-			default: "",
+			type: documentSchema,
+			default: () => {},
 			required: true
 		},
 		
@@ -216,8 +223,8 @@ module.exports = {
 		},
 		
 		description: {
-			type: String,
-			default: "",
+			type: documentSchema,
+			default: () => {},
 			required: true
 		},
 		
@@ -236,8 +243,8 @@ module.exports = {
 		},
 		
 		description: {
-			type: String,
-			default: "",
+			type: documentSchema,
+			default: () => {},
 			required: true
 		}
 	}],
@@ -249,13 +256,13 @@ module.exports = {
 	},
 	
 	bondAllocation: {
-		type: String,
-		default: ""
+		type: documentSchema,
+		default: () => {}
 	},
 	
 	anchors: {
-		type: String,
-		default: ""
+		type: documentSchema,
+		default: () => {}
 	},
 	
 	riteOfHolyFire: {
@@ -271,24 +278,24 @@ module.exports = {
 		},
 		
 		cpSource: {
-			type: String,
-			default: "",
+			type: documentSchema,
+			default: () => {},
 			required: true
 		}
 	}],
 
 	chancelInformation: {
-		type: String,
-		default: ""
+		type: documentSchema,
+		default: () => {}
 	},
 
 	imperatorInformation: {
-		type: String,
-		default: ""
+		type: documentSchema,
+		default: () => {}
 	},
 
 	genericCharacterDetails: {
-		type: String,
-		default: ""
+		type: documentSchema,
+		default: () => {}
 	}
 };

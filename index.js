@@ -28,13 +28,35 @@ var express = require("express"),
 	bodyParser = require("body-parser"),
 	cookieParser = require("cookie-parser"),
 	mongoose = require("mongoose"),
+	ShareDB = require("sharedb"),
+	sharedbMongo = require("sharedb-mongo"),
+	richText = require("rich-text"),
 	config = require("./config"),
 	path = require("path"),
 	{installAccountManager} = require("./utils/accountManager"),
-	installSheetsRouter = require("./routes/sheets");
+	installSheetsRouter = require("./routes/sheets"),
+	installWebsocketManager = require("./utils/websocketManager");
 
-function main(app) {
-	mongoose.connect(config.CONNECT_STRING);
+let queryParse = (query) => {
+	if(query === null) return {};
+
+	let result = {};
+	for(let [key, value] in new URLSearchParams(query)) {
+		result[key] = value;
+	}
+
+	return result;
+};
+	
+function main(app, prefix, server) {
+	ShareDB.types.register(richText.type);
+
+	let db = sharedbMongo({
+		mongo: function(callback) {
+			mongoose.connect(config.CONNECT_STRING, callback);
+		}
+	});
+	const backend = new ShareDB({db: db, presence: true, doNotForwardSendPresenceErrorsToClient: true});
 	
 	//app.use(express.urlencoded({"extended": true}));
 	//app.use("/api/sheetData", express.text());
@@ -44,14 +66,22 @@ function main(app) {
 	
 	installAccountManager(app, config);
 	installSheetsRouter(app, config);
+	installWebsocketManager(app, config, backend, server);
 
 	app.use("/", express.static(path.join(__dirname, "webroot")));
+
 	return app;
 }
 
 if(require.main === module) {
-	let app = main(express());
-	app.listen(config.PORT, () => {
+	let http = require("http");
+	let app = express();
+	let server = http.createServer(app);
+	app.set("query parser", "simple");
+
+	app = main(app, "", server);
+
+	server.listen(config.PORT, () => {
 		console.log("Serving indefinitely on port", config.PORT);
 	});
 }

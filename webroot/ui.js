@@ -25,6 +25,8 @@ SOFTWARE.
 */
 
 (() => {
+	Quill.register('modules/cursors', QuillCursors);
+
 	window.UI = {};
 	UI = window.UI;
 	
@@ -188,6 +190,8 @@ SOFTWARE.
 		this.sections = [];
 		this.sectionAnchors = [];
 		this.editorID = _editorIDCounter++;
+
+		this.collaboration = null;
 	}
 	
 	UI.EditorFactory.prototype = {
@@ -242,6 +246,17 @@ SOFTWARE.
 			
 			return $(heading);
 		},
+
+		enableCollaboration: function(endpoint, name) {
+			if(window.ReconnectingWebSocket) {
+				this.collaboration = {
+					socket: new ReconnectingWebSocket(endpoint),
+					name: name
+				};
+
+				this.collaboration.connection = new sharedb.Connection(this.collaboration.socket);
+			}
+		},
 		
 		//Creates an attached text input for an attribute in object
 		attachText: function(name, text, attrs) {
@@ -262,7 +277,7 @@ SOFTWARE.
 		},
 		
 		attachTextArea: function(name, label, attrs) {
-			let rnd = (Math.random()).toString().substr(2);
+			let rnd = (Math.random()).toString().substring(2);
 			
 			let container = $("<div></div>");
 			let input = $("<textarea class='editorarea'/>");
@@ -286,13 +301,172 @@ SOFTWARE.
 			
 			return input;
 		},
+
+		attachRichTextArea: function(name, label, attrs, realPath) {
+			if(Quill === undefined) {
+				return this.attachTextArea(name, label, attrs);
+			}
+			
+			let docid = realPath || name;
+			let rnd = (Math.random()).toString().substring(2);
+			let editorid = "richtextarea" + rnd;
+
+			let editor = $("<div id='" + editorid + "'></div>");
+
+			let container = $("<div></div>")
+				.css({
+					"margin": "2px",
+					"border-collapse": "initial",
+					"text-indent": "initial",
+					"border-spacing": "initial"
+				});
+			
+			if(label != false) {
+				if(typeof label === "string" || !label) {
+					container.append($("<p></p>").text(label || utils.capitalize(name)).css("margin-bottom", "2px"));
+				}
+				else {
+					container.append($(label));
+				}
+			}
+			
+			container.append(editor);
+			
+			let onAdded = () => {
+					let quill = new Quill(
+						"#" + editorid,
+						{
+							modules: {
+								toolbar: [
+									[{ size: [] }],
+									['bold', 'italic', 'underline', 'strike'],
+									[ /* 'image', */ 'link', 'blockquote'],
+
+									[{ list: 'ordered' }, { list: 'bullet' }],
+									[{ script: 'sub' }, { script: 'super' }],
+
+									[{'color': []}],
+									[{'font': []}],
+									[{'align': []}],
+
+									['clean']
+								],
+								cursors: this.collaboration !== undefined && this.collaboration !== null
+							},
+							theme: "snow"
+						});
+					
+					if(this.collaboration) {
+						doc.subscribe(function(err) {
+							if(err) {
+								console.error(err);
+								editor.append(this.attachTextArea(name, label, attrs).parent());
+			
+								return;
+							}
+		
+							let doc = this.collaboration.connection.get("collaboration", docid);
+			
+							// ?
+			
+							let cursors = quill.getModule('cursors');
+							
+							quill.on("text-change", function(delta, oldDelta, source) {
+								if(source !== "user") return;
+								doc.submitOp(delta);
+							});
+			
+							doc.on("op", function(op, source) {
+								if(source === quill) return;
+								quill.updateContents(op);
+							});
+			
+							let presence = doc.connection.get("presence", docid);
+			
+							presence.subscribe((err) => {
+								throw err;
+							});
+			
+							let presenceId = new ObjectID().toString();
+			
+							let localPresence = presence.create(presenceId);
+			
+							quill.on("selection-change", (range, oldRange, source) => {
+								if(source !== "user") return;
+								if(!range) return;
+			
+								range.name = this.collaboration.name;
+								localPresence.submit(range, (err) => {
+									if(err) throw err;
+								});
+							});
+			
+							presence.on("receive", (id, range) => {
+								let name = range.name || "Anonymous";
+								cursors.createCursor(docid, name, "#000000");
+								cursors.moveCursor(docid, range);
+							});
+						});
+					}
+					else {
+						let value = this.object[name];
+		
+						if(typeof value === "string") {
+							quill.setText(value);
+						}
+						else if(typeof value === "object") {
+							quill.setContents(value);
+						}
+						this.object[name] = quill.getContents();
+		
+						quill.on("text-change", (delta, oldDelta, source) => {
+							if(source !== "user") return;
+							this.object[name] = quill.getContents();
+						});
+					}
+				};
+			
+			let checkNodes = (node) => {
+				if(node.id === editorid) {
+					observer.disconnect();
+					setTimeout(onAdded, 1);
+					
+					return true;
+				}
+
+				for(let i = 0; i < node.childNodes.length; i++) {
+					let childNode = node.childNodes[i];
+					
+					if(childNode.nodeType === Node.ELEMENT_NODE) {
+						if(checkNodes(childNode)) {
+							return true;
+						}
+					}
+				}
+			};
+			
+			// There's probably a more efficient way to do this...
+			let observer = new MutationObserver((records) => {
+				for(let i = 0; i < records.length; i++) {
+					if(checkNodes({childNodes: records[i].addedNodes})) {
+						return;
+					}
+				}
+			});
+			observer.observe($("body")[0], { childList: true, subtree: true });
+
+			this.fragments.push(container);
+			this.pushTable();
+
+			return container;
+		},
 		
 		attachNumber: function(name, text, bounds, defaultValue, attrs) {
 			if(bounds == undefined) {
 				bounds = {min: 0};
 			}
 			
-			var rnd = (Math.random()).toString().substr(2);
+			var rnd = (Math.random()).toString().substring(2);
 			var row = this.add("<label for=\"num"+rnd+"\" class='secretnoselect'>" +
 				(text || utils.capitalize(name)) + "</label>"
 			);

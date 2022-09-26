@@ -47,7 +47,7 @@ let initializeSheet = (window, sheetID) => {
 		)
 		.children().last().wrap($("<div class='sheetContainer'></div>"));
 	
-	if(!sheetPermissions.write) {
+	if(!window.sheetPermissions.write) {
 		$("#saveSheet").hide();
 	}
 	
@@ -96,7 +96,7 @@ let initializeSheet = (window, sheetID) => {
 		if(window.sheetOwner) {
 			owningMessage.html("This sheet is owned by ").append($("<span style='color: green; font-style: italic'></span>").text(window.sheetOwner));
 
-			if(sheetPermissions.write) {
+			if(window.sheetPermissions.write) {
 				owningMessage
 					.append(" (you) ")
 					.append($("<button id='unclaimSheetButton'>Unclaim sheet?</button>").click(() => {
@@ -177,8 +177,8 @@ let initializeSheet = (window, sheetID) => {
 			let color;
 			let description;
 
-			if(sheetPermissions[permission]) {
-				if(!sheetPermissions[permission + "NoAdmin"]) {
+			if(window.sheetPermissions[permission]) {
+				if(!window.sheetPermissions[permission + "NoAdmin"]) {
 					color = "orange";
 					description = "You " + yesDesc[permission] + " this sheet (because you're an admin).";
 				}
@@ -202,9 +202,9 @@ let initializeSheet = (window, sheetID) => {
 		permissionArea.append($("<br>"));
 		
 		// If the user can write to the sheet, show them a checkbox to mark it as public.
-		if(sheetPermissions.owner) {
-			let publicCheckbox = $("<input type='checkbox' id='publicCheckbox'>").prop("checked", sheetPermissions.public);
-			let publicWritableCheckbox = $("<input type='checkbox' id='publicWritableCheckbox'>").prop("checked", sheetPermissions.publicWritable);
+		if(window.sheetPermissions.owner) {
+			let publicCheckbox = $("<input type='checkbox' id='publicCheckbox'>").prop("checked", window.sheetPermissions.public);
+			let publicWritableCheckbox = $("<input type='checkbox' id='publicWritableCheckbox'>").prop("checked", window.sheetPermissions.publicWritable);
 
 			let updatePermissions = () => {
 				let checked1 = publicCheckbox.prop("checked");
@@ -225,14 +225,14 @@ let initializeSheet = (window, sheetID) => {
 					"contentType": "application/json"
 				})
 					.done((data, text, xhr) => {
-						sheetPermissions.public = checked1;
-						sheetPermissions.publicWritable = checked2;
+						window.sheetPermissions.public = checked1;
+						window.sheetPermissions.publicWritable = checked2;
 					})
 					.fail((xhr, text, err) => {
 						console.error(err);
 
-						publicCheckbox.prop("checked", sheetPermissions.public);
-						publicWritableCheckbox.prop("checked", sheetPermissions.publicWritable);
+						publicCheckbox.prop("checked", window.sheetPermissions.public);
+						publicWritableCheckbox.prop("checked", window.sheetPermissions.publicWritable);
 
 						let errorText = $("<span><br /></span>")
 							.append(
@@ -389,8 +389,8 @@ let initializeSheet = (window, sheetID) => {
 		.append($("<td></td>").append(lockUnlockButton));
 	
 	// Preload lock/unlock images
-	let imgLock = $("<img src='images/lock.svg' />");
-	let imgUnlock = $("<img src='images/unlock.svg' />");
+	let imgLock = $("<img src='../images/lock.svg' />");
+	let imgUnlock = $("<img src='../images/unlock.svg' />");
 	
 	let permanentAMPSlider = factory.attachSlider("permanentAMP", "<b>Aspect</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
 		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
@@ -694,7 +694,7 @@ let initializeSheet = (window, sheetID) => {
 		});
 		
 		attributeFactory.attachStandalone(infoTable);
-		attributeFactory.attachTextArea(
+		attributeFactory.attachRichTextArea(
 			"estateProperties", 
 			$("<p class='lookslikelink'>Estate Properties (click for info)</p>")
 				.click(() => (estatePropertiesInfoWindow.show()))
@@ -934,7 +934,7 @@ let initializeSheet = (window, sheetID) => {
 		let giftCostCalculation = $("<p><span class='giftcost'>Loading...</span><span class='giftcostaddendum'></span></p>");
 		giftFactory.add($("<p class='secretnoselect'>Gift cost</p>")).append($("<td></td>").append(giftCostCalculation));
 		
-		let giftDescription = giftFactory.attachTextArea("giftDescription", "Gift Description");
+		let giftDescription = giftFactory.attachRichTextArea("giftDescription", "Gift Description");
 		
 		let recalculateCost = () => {
 			let cost = parseInt(miracleLevel.val());
@@ -994,7 +994,7 @@ let initializeSheet = (window, sheetID) => {
 			$("<p>This is the number of miracle points your Restriction grants you when it is invoked.</p>")
 		);
 		
-		localFactory.attachTextArea("description");
+		localFactory.attachRichTextArea("description");
 		
 		return {"element": localFactory.create().css("padding", "10px").css("padding-left", "30px").css("border", "1px dotted grey"), "object": object};
 	};
@@ -1033,7 +1033,7 @@ let initializeSheet = (window, sheetID) => {
 		).addClass("limitCPs").on("input change", attributeUpdate);
 		
 		
-		localFactory.attachTextArea("description");
+		localFactory.attachRichTextArea("description");
 		
 		return {"element": localFactory.create().css("padding", "10px").css("padding-left", "30px").css("border", "1px dotted grey"), "object": object};
 	};
@@ -1065,7 +1065,7 @@ let initializeSheet = (window, sheetID) => {
 		let localFactory = new UI.EditorFactory(object);
 		
 		localFactory.attachText("virtueName");
-		localFactory.attachTextArea("description");
+		localFactory.attachRichTextArea("description");
 		
 		return {"element": localFactory.create().css("padding", "10px").css("padding-left", "30px").css("border", "1px dotted grey"), "object": object};
 	};
@@ -1140,7 +1140,7 @@ let initializeSheet = (window, sheetID) => {
 				$(this).val("0");
 				attributeUpdate();
 			});
-		sectionFactory.attachTextArea("cpSource", "Source of Character Points");
+		sectionFactory.attachRichTextArea("cpSource", "Source of Character Points");
 		
 		return {"element": sectionFactory.create().css("padding-left", "30px").css("border", "1px dotted grey"), "object": sectionData};
 	};
@@ -1149,7 +1149,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.startSection("Bonds and Anchors", "h2");
 	
-	let anchors = factory.attachTextArea("anchors");
+	let anchors = factory.attachRichTextArea("anchors");
 	let anchorsMax = $("<i> (Loading...)</i>").appendTo(anchors.prev());
 	
 	UI.addHoverInfo(
@@ -1177,7 +1177,7 @@ let initializeSheet = (window, sheetID) => {
 	spiritSlider.on("input", updateAnchorMax);
 	updateAnchorMax();
 	
-	let bondAllocation = factory.attachTextArea("bondAllocation");
+	let bondAllocation = factory.attachRichTextArea("bondAllocation");
 	
 	UI.addHoverInfo(
 		bondAllocation.prev(),
@@ -1188,11 +1188,11 @@ let initializeSheet = (window, sheetID) => {
 	);
 	
 	factory.startSection("Chancel and Imperator Details", "h2");
-	factory.attachTextArea("chancelInformation");
-	factory.attachTextArea("imperatorInformation");
+	factory.attachRichTextArea("chancelInformation");
+	factory.attachRichTextArea("imperatorInformation");
 	
 	factory.startSection("Other Character Details", "h2");
-	factory.attachTextArea("genericCharacterDetails", "Anything else you want to add");
+	factory.attachRichTextArea("genericCharacterDetails", "Anything else you want to add");
 	
 	let toc = $(factory.createTableOfContents());
 	

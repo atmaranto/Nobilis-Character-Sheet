@@ -415,3 +415,12 @@ div.tableOfContents {
 a.tocItem:visited {
 	color: blue;
 }
+
+/* Quill modifications */
+
+.ql-editor {
+    resize: vertical; 
+    overflow-y: scroll;
+	min-height: 200px;
+	width: 1000px;
+}

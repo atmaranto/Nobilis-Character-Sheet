@@ -106,7 +106,7 @@ module.exports = function(app, config) {
 				
 				CharacterSheet.findOneAndUpdate(query, newData, (err, sheet) => {
 					if(err || !sheet) {
-						debug(err);
+						console.log(err);
 						return res.status(400).send("Invalid id");
 					}
 					
