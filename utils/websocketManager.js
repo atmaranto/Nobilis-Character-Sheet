@@ -20,9 +20,6 @@ let installWebsocketManager = (app, config, backend, server) => {
 			ws.close(1008, "Invalid path " + urlPath);
 			return;
 		}
-
-		let stream = new WebSocketJSONStream(ws);
-		backend.listen(stream);
 	});
 
     return wss;
