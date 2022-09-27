@@ -288,7 +288,7 @@ function installAccountManager(app) {
 				res.cookie("email", acct.email, {maxAge: sessionDuration, httpOnly: false});
 				res.cookie("sessionKey", sessionKey, {maxAge: sessionDuration, httpOnly: false});
 				
-				return res.redirect("/?verified");
+				return res.redirect("./?verified");
 			});
 		});
 	}
