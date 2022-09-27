@@ -9,6 +9,11 @@ div.jswindow {
 	overflow: hidden; /* Allows the windows to run off the screen, to an extent */
 }
 
+/* Ehh, I'll just do it for all windows */
+.windowcontent table, .windowcontent th, .windowcontent td {
+	border: 1px solid black;
+}
+
 /* NOTE: overflow: auto should fix child content rendering outside its parent */
 
 div.titlebar {

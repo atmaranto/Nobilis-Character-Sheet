@@ -1,39 +1,54 @@
-let constructReadQuery = (id, acct) => {
+let constructReadQuery = (id, acct, includePublic) => {
 	let query = {
 		uuid: id,
 	};
 
 	if(!acct || !acct.isAdmin) {
-		query.$or = [{public: true}, {publicWritable: true}];
+		query.$or = [];
+
+		if(includePublic !== false) {
+			query.$or.push({public: true});
+			query.$or.push({publicWritable: true});
+		}
 
 		if(acct) {
 			query.$or.push({owner: acct._id});
-			query.$or.push({
-				sharedWith: {
-					owner: acct._id
+			query.$or.push(
+				{
+					sharedWith: {
+						$elemMatch: {
+							user: acct._id,
+						}
+					}
 				}
-			});
+			);
 		}
 	}
 
 	return query;
 }
 
-let constructWriteQuery = (id, acct) => {
+let constructWriteQuery = (id, acct, includePublic) => {
 	let query = {
 		uuid: id
 	};
 
 	if(!acct || !acct.isAdmin) {
-		query.$or = [{publicWritable: true}];
+		query.$or = [];
+
+		if(includePublic !== false) {
+			query.$or.push({publicWritable: true});
+		}
 
 		if(acct) {
 			query.$or.push({owner: acct._id});
 			query.$or.push({
 				sharedWith: {
-					owner: acct._id,
-					permission: {
-						$in: ["write", "owner"]
+					$elemMatch: {
+						user: acct._id,
+						permission: {
+							$in: ["write", "owner"]
+						}
 					}
 				}
 			});
@@ -53,8 +68,10 @@ let constructDeleteQuery = (id, acct) => {
 			{owner: acct._id},
 			{
 				sharedWith: {
-					owner: acct._id,
-					permission: "owner"
+					$elemMatch: {
+						user: acct._id,
+						permission: "owner"
+					}
 				}
 			}
 		];

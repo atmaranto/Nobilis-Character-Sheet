@@ -79,11 +79,6 @@ div.sheetContainer {
 	margin: 5px;
 }
 
-/* Ehh, I'll just do it for all windows */
-.windowcontent table, .windowcontent th, .windowcontent td {
-	border: 1px solid black;
-}
-
 /* Miracle settings */
 
 .miracleName:hover {

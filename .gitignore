@@ -1,4 +1,8 @@
 node_modules/*
 .vscode/*
 *.key
-
+*.key.js
+*.key.css
+*.key.html
+*.key.txt
+*.key.json

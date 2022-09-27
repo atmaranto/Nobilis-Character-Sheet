@@ -57,19 +57,33 @@ module.exports = new mongoose.Schema({
 		type: String,
 		required: "Each account must have a common name"
 	},
+
+	verified: {
+		type: Boolean,
+		default: false,
+		required: "Each account must have a verification status"
+	},
+
+	verificationCode: {
+		type: String,
+		required: false
+	},
 	
 	isAdmin: {
 		type: Boolean,
 		default: false
 	},
-	
-	sessionKey: {
-		type: String,
-		default: null
-	},
-	
-	sessionDate: {
-		type: Date,
-		default: Date.now
-	}
+
+	sessions: [{
+		key: {
+			type: String,
+			required: "Each session must have a key"
+		},
+
+		created: {
+			type: Date,
+			default: Date.now,
+			required: "Each session must have a creation date"
+		}
+	}]
 });

@@ -25,7 +25,6 @@ module.exports = function(app, config) {
 
 				CharacterSheet.findOne(query).populate("owner", "name").lean().exec((err, sheet) => {
 					if(err || !sheet) {
-						console.error(err, sheet, query);
 						return sayInvalid();
 					}
 
@@ -89,6 +88,7 @@ module.exports = function(app, config) {
 			}, true);
 		})
 		.put((req, res) => {
+			/* Update a character sheet */
 			if(!req.query || (typeof req.query.id !== "string")) {
 				return res.status(400).send("No id provided");
 			}
@@ -106,7 +106,6 @@ module.exports = function(app, config) {
 				
 				CharacterSheet.findOneAndUpdate(query, newData, (err, sheet) => {
 					if(err || !sheet) {
-						console.log(err);
 						return res.status(400).send("Invalid id");
 					}
 					
@@ -315,7 +314,7 @@ module.exports = function(app, config) {
 
 				let newSheet = new CharacterSheet();
 				newSheet.sheetData = sheet.sheetData;
-				newSheet._owner = sheet._owner;
+				newSheet.owner = sheet.owner;
 				
 				newSheet.save().then((newSheet, err) => {
 					if(!newSheet || err) {
@@ -355,6 +354,34 @@ module.exports = function(app, config) {
 					else {
 						return respond();
 					}
+				});
+			});
+		});
+	});
+
+	app.post("/api/transfer", (req, res) => {
+		if(!req.body || (typeof req.body.id !== "string") || (typeof req.body.newOwner !== "string")) {
+			return res.status(400).send("Invalid request");
+		}
+
+		validateSession(req, res, (account) => {
+			Account.findOne({"email": req.body.newOwner}).lean().exec((err, acct) => {
+				if(err || !acct) {
+					return res.status(400).send("Invalid email");
+				}
+
+				let query = constructDeleteQuery(req.body.id, account);
+	
+				let update = {
+					owner: acct._id
+				};
+
+				CharacterSheet.findOneAndUpdate(query, update).lean().exec((err, sheet) => {
+					if(err || !sheet) {
+						return res.status(404).send("Invalid id");
+					}
+
+					return res.status(200).send("");
 				});
 			});
 		});
@@ -403,30 +430,125 @@ module.exports = function(app, config) {
 		});
 	});
 
-	app.post("/api/permissions", (req, res) => {
+	app.get("/api/permissions", (req, res) => {
+		if(!req.query || (typeof req.query.id !== "string")) {
+			return res.status(400).send("Invalid request");
+		}
+
+		validateSession(req, res, (account) => {
+			let query = constructDeleteQuery(req.query.id, account);
+
+			CharacterSheet.findOne(query).populate("sharedWith.user", "email").lean().exec((err, sheet) => {
+				if(err || !sheet) {
+					return res.status(404).send("Invalid id");
+				}
+				
+				return res.status(200).send({
+					public: sheet.public,
+					publicWritable: sheet.publicWritable,
+					sharedWith: (sheet.sharedWith || []).map((share) => {
+						return {
+							email: share.user.email,
+							permission: share.permission
+						};
+					})
+				});
+			});
+		});
+	})
+	.post("/api/permissions", (req, res) => {
 		const sheetErrorString = "Invalid or missing sheet ID";
 		
 		if(typeof req.body.id !== "string") {
 			return res.status(400).send(sheetErrorString);
 		}
-		if(typeof req.body.public !== "boolean") {
-			return res.status(400).send("Invalid or missing public flag");
+		if(typeof req.body.permissions !== "object") {
+			return res.status(400).send("Invalid or missing permissions");
 		}
-		if(typeof req.body.publicWritable !== "boolean") {
-			return res.status(400).send("Invalid or missing publicWritable flag");
+
+		let permissions = req.body.permissions;
+		if(typeof permissions.public !== "boolean" && typeof permissions.publicWritable !== "boolean" && !Array.isArray(permissions.sharedWith)) {
+			return res.status(400).send("Invalid or missing permission data");
+		}
+		if(Array.isArray(permissions.sharedWith) && permissions.sharedWith.length > 10) {
+			return res.status(400).send("Too many shared users");
 		}
 		
 		return validateSession(req, res, (account) => {
 			let query = constructDeleteQuery(req.body.id, account); // Not technically a delete query, but it requires the same permissions
-			let update = {public: req.body.public, publicWritable: req.body.publicWritable};
 
-			CharacterSheet.findOneAndUpdate(query, update).lean().exec((err, sheet) => {
-				if(err || !sheet) {
-					return res.status(400).send(sheetErrorString);
+			let update = {};
+
+			let updateSheet = () => {
+				CharacterSheet.findOneAndUpdate(query, update).lean().exec((err, sheet) => {
+					if(err || !sheet) {
+						return res.status(400).send(sheetErrorString);
+					}
+					
+					return res.status(200).send("Sheet permissions set successfully");
+				});
+			};
+
+			if(typeof permissions.public === "boolean") {
+				update.public = permissions.public;
+			}
+			if(typeof permissions.publicWritable === "boolean") {
+				update.publicWritable = permissions.publicWritable;
+			}
+
+			if(Array.isArray(permissions.sharedWith)) {
+				let invalid = permissions.sharedWith.find((share) => {
+					return (typeof share.email !== "string") || (typeof share.permission !== "string") || !["read", "write", "owner"].includes(share.permission);
+				});
+
+				if(invalid !== undefined) {
+					return res.status(400).send("Invalid or missing sharing data");
 				}
+
+				/* if(permissions.sharedWith.find(shared => shared.email === account.email)) {
+					return res.status(400).send("You can't share a sheet with yourself");
+				} */
 				
-				return res.status(200).send("Sheet unclaimed successfully");
-			});
+				let emails = permissions.sharedWith.map((share) => {
+					return share.email;
+				});
+
+				let emailSet = new Set(emails);
+				if(emailSet.size !== emails.length) {
+					return res.status(400).send("Duplicate emails");
+				}
+
+				Account.find({email: {$in: emails}}).lean().exec((err, accounts) => {
+					if(err) {
+						return res.status(400).send("Error finding accounts");
+					}
+
+					let emailMap = {};
+					accounts.forEach((acct) => {
+						emailMap[acct.email] = acct;
+					});
+
+					let invalidShare = permissions.sharedWith.find((share) => {
+						return !emailMap[share.email];
+					});
+
+					if(invalidShare) {
+						return res.status(400).send("Invalid email address: " + invalidShare.email);
+					}
+
+					update.sharedWith = permissions.sharedWith.map((share) => {
+						return {
+							user: emailMap[share.email]._id,
+							permission: share.permission
+						};
+					});
+
+					updateSheet();
+				});
+			}
+			else {
+				updateSheet();
+			}
 		}, (failureMessage) => {
 			return res.status(400).send("You aren't logged in");
 		});
@@ -496,7 +618,8 @@ module.exports = function(app, config) {
 		let page = (typeof req.body.page === "string") ? parseInt(req.body.page) : (typeof req.body.page === "number") ? req.body.page : 0;
 		
 		return validateSession(req, res, (account) => {
-			let query = constructReadQuery(undefined, account);
+			let shouldIncludePublic = account.isAdmin === true;
+			let query = constructReadQuery(undefined, account, shouldIncludePublic); // Exclude public sheets from the list, unless the user is an admin
 			delete query["uuid"]; // We don't actually want to get a specific sheet
 
 			if(req.body.criteria !== null && req.body.criteria !== undefined) {
@@ -546,7 +669,8 @@ module.exports = function(app, config) {
 						return {
 							lastModified: sheet.lastModified,
 							uuid: sheet.uuid,
-							owner: (sheet.owner && sheet.owner.email) ? sheet.owner.email : null,
+							owner: (sheet.owner && sheet.owner.name) ? sheet.owner.name : null,
+							ownerEmail: (sheet.owner && sheet.owner.email && (account.isAdmin || account.email == sheet.owner.email)) ? sheet.owner.email : undefined,
 							sheetName: sheet.sheetData.characterName || sheet.sheetName,
 							ownerName: sheet.sheetData.playerName,
 							public: sheet.public,

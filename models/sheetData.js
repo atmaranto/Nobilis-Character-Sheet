@@ -113,8 +113,7 @@ module.exports = {
 		
 		domainDescription: {
 			type: String,
-			default: "",
-			required: true
+			default: ""
 		},
 		
 		estateProperties: {
@@ -154,14 +153,12 @@ module.exports = {
 		
 		giftName: {
 			type: String,
-			default: "",
-			required: true
+			default: ""
 		},
 		
 		giftEstate: {
 			type: String,
-			default: "",
-			required: true
+			default: ""
 		},
 		
 		giftAOEType: {
@@ -190,16 +187,14 @@ module.exports = {
 
 		giftDescription: {
 			type: documentSchema,
-			default: "",
-			required: true
+			default: () => {}
 		}
 	}],
 	
 	restrictions: [{
 		restrictionName: {
 			type: String,
-			default: "",
-			required: true
+			default: ""
 		},
 		
 		description: {
@@ -238,8 +233,7 @@ module.exports = {
 	virtues: [{
 		virtueName: {
 			type: String,
-			default: "",
-			required: true
+			default: ""
 		},
 		
 		description: {
@@ -273,8 +267,7 @@ module.exports = {
 	additionalCPs: [{
 		rawCPs: {
 			type: String, // Apparently?
-			default: "0",
-			required: true
+			default: "0"
 		},
 		
 		cpSource: {

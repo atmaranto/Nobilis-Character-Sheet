@@ -44,7 +44,22 @@ const sessionKeyLength = config.SESSION_KEY_LENGTH || 40;
 
 const sessionDuration = config.SESSION_LENGTH || 1000 * 60 * 60 * 24 * 7;
 
-const enableAccountCreation = config.ACCOUNT_CREATION_DISABLED != true;
+let enableAccountCreation = config.ACCOUNT_CREATION_DISABLED !== true;
+const accountCreationRequiresVerification = config.ACCOUNT_CREATION_REQUIRES_VERIFICATION;
+
+const maxActiveSessions = config.MAX_ACTIVE_SESSIONS || 5;
+
+let verifierScript;
+if(enableAccountCreation && accountCreationRequiresVerification) {
+	try {
+		verifierScript = require(config.ACCOUNT_CREATION_VERIFICATION_SCRIPT);
+	}
+	catch(e) {
+		console.error(e);
+		console.error("Failed to load account creation verification script. Account creation will be disabled.");
+		enableAccountCreation = false;
+	}
+}
 
 const emailRegex = /^\w+\@([\w\-]+\.)+(\w+)$/;
 
@@ -71,8 +86,14 @@ function validateSession(req, res, callback, failureCallback, lean, populate) {
 	
 	let email = req.body.email || req.cookies.email;
 	let sessionKey = req.body.sessionKey || req.cookies.sessionKey;
+
+	let filter = {email: email, session: {key: sessionKey, created: {$gte: Date.now() - sessionDuration}}};
 	
-	let query = Account.findOne({email: email, sessionKey: sessionKey, sessionDate: {$gte: Date.now() - sessionDuration}});
+	if(accountCreationRequiresVerification) {
+		filter.verified = true;
+	}
+
+	let query = Account.findOne(filter);
 
 	if(lean) {
 		query = query.lean();
@@ -101,8 +122,13 @@ function installAccountManager(app) {
 			if(typeof req.body.password !== "string" || req.body.password.length > maxPasswordLength || req.body.password.length < minPasswordLength) {
 				return res.status(400).send("Invalid password");
 			}
+
+			let query = {email: req.body.email};
+			if(accountCreationRequiresVerification) {
+				query.verified = true;
+			}
 			
-			Account.findOne({email: req.body.email}, (err, account) => {
+			Account.findOne(query, (err, account) => {
 				if(err || !account) {
 					return res.status(400).send("Invalid credentials");
 				}
@@ -114,8 +140,24 @@ function installAccountManager(app) {
 					}
 					
 					if(account.passwordHash === derivedKey.toString("hex")) {
-						account.sessionKey = newSession();
-						account.sessionDate = Date.now();
+						if(!Array.isArray(account.sessions)) {
+							account.session = [];
+
+							if(account.sessionKey && account.sessionDate) {
+								account.session.push({key: account.sessionKey, created: account.sessionDate});
+							}
+						}
+
+						if(account.sessions.length >= maxActiveSessions) {
+							account.sessions.shift();
+						}
+
+						let session = {
+							key: newSession(),
+							created: Date.now()
+						};
+
+						account.sessions.push(session);
 						
 						account.save().then((acct, err) => {
 							if(err || !acct) {
@@ -142,13 +184,16 @@ function installAccountManager(app) {
 			if(typeof req.body.name !== "string" || req.body.name.length > maxNameLength || req.body.name.length == 0) {
 				return res.status(400).send("Missing or invalid name");
 			}
+
+			if(!enableAccountCreation) {
+				return res.status(400).send("Account creation is disabled");
+			}
 			
 			let account = new Account();
 			
 			account.name = req.body.name;
 			account.email = req.body.email;
 			account.passwordSalt = Buffer.from(crypto.randomBytes(passwordSaltLength));
-			account.sessionKey = newSession();
 			
 			crypto.pbkdf2(req.body.password, account.passwordSalt, pbkdf2Iterations, resultantKeyLength, "sha256", (err, derivedKey) => {
 				if(err) {
@@ -157,14 +202,37 @@ function installAccountManager(app) {
 				}
 				
 				account.passwordHash = derivedKey.toString("hex");
+				if(accountCreationRequiresVerification) {
+					account.verified = false;
+				}
+				else {
+					account.verified = true;
+				}
+
+				let deleteAndContinue = (code, err) => {
+					Account.deleteOne({_id: account._id}).finally(() => {
+						return res.status(code).send(err);
+					});
+				};
 				
-				account.save().then((acct, err) => {
-					if(err) {
-						console.error(err);
-						return res.status(500).send("Error creating account");
+				account.save().then(() => {
+					if(accountCreationRequiresVerification) {
+						if(typeof verifierScript !== "function") {
+							return deleteAndContinue(500, "Account creation requires verification, but no verification script is set");
+						}
+	
+						verifierScript(account, () => {
+							return res.status(200).send("Account created");
+						}, (err) => {
+							console.error(err);
+							return deleteAndContinue(500, "Error sending verification email");
+						});
 					}
-					
-					return res.status(200).send(account.sessionKey);
+					else {
+						return res.status(200).send("Account created");
+					}
+				}).catch((err) => {
+					return res.status(500).send("Error creating account (duplicate email?)");
 				});
 			});
 		});
@@ -180,7 +248,10 @@ function installAccountManager(app) {
 		let email = req.body.email || req.cookies.email;
 		let sessionKey = req.body.sessionKey || req.cookies.sessionKey;
 		
-		Account.findOneAndUpdate({email: email, sessionKey: sessionKey, sessionDate: {$gt: Date.now() - sessionDuration}}, {sessionKey: null}, {lean: true}, (err, acct) => {
+		let query = {email: email, session: {key: sessionKey, created: {$gt: Date.now() - sessionDuration}}};
+		let update = {$pull: {session: {key: sessionKey}}};
+
+		Account.findOneAndUpdate(query, update, {lean: true}, (err, acct) => {
 			if(err || !acct) {
 				return res.status(400).send("Invalid or missing credentials");
 			}
@@ -188,6 +259,36 @@ function installAccountManager(app) {
 			return res.status(200).send("Logged out");
 		});
 	});
+
+	// Not an API endpoint
+
+	if(accountCreationRequiresVerification) {
+		app.get("/verify", (req, res) => {
+			if(typeof req.query.email !== "string" || req.query.email.match(emailRegex) === null) {
+				return res.status(400).send("Invalid or missing email");
+			}
+			if(typeof req.query.code !== "string") {
+				return res.status(400).send("Invalid or missing key");
+			}
+
+			let sessionKey = newSession();
+			let sessionDate = new Date();
+
+			let update = {verified: true, $push: {sessions: {key: sessionKey, created: sessionDate}}};
+
+			// Find the account with the given email and verification code, then set its verified to true
+			Account.findOneAndUpdate({email: req.query.email, verificationCode: req.query.code, verified: false}, update, {lean: true}, (err, acct) => {
+				if(err || !acct) {
+					return res.status(400).send("Invalid or missing credentials");
+				}
+
+				res.cookie("email", acct.email, {maxAge: sessionDuration, httpOnly: false});
+				res.cookie("sessionKey", sessionKey, {maxAge: sessionDuration, httpOnly: false});
+				
+				return res.redirect("/?verified");
+			});
+		});
+	}
 }
 
 module.exports = {installAccountManager, validateSession};

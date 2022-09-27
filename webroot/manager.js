@@ -29,11 +29,18 @@ if(STRIPPED_PATHNAME.endsWith("/")) {
 	STRIPPED_PATHNAME = STRIPPED_PATHNAME.substring(0, STRIPPED_PATHNAME.length - 1);
 }
 
-let showError = (text, color) => {
+// CURRENTLY NOT WORKING
+let specialCriteria = ["ownerEmail", "ownerName"];
+
+let showMessage = (text, color, fadeTime) => {
 	let errorText = $("<p style='color: " + (color || "red") + "; font-weight: bold;'></p>").text(text);
-	errorText.appendTo($("#container"));
+	errorText.appendTo($("#messageContainer"));
 	
-	setTimeout(() => (errorText.fadeOut()), 5000);
+	setTimeout(() => (errorText.fadeOut()), fadeTime || 5000);
+};
+
+let showError = (text, fadeTime) => {
+	showMessage(text, "red", fadeTime);
 };
 
 let openSheet = (uuid) => {
@@ -78,6 +85,135 @@ let duplicateSheet = (uuid, after) => {
 		});
 };
 
+let transferOwnership = (uuid, after) => {
+	let newOwner = prompt("Enter the new owner's email address:");
+	
+	if(newOwner === null) {
+		return;
+	}
+
+	let confirmed = confirm("Are you sure you want to transfer ownership of this sheet to " + newOwner + "? You can't take undo this action without their consent.");
+
+	if(!confirmed) {
+		return;
+	}
+	
+	$.ajax({
+		"url": "./api/transfer",
+		"data": {"id": uuid, "newOwner": newOwner},
+		"method": "POST"
+	})
+		.done((data, text, xhr) => {
+			if(after) {
+				after(true);
+			}
+		})
+		.fail((xhr, text, err) => {
+			showError("Error while transferring ownership: " + xhr.responseText);
+		})
+		.always(() => {
+			
+		});
+};
+
+let shareSheet = (uuid) => {
+	$.ajax({
+		"url": "./api/permissions",
+		"data": {"id": uuid},
+		"method": "GET",
+		"type": "json"
+	})
+		.done((data, text, xhr) => {
+			let permissions = data;
+			
+			let container = $("<div></div>");
+
+			let updatePermissions = (after) => {
+				permissions.sharedWith = [];
+				container.find(".sharedwithentry").each((i, element) => {
+					let entry = $(element);
+					let email = entry.find(".sharedwithemail").text();
+					let permission = entry.find(".sharedwithpermission").val();
+					permissions.sharedWith.push({"email": email, "permission": permission});
+				});
+
+				$.ajax({
+					"url": "./api/permissions",
+					"data": JSON.stringify({"id": uuid, "permissions": permissions}),
+					"method": "POST",
+					"contentType": "application/json"
+				})
+					.done((data, text, xhr) => {
+						showMessage("Permissions updated.", 'green');
+						if(after) after(true);
+					})
+					.fail((xhr, text, err) => {
+						showError("Error while updating permissions: " + xhr.responseText);
+						if(after) after(false);
+					})
+			};
+
+			let publicCheckbox = $("<div><label for='publicCheckbox'>Public: <input type='checkbox' id='publicCheckbox' /></label></div>")
+				.appendTo(container).find("input").prop("checked", permissions.public).change(updatePermissions);
+			let publicWritableCheckbox = $("<div><label for='publicWritableCheckbox'>Public Writable: <input type='checkbox' id='publicWritableCheckbox' /></label></div>")
+				.appendTo(container).find("input").prop("checked", permissions.publicWritable).change(updatePermissions);
+			
+			let addEmailEntry = (email, permission) => {
+				let row = $("<div class='sharedwithentry'></div>").appendTo(container);
+				let emailText = $("<span class='sharedwithemail'></span>").text(email).appendTo(row);
+				let permissionSelect = $("<select class='sharedwithpermission'><option value='read'>Read</option><option value='write'>Write</option><option value='owner'>Owner</option></select>")
+					.appendTo(row).val(permission).change(updatePermissions);
+				let removeButton = $("<button>Remove</button>").appendTo(row).click(() => {
+					row.remove();
+					updatePermissions();
+				});
+
+				return row;
+			};
+
+			for(let {email, permission} of permissions.sharedWith) {
+				addEmailEntry(email, permission);
+			}
+
+			let addEmailButton = $("<button>Add Email</button>").appendTo(container).click(() => {
+				let email = prompt("Enter the email address to share with:");
+
+				if(email === null) {
+					return;
+				}
+
+				let permission = prompt("Enter the permission to give them (read, write, owner):");
+
+				if(!["owner", "read", "write"].includes(permission)) {
+					return;
+				}
+
+				$(addEmailButton).prop("disabled", true);
+
+				let entry = addEmailEntry(email, permission);
+
+				updatePermissions(
+					(success) => {
+						if(!success) {
+							entry.remove();
+						}
+
+						$(addEmailButton).prop("disabled", false);
+					}
+				);
+			});
+			
+			let win = new UI.AlertWindow(container[0], "Share Sheet");
+			win.show();
+		})
+		.fail((xhr, text, err) => {
+			showError("Error while getting sharing information: " + xhr.responseText);
+		})
+		.always(() => {
+
+		});
+};
+
 let updateSheet = (uuid, after) => {
 	$.ajax({
 		"url": "./api/updateSheetVersion",
@@ -104,9 +240,15 @@ let createSheetList = (sheets, container, currentPage) => {
 		.html("<tr><th>Sheet Name</th><th>Owner</th><th>Last Modified</th></tr>")
 		.css({"user-select": "none"});
 	sheets.forEach((sheet) => {
+		let sheetOwnerString = sheet.ownerName || sheet.owner;
+
+		if(typeof sheet.ownerEmail === "string") {
+			sheetOwnerString += " (" + sheet.ownerEmail + ")";
+		}
+
 		let rowEntry = $("<tr></tr>")
 			.append($("<td></td>").text(sheet.name || sheet.sheetName))
-			.append($("<td></td>").text(sheet.ownerName || sheet.owner))
+			.append($("<td></td>").text(sheetOwnerString))
 			.append($("<td></td>").text(sheet.lastModified))
 			.click((e) => {
 				openSheet(sheet.uuid);
@@ -129,7 +271,7 @@ let createSheetList = (sheets, container, currentPage) => {
 							.append(
 								$("<li><a href='#'>Duplicate Sheet</a></li>").click(
 									() => {
-										duplicateSheet(sheet.uuid, () => refreshSheet(container, currentPage));
+										duplicateSheet(sheet.uuid, () => refreshSheet(container, currentPage, true));
 									}
 								)
 							)
@@ -140,6 +282,20 @@ let createSheetList = (sheets, container, currentPage) => {
 									}
 								)
 							) */
+							.append(
+								$("<li><a href='#'>Transfer Ownership</a></li>").click(
+									() => {
+										transferOwnership(sheet.uuid, () => refreshSheet(container, currentPage));
+									}
+								)
+							)
+							.append(
+								$("<li><a href='#'>Share Sheet</a></li>").click(
+									() => {
+										shareSheet(sheet.uuid);
+									}
+								)
+							)
 							.append(
 								$("<li><a href='#' class='context-menu-delete'>Delete Sheet</a></li>").click(
 									() => {
@@ -170,7 +326,7 @@ let createSheetList = (sheets, container, currentPage) => {
 let _REQUESTING_REFRESH = false;
 let _RFID = 0;
 
-let refreshSheet = (container, currentPage) => {
+let refreshSheet = (container, currentPage, force) => {
 	let _this_rfid = ++_RFID;
 	if(_REQUESTING_REFRESH) {
 		setTimeout(() => {
@@ -253,9 +409,21 @@ let refreshSheet = (container, currentPage) => {
 	let stringifiedCriteria = JSON.stringify(message.criteria || {});
 
 	// DO NOT TRY THIS AT HOME
-	if(stringifiedCriteria == window.lastCriteria) {
+	if(stringifiedCriteria == window.lastCriteria && force !== true) {
 		_REQUESTING_REFRESH = false;
 		return;
+	}
+
+	if(message.criteria) {
+		// Special criteria
+		for(let key of specialCriteria) {
+			let value = message.criteria[key];
+			
+			if(value !== undefined) {
+				message[key] = value;
+				message.criteria[key] = undefined;
+			}
+		}
 	}
 
 	window.lastCriteria = stringifiedCriteria;
@@ -376,6 +544,11 @@ let initializeManager = () => {
 
 	window.orderedQueryPaths = Object.keys(validQueryPaths);
 
+	// Special criteria
+	for(let key of specialCriteria) {
+		window.orderedQueryPaths.unshift(key);
+	}
+
 	window.searchCriteria = {};
 	let searchFactory = new UI.EditorFactory(window.searchCriteria);
 
@@ -485,7 +658,7 @@ let initializeManager = () => {
 		
 		accountControls
 			.append($("<div><h3>Create Account</h3><br /><label for='registerEmail'>Email: </label><input type='text' id='registerEmail' /><br /><label for='registerPassword'>Password: </label><input type='password' id='registerPassword' />" +
-					  "<br /><label for='registerName'>Name</label><input type='text' id='registerName' /></div>"))
+					  "<br /><label for='registerName'>Name: </label><input type='text' id='registerName' /></div>"))
 			.append(
 				$("<button id='registerbutton'>Create Account</button>").click(() => {
 					let message = {
@@ -500,10 +673,7 @@ let initializeManager = () => {
 						"method": "PUT"
 					})
 						.done((data, text, xhr) => {
-							utils.zealousSet("email", message.email);
-							utils.zealousSet("sessionKey", data);
-							
-							window.location.reload();
+							showMessage("Success! Please check your email for the verification code (if there is any), then log in.", "green", 10000);
 						})
 						.fail((xhr, text, err) => {
 							showError("Error while creating account: " + xhr.responseText);
@@ -519,6 +689,13 @@ let initializeManager = () => {
 			});;
 		
 		$("#email").val(utils.zealousGet("email") || "");
+	}
+
+	if(new URLSearchParams(window.location.search).get("verified") !== null) {
+		let newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+		window.history.replaceState({path: newUrl}, document.title, newUrl);
+
+		showMessage("Your account has been verified! You should be logged in.", "green", 10000);
 	}
 };
 

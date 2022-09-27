@@ -214,8 +214,10 @@ let initializeSheet = (window, sheetID) => {
 					id: sheetID,
 					email: utils.zealousGet("email"),
 					sessionKey: utils.zealousGet("sessionKey"),
-					public: checked1,
-					publicWritable: checked2
+					permissions: {
+						public: checked1,
+						publicWritable: checked2
+					}
 				};
 				
 				$.ajax({

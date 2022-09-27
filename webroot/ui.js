@@ -25,7 +25,9 @@ SOFTWARE.
 */
 
 (() => {
-	Quill.register('modules/cursors', QuillCursors);
+	if(window.Quill !== undefined) {
+		Quill.register('modules/cursors', QuillCursors);
+	}
 
 	window.UI = {};
 	UI = window.UI;
@@ -1006,6 +1008,27 @@ SOFTWARE.
 			return this;
 		}
 	}
+
+	let UIgreyOut = () => {
+		if($('#greyout').length == 0) {
+			$("<div id='greyout'></div>")
+				.css({
+					"position": "fixed",
+					"top": "0",
+					"left": "0",
+					"width": "100%",
+					"height": "100%",
+					"background-color": "black",
+					"opacity": "0.5",
+					"z-index": "9999"
+				})
+				.appendTo($("body"));
+		}
+	};
+
+	let UIunGreyOut = () => {
+		$('#greyout').remove();
+	};
 	
 	UI.AlertWindow = function(elem, title, buttons) {
 		UI.ElementWindow.call(this, elem, title, buttons);
@@ -1019,8 +1042,15 @@ SOFTWARE.
 			this.container.style.left = "50%";
 			this.container.style.top = "50%";
 			this.container.style.transform = "translate(-50%, -50%)";
-			
-			//TODO: Make all other content greyed out
+		},
+		
+		show: function() {
+			if(this.hidden) {
+				document.body.appendChild(this.container);
+				this.hidden = false;
+			}
+			this.onShown();
+			return this;
 		},
 		
 		onShown: function() {

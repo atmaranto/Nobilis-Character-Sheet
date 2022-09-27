@@ -54,11 +54,7 @@ module.exports = new mongoose.Schema({
 		required: true
 	},
 	
-	sheetData: {
-		type: sheetData,
-		default: () => {},
-		required: true
-	},
+	sheetData: sheetData,
 	
 	owner: {
 		type: mongoose.ObjectId,

@@ -57,6 +57,8 @@ function main(app, prefix, server) {
 		}
 	});
 	const backend = new ShareDB({db: db, presence: true, doNotForwardSendPresenceErrorsToClient: true});
+
+	mongoose.Schema.Types.String.checkRequired(v => typeof v === 'string');
 	
 	//app.use(express.urlencoded({"extended": true}));
 	//app.use("/api/sheetData", express.text());
