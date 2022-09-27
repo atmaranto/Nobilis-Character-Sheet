@@ -136,3 +136,8 @@ SOFTWARE.
  from [Material.io](https://material.io/resources), licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html).
  This game also contains snippets of text and paraphrasing from [*Nobilis: The Game of Soverign Powers*](https://www.drivethrurpg.com/product/141424/Nobilis-the-Game-of-Sovereign-Powers-2002-Edition)
  by Jenna Katerin Moran, 2002/Hogshead edition. Used with permission.
+
+ The `ui-bundle.js` file may be licensed under additional licenses, as it is made up of all the
+ dependencies listed in `ui-reqs.js`, as packed together by `browserify`. Please see the dependencies
+ manually for each individual module's license.
+ 
