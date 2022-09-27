@@ -320,8 +320,8 @@ SOFTWARE.
 			},
 			{
 				"level": 3,
-				"name": "improbablyFeats",
-				"label": "Improbably Feats",
+				"name": "improbableFeats",
+				"label": "Improbable Feats",
 				"text": "Level-3 Aspect miracles are physically possible, but unreasonable for a normal human to even attempt. This includes things such as standing on eight fingertips, skeet shooting" +
 						" while surfing, running on fencetops, or punching through steel, and equivalent mental feats.",
 				"examples": [
@@ -333,8 +333,8 @@ SOFTWARE.
 			},
 			{
 				"level": 4,
-				"name": "veryImprobablyFeats",
-				"label": "Very Improbably Feats",
+				"name": "veryImprobableFeats",
+				"label": "Very Improbable Feats",
 				"text": "Level-4 Aspect miracles straddle the border of physical impossbility: things like throwing a motorcycle and standing on two fingertips; outcomputing a supercomputer or singing both" +
 						" halve of a duet. In general, if there's any chance a human could have once accomplished it - and humans have apparently bounced cannonballs - it can be done with a level-4 Aspect" +
 						" miracle.",
