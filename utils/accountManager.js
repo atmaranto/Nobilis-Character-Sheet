@@ -164,7 +164,10 @@ function installAccountManager(app) {
 								return res.status(500).send("Internal error while logging in");
 							}
 							
-							return res.status(200).send(account.sessionKey);
+							return res.status(200)
+								.cookie("email", account.email)
+								.cookie("sessionKey", session.key)
+								.send(session.key);
 						});
 					}
 					else {
