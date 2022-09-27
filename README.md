@@ -1,5 +1,11 @@
 # Nobilis Character Sheet
  A character sheet for the game "Nobilis" that can be viewed in conventional browsers. It's specifically meant for a slightly altered version of 2e.
+
+# Example
+
+
+
+# Development Info
  
 ## To-Do
  - Make a websocket-compliant update system for the Character Sheets. This will sync the character sheet's state across tabs (implementing collaborative editing).
@@ -60,14 +66,15 @@
  ```bash
  node index.js
  ```
- And the server will start up. You can then navigate to `http://localhost:port/` and see the fruits of your labor: an error screen. This is because you haven't created a sheet. To do so,
+ And the server will start up. For the sake of this example, I will assume you've used port 80.
+ You can then navigate to `http://localhost:80/` and see the fruits of your labor: an error screen. This is because you haven't created a sheet. To do so,
  run:
  ```bash
  node new_sheet.js
  ```
  in a separate window (optionally with the server IP and the port you specified). If the connection succeeded, the simple `new_sheet.js` script should return a UUID in the form
- "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE". Once you have this, navigate to http://localhost:<port>/?id=AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE. Finally, you have your sheet! The settings don't
- (currently) work, but saving and loading does. You can now also create a sheet at http://localhost/manager.html, which allows one to create an account and log in through a very basic
+ "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE". Once you have this, navigate to `http://localhost:80/?id=AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE`. Finally, you have your sheet! The settings don't
+ (currently) work, but saving and loading does. You can now also see the sheet manager at `http://localhost:80/`, which allows one to create an account and log in through a very basic
  interface.
 
 # Additional configuration options
@@ -140,4 +147,3 @@ SOFTWARE.
  The `ui-bundle.js` file may be licensed under additional licenses, as it is made up of all the
  dependencies listed in `ui-reqs.js`, as packed together by `browserify`. Please see the dependencies
  manually for each individual module's license.
- 
