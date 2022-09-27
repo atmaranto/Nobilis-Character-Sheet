@@ -1,11 +1,11 @@
 # Nobilis Character Sheet
  A character sheet for the game "Nobilis" that can be viewed in conventional browsers. It's specifically meant for a slightly altered version of 2e.
 
-# Example
+## Example
 
-
-
-# Development Info
+ An example of this repository is currently hosted live at [https://maranto.dev/nobilis/](https://maranto.dev/nobilis/). I can't
+ promise I won't take it down if I end up having issues with it, for for now, feel free to create an account and look at character
+ sheets at that link above! You can find a link to an example sheet at the base website, [https://maranto.dev/](https://maranto.dev/).
  
 ## To-Do
  - Make a websocket-compliant update system for the Character Sheets. This will sync the character sheet's state across tabs (implementing collaborative editing).
