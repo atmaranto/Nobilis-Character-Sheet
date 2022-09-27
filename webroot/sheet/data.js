@@ -244,7 +244,7 @@ SOFTWARE.
 				"level": -1,
 				"name": "generalRules",
 				"label": "General Rules for Aspect-Driven Miracles",
-				"text": "Some general guidelines for Aspect-Drive miracles:<br />" +
+				"text": "Some general guidelines for Aspect-Driven miracles:<br />" +
 						"<ul>" +
 							"<li>Aspect <b>cannot</b>, for instance:<br />" +
 							"<ul>" +
@@ -426,7 +426,7 @@ SOFTWARE.
 				"level": -1,
 				"name": "generalRules",
 				"label": "General Rules for Realm-Driven Miracles",
-				"text": "Some general guidelines for Domain-Drive miracles:<br />" +
+				"text": "Some general guidelines for Realm-Drive miracles:<br />" +
 						"<ul>" +
 							"<li>Realm miracles can <b>only affect things inside your Chancel</b><br />" +
 							"<li>Realm miracles are like Domain miracles in which <i>everything</i> inside your Chancel is part of your Estate<br />" +

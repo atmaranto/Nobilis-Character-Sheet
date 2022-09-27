@@ -297,5 +297,10 @@ module.exports = {
 	genericCharacterDetails: {
 		type: documentSchema,
 		default: () => {}
+	},
+
+	tempPermSync: {
+		type: Boolean,
+		default: false
 	}
 };

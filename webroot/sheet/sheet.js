@@ -276,34 +276,95 @@ let initializeSheet = (window, sheetID) => {
 		});
 	factory.attachText("playerName", "Player Name");
 	
+	let attributeHoverInfo = $("<p>Loading...</p>");
+
 	let attributeUpdate = () => {
 		let _s = 0;
 		let max = 25;
+
+		let explanations = ["Character point cost assessment:"];
+
+		let getSourceExplanation = (source) => {
+			let explanation = $(source).prop("cpExplanation");
+			let realSource = $(source).prop("cpExplanationSource");
+
+			if(explanation) {
+				if(realSource) {
+					return explanation + " \"" + $("." + realSource).val() + "\"";
+				}
+				else {
+					return explanation;
+				}
+			}
+			else {
+				return "Unknown Sources";
+			}
+		}
+
+		let getRollingSum = (source) => {
+			return "[+=" + _s + "] ";
+		}
 		
 		$(".attribute").each((index, item) => {
-			_s += parseInt($(item).val()) * 3;
+			let total = parseInt($(item).val()) * 3;
+			_s += total;
+			
+			if(total > 0) {
+				explanations.push(getRollingSum() + $(item).val() + " x 3 = " + total + " from " + getSourceExplanation(item));
+			}
 		});
 		$(".smallAttribute").each((index, item) => {
-			_s += parseInt($(item).val()) * 1;
+			let total = parseInt($(item).val()) * 1;
+			_s += total;
+
+			if(total > 0) {
+				explanations.push(getRollingSum() + total + " from " + getSourceExplanation(item));
+			}
 		});
 		$(".attributePermanentPoint").each((index, item) => {
-			_s += parseInt($(item).val()) - 5;
+			let total = parseInt($(item).val()) - 5;
+			_s += total;
+
+			if(total > 0) {
+				explanations.push(getRollingSum() + total + " from extra " + getSourceExplanation(item));
+			}
 		});
 		$(".giftcost").each((index, item) => {
-			let result = parseInt($(item).text());
-			if(!isNaN(result)) {
-				_s += result;
+			let total = parseInt($(item).text());
+			if(!isNaN(total)) {
+				_s += total;
+				explanations.push(getRollingSum() + total + " from " + getSourceExplanation(item));
 			}
 		});
 		$(".limitCPs").each((index, item) => {
-			max += parseInt($(item).val());
+			let total = parseInt($(item).val());
+			max += total;
+			explanations.push(total + " extra maximum CP from " + getSourceExplanation(item));
 		});
+		let fromRaw = 0;
 		$(".rawCPs").each((index, item) => {
 			let raw = parseInt($(item).val());
 			if(!isNaN(raw)) {
 				max += raw;
+				fromRaw += raw;
 			}
 		});
+
+		if(fromRaw > 0) {
+			explanations.push(fromRaw + " extra maximum CP granted from extraneous sources");
+		}
+
+		explanations.push("");
+		let totalTag = $("<span></span>").text("Total: " + _s + " / " + max);
+		if(_s > max) {
+			totalTag.css("color", "red");
+			totalTag.append(" (Over by " + (_s - max) + ")");
+		}
+		explanations.push(totalTag);
+
+		attributeHoverInfo.html("").append(
+			explanations.map((item) => ((typeof item === "string") ? $("<span></span>").text(item) : item).append("<br />"))
+		);
 		
 		let attributeSum = $("#attributeSum")
 			.html("").text(_s.toString() + " character points");
@@ -325,17 +386,22 @@ let initializeSheet = (window, sheetID) => {
 		}
 	};
 	
-	factory.add().append($("<td><span id='attributeSum' class='secretnoselect'>Loading...</span></td>").ready(attributeUpdate));
+	factory.add().append(
+		UI.addHoverInfo(
+			$("<td><span id='attributeSum' class='secretnoselect'>Loading...</span></td>").ready(attributeUpdate),
+			attributeHoverInfo
+		)
+	);
 	
 	factory.startSection("Attributes", "h2");
 	let aspectSlider = factory.attachSlider("aspect", "<b>Aspect</b> (body and mind)", {min: 0, max: 5}, 0)
-		.addClass("attribute").on("input change", attributeUpdate);
+		.addClass("attribute").prop("cpExplanation", "Aspect Levels").on("input change", attributeUpdate);
 	let domainSlider = factory.attachSlider("domain", "<b><i>Primary</i> Domain</b> (control over Estate)", {min: 0, max: 5}, 0)
-		.addClass("attribute").on("input change", attributeUpdate);
+		.addClass("attribute").prop("cpExplanation", "Primary Domain Levels").on("input change", attributeUpdate);
 	let realmSlider = factory.attachSlider("realm", "<b>Realm</b> (power in Chancel)", {min: 0, max: 5}, 0)
-		.addClass("attribute").on("input change", attributeUpdate);
+		.addClass("attribute").prop("cpExplanation", "Realm Levels").on("input change", attributeUpdate);
 	let spiritSlider = factory.attachSlider("spirit", "<b>Spirit</b> (rites and Auctoritas)", {min: 0, max: 5}, 0)
-		.addClass("attribute").on("input change", attributeUpdate);
+		.addClass("attribute").prop("cpExplanation", "Spirit Levels").on("input change", attributeUpdate);
 	
 	let setupAttributeSliderDescription = (slider, data) => {
 		let title = $("<p class='attributeTitle noselect'></p>").appendTo(slider.parent().parent());
@@ -393,13 +459,13 @@ let initializeSheet = (window, sheetID) => {
 	let imgUnlock = $("<img src='../images/unlock.svg' />");
 	
 	let permanentAMPSlider = factory.attachSlider("permanentAMP", "<b>Aspect</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
-		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
+		.addClass("attributePermanentPoint").prop("cpExplanation", "Aspect Miracle Points").on("input change", attributeUpdate).attr("disabled", true);
 	let permanentDMPSlider = factory.attachSlider("permanentDMP", "<b>Domain</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
-		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
+		.addClass("attributePermanentPoint").prop("cpExplanation", "Domain Miracle Points").on("input change", attributeUpdate).attr("disabled", true);
 	let permanentRMPSlider = factory.attachSlider("permanentRMP", "<b>Realm</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
-		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
+		.addClass("attributePermanentPoint").prop("cpExplanation", "Realm Miracle Points").on("input change", attributeUpdate).attr("disabled", true);
 	let permanentSMPSlider = factory.attachSlider("permanentSMP", "<b>Spirit</b> Permanent Miracle Points", {min: 5, max: 20}, 5)
-		.addClass("attributePermanentPoint").on("input change", attributeUpdate).attr("disabled", true);
+		.addClass("attributePermanentPoint").prop("cpExplanation", "Spirit Miracle Points").on("input change", attributeUpdate).attr("disabled", true);
 	
 	UI.addHoverInfo(
 		permanentSMPSlider,
@@ -421,7 +487,7 @@ let initializeSheet = (window, sheetID) => {
 	
 	factory.startSection("Temporary Miracle Points", "h3");
 	
-	let maxTemporaryMPs = 25;
+	let maxTemporaryMPs = 25; // Theoretically configurable, but needing more than this seems unlikely, so I've hardcoded it for now
 	
 	let temporaryAMPSlider = factory.attachSlider("temporaryAMP", "<b>Aspect</b> Miracle Points", {min: 0, max: maxTemporaryMPs}, 5)
 		.addClass("attributeTemporaryPoint").on("input change", attributeUpdate)
@@ -642,7 +708,8 @@ let initializeSheet = (window, sheetID) => {
 				}
 			});
 		
-		attributeFactory.attachText("domainDescription", "Domain description");
+		let indicatorClass = "cpsource" + Math.random().toString(36).substr(2, 9);
+		attributeFactory.attachText("domainDescription", "Domain description").addClass(indicatorClass);
 		
 		let domainSliderHandler = () => {
 			sliderSync();
@@ -668,6 +735,8 @@ let initializeSheet = (window, sheetID) => {
 		
 		slider = attributeFactory.attachSlider("domain", "Domain Value", {min: 0, max: 5}, 0)
 			.addClass("smallAttribute editorevents")
+			.prop("cpExplanation", "Secondary Domain")
+			.prop("cpExplanationSource", indicatorClass)
 			.on("input change", (evt) => {
 				if($(slider).parents(".editoritem").prev().length == 0 && $(slider).val() != characteristics.domain) {
 					sliderSync();
@@ -858,8 +927,10 @@ let initializeSheet = (window, sheetID) => {
 	let createGiftSection = (i, gift) => {
 		gift = gift || {};
 		let giftFactory = new UI.EditorFactory(gift);
-		
-		giftFactory.attachText("giftName", "Gift Name");
+
+		let giftNameClass = "cpexplanation" + Math.random().toString(36).substring(2, 15);
+
+		giftFactory.attachText("giftName", "Gift Name").addClass(giftNameClass);
 		let miracleLevel = $(giftFactory.attachSlider("miracleLevel", "Miracle Level", {min: 0, max: 9}, 0));
 		miracleLevel.parent().prev().find("label").css("cursor", "pointer").click(() => {
 			giftMiracleExampleWindow.show();
@@ -956,7 +1027,10 @@ let initializeSheet = (window, sheetID) => {
 			
 			cost = Math.max(cost, 1);
 			
-			giftCostCalculation.find(".giftcost").text(cost.toString());
+			giftCostCalculation.find(".giftcost")
+				.prop("cpExplanation", "Gift")
+				.prop("cpExplanationSource", giftNameClass)
+				.text(cost.toString());
 			
 			attributeUpdate();
 		};
@@ -1025,10 +1099,13 @@ let initializeSheet = (window, sheetID) => {
 		
 		let localFactory = new UI.EditorFactory(object);
 		
-		localFactory.attachText("limitName");
+		let limitNameClass = "limitname" + Math.random().toString(36).substring(2, 15);
+		localFactory.attachText("limitName").addClass(limitNameClass);
 		
 		UI.addHoverInfo(
-			localFactory.attachSlider("cps", "Character Points Granted", {min: 1, max: 5}),
+			localFactory.attachSlider("cps", "Character Points Granted", {min: 1, max: 5})
+				.prop("cpExplanation", "Limit")
+				.prop("cpExplanationSource", limitNameClass),
 			$("<p>This is the number of miracle points granted by your Limit when you took it.</p>")
 		).addClass("limitCPs").on("input change", attributeUpdate);
 		
