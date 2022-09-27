@@ -2,14 +2,9 @@
  A character sheet for the game "Nobilis" that can be viewed in conventional browsers. It's specifically meant for a slightly altered version of 2e.
  
 ## To-Do
- - (Eventually) Make a more easily-configurable server system (and a more easily-configurable client-side API)
-   * Partially fulfilled with the flexible ability to `require()` the main file in order to "add" the character sheet system to a modular server
- - Make a websocket-compliant update system for the Character Sheets. This will sync the character sheet's state across tabs.
+ - Make a websocket-compliant update system for the Character Sheets. This will sync the character sheet's state across tabs (implementing collaborative editing).
    * As part of this, I could also add the ability to make character sheet updates (via the endpoint) more specific, with only the necessary attributes updated. However, I would need
      to combine this with the below in order to do so.
- - Change the character sheet specification to include the full breadth of what one can do with a character sheet, meaning it will be stored in MongoDB as
-   an object rather than as a string. This should make it easier to search for character sheets by their attributes.
-   * Additionally, I should restructure the CharacterSheet to be a subitem of Account so that they can be querried together more easily (and more atomically)
  - (*Maybe* eventually, but this is beyond the scope of the current project) Make the character sheet server shardable, so that I can host it across several servers on a
    reasonable payment model.
  
@@ -74,6 +69,36 @@
  "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE". Once you have this, navigate to http://localhost:<port>/?id=AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE. Finally, you have your sheet! The settings don't
  (currently) work, but saving and loading does. You can now also create a sheet at http://localhost/manager.html, which allows one to create an account and log in through a very basic
  interface.
+
+# Additional configuration options
+
+ If you would like to add email verification, you can also suggest a verification script in `config.key`. Here's an example:
+
+```json
+{
+	# Previously described config values...,
+	"ACCOUNT_CREATION_REQUIRES_VERIFICATION": true,
+	"ACCOUNT_CREATION_VERIFICATION_SCRIPT": "./verify.key.js"
+}
+```
+
+In this instance, the verifier script located at `github_root/utils/verify.key.js` will be loaded, and its single export
+will be used as a verify function like so:
+
+```javascript
+require("verify.key.js")(accountDocument, () => {
+	// Success!
+}, (err) => {
+	// Failure!
+});
+```
+
+If the verify script makes any changes to the `mongoose` account document (including setting the verificationCode value in the document so
+that the `/verify` endpoint can work as intended), **it is responsible for saving the document before calling the success function**. The
+`/verify` endpoint is a GET endpoint added when account verification is enabled. It takes URLs like so:
+```
+/verify?email=you@example.com&code=verify_code_as_saved_in_the_account_document
+```
 
 # License
  Most files I created (models/\*, index.js, new_sheet.js, new_sheet.py, and everything under webroot except data.js and images/\*) are licensed under the MIT License:

@@ -25,11 +25,8 @@ SOFTWARE.
 */
 
 const Account = require("../models/accountModel"),
-	  fs = require("fs"),
 	  crypto = require("crypto"),
-	  config = require("../config"),
-	  CharacterSheet = require("../models/characterSheetModel");
-const { constructReadQuery } = require("./commonQueries");
+	  config = require("../config");
 
 const minPasswordLength = config.MIN_PW_LENGTH || 6;
 const maxPasswordLength = config.MAX_PW_LENGTH || 72;
