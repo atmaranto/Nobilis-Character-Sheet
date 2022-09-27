@@ -419,7 +419,14 @@ module.exports = function(app, config) {
 		
 		return validateSession(req, res, (account) => {
 			// NOTE: Consider setting publicWritable to false here
-			CharacterSheet.findOneAndUpdate({"uuid": req.body.id, owner: null}, {owner: account._id}).lean().exec((err, sheet) => {
+			let query = {"uuid": req.body.id};
+
+			// If the account is not an administrator, we also need the sheet to actually *be* unclaimed.
+			if(!account.isAdmin) {
+				query.owner = null;
+			}
+
+			CharacterSheet.findOneAndUpdate(query, {owner: account._id}).lean().exec((err, sheet) => {
 				if(err || !sheet) {
 					return res.status(400).send(sheetErrorString);
 				}
