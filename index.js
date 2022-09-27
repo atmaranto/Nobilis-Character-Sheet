@@ -28,8 +28,8 @@ var express = require("express"),
 	bodyParser = require("body-parser"),
 	cookieParser = require("cookie-parser"),
 	mongoose = require("mongoose"),
-	ShareDB = require("sharedb"),
-	sharedbMongo = require("sharedb-mongo"),
+//	ShareDB = require("sharedb"),
+//	sharedbMongo = require("sharedb-mongo"),
 	richText = require("rich-text"),
 	config = require("./config"),
 	path = require("path"),
@@ -49,14 +49,16 @@ let queryParse = (query) => {
 };
 	
 function main(app, prefix, server) {
-	ShareDB.types.register(richText.type);
+	mongoose.connect(config.CONNECT_STRING, {useNewUrlParser: true, useUnifiedTopology: true});
+
+	/* ShareDB.types.register(richText.type);
 
 	let db = sharedbMongo({
 		mongo: function(callback) {
 			mongoose.connect(config.CONNECT_STRING, callback);
 		}
 	});
-	const backend = new ShareDB({db: db, presence: true, doNotForwardSendPresenceErrorsToClient: true});
+	const backend = new ShareDB({db: db, presence: true, doNotForwardSendPresenceErrorsToClient: true}); */
 
 	mongoose.Schema.Types.String.checkRequired(v => typeof v === 'string');
 	
@@ -68,7 +70,7 @@ function main(app, prefix, server) {
 	
 	installAccountManager(app, config);
 	installSheetsRouter(app, config);
-	installWebsocketManager(app, config, backend, server);
+	// installWebsocketManager(app, config, backend, server);
 
 	app.use("/", express.static(path.join(__dirname, "webroot")));
 
