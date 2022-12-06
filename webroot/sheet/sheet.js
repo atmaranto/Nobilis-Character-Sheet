@@ -58,7 +58,7 @@ let initializeSheet = (window, sheetID) => {
 	// For now, we'll just index the window's attribute directly.
 	// let characteristics = window.characteristics;
 	
-	window.saveSheet = () => {
+	window.saveSheet = (doSynchronously) => {
 		$("#saveSheet").attr("disabled", true);
 		
 		let message = {
@@ -71,7 +71,8 @@ let initializeSheet = (window, sheetID) => {
 			"url": STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID),
 			"data": JSON.stringify(message),
 			"method": "PUT",
-			"contentType": "application/json"
+			"contentType": "application/json",
+			"async": !doSynchronously
 		})
 			.done((data, text, xhr) => {
 				$("#saveStatus").css('visibility', 'visible').text("Successfully saved sheet.");
@@ -86,6 +87,8 @@ let initializeSheet = (window, sheetID) => {
 				$("#saveSheet").removeAttr("disabled");
 			});
 	};
+
+	$(window).on("beforeunload", () => window.saveSheet(true));
 	
 	let factory = new UI.EditorFactory(characteristics);
 	
