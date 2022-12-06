@@ -38,6 +38,7 @@ let initializeSheet = (window, sheetID) => {
 		.append(
 			"<button id='openSettings' onclick='UI.createSettingsWindow().show()'>Open Settings</button>" +
 			"<button id='saveSheet' onclick='window.saveSheet()'>Save Sheet</button>" +
+			"<button id='discardChanges' onclick='window.discardChanges()'>Discard Changes Since Last Save</button>" +
 			"<button id='gotoManager' onclick='window.gotoManager()'>Go To Sheet Manager</button>" +
 			"<p id='saveStatus' class='noselect saveStatus'>Placeholder</p>" +
 			"<br />"
@@ -54,7 +55,9 @@ let initializeSheet = (window, sheetID) => {
 	window.gotoManager = () => {
 		window.location = "../";
 	};
-	
+
+	window.lastSavedCharacteristics = characteristics;
+
 	// For now, we'll just index the window's attribute directly.
 	// let characteristics = window.characteristics;
 	
@@ -75,6 +78,7 @@ let initializeSheet = (window, sheetID) => {
 			"async": !doSynchronously
 		})
 			.done((data, text, xhr) => {
+				window.lastSavedCharacteristics = characteristics;
 				$("#saveStatus").css('visibility', 'visible').text("Successfully saved sheet.");
 				
 				setTimeout(() => ($("#saveStatus").css('visibility', 'hidden')), 5000);
@@ -88,7 +92,17 @@ let initializeSheet = (window, sheetID) => {
 			});
 	};
 
-	$(window).on("beforeunload", () => window.saveSheet(true));
+	let beforeUnloadSaveHandler = () => window.saveSheet(true);
+	
+	$(window).on("beforeunload", beforeUnloadSaveHandler);
+
+	window.discardChanges = () => {
+		if(window.confirm("Are you sure you want to discard all changes since the last time you saved?")) {
+			window.off("beforeunload", beforeUnloadSaveHandler);
+
+			window.location.reload();
+		}
+	}
 	
 	let factory = new UI.EditorFactory(characteristics);
 	
