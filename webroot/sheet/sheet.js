@@ -66,8 +66,8 @@ let initializeSheet = (window, sheetID) => {
 			return;
 		}
 
-		// Check if the sheet even needs to be saved
-		if(utils.deepObjectEquals(characteristics, window.lastSavedCharacteristics)) {
+		// Check if the sheet even needs to be saved (ignoring _id fields)
+		if(utils.deepObjectEquals(characteristics, window.lastSavedCharacteristics, (key) => (key === "_id"))) {
 			if(cause === "user") {
 				$("#saveStatus").css('visibility', 'visible').text("No changes to save.");
 				setTimeout(() => ($("#saveStatus").css('visibility', 'hidden')), 5000);

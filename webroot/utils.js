@@ -541,22 +541,24 @@ SOFTWARE.
 		return params;
 	};
 
-	utils.deepObjectEquals = (a, b, checked) => {
+	utils.deepObjectEquals = (a, b, ignore, checked) => {
 		if(a === b) return true;
 		if(a == null || b == null) return false;
 		if(typeof a != "object" || typeof b != "object") return false;
 
 		checked = checked || [];
+		ignore = ignore || (a => false);
 		if(checked.indexOf(a) != -1) return true;
 
 		checked.push(a);
-		let keys = Object.keys(a);
-		if(keys.length != Object.keys(b).length) return false;
+		let keysA = Object.keys(a).filter(key => !ignore(key));
+		let keysB = Object.keys(b).filter(key => !ignore(key));
+		if(keysA.length != keysB.length) return false;
 
-		for(let i = 0; i < keys.length; i++) {
-			let key = keys[i];
+		for(let i = 0; i < keysA.length; i++) {
+			let key = keysA[i];
 			if(!Object.hasOwn(b, key)) return false;
-			if(!utils.deepObjectEquals(a[key], b[key], checked)) return false;
+			if(!utils.deepObjectEquals(a[key], b[key], ignore, checked)) return false;
 		}
 
 		return true;
