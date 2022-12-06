@@ -540,6 +540,27 @@ SOFTWARE.
 		
 		return params;
 	};
+
+	utils.deepObjectEquals = (a, b, checked) => {
+		if(a === b) return true;
+		if(a == null || b == null) return false;
+		if(typeof a != "object" || typeof b != "object") return false;
+
+		checked = checked || [];
+		if(checked.indexOf(a) != -1) return true;
+
+		checked.push(a);
+		let keys = Object.keys(a);
+		if(keys.length != Object.keys(b).length) return false;
+
+		for(let i = 0; i < keys.length; i++) {
+			let key = keys[i];
+			if(!Object.hasOwn(b, key)) return false;
+			if(!utils.deepObjectEquals(a[key], b[key], checked)) return false;
+		}
+
+		return true;
+	};
 	
 	utils.zealousGet = (attr) => {
 		return utils.cookie.get(attr) || localStorage.getItem(attr) || sessionStorage.getItem(attr);

@@ -37,7 +37,7 @@ let initializeSheet = (window, sheetID) => {
 	let sheet = container.html("")
 		.append(
 			"<button id='openSettings' onclick='UI.createSettingsWindow().show()'>Open Settings</button>" +
-			"<button id='saveSheet' onclick='window.saveSheet()'>Save Sheet</button>" +
+			"<button id='saveSheet' onclick='window.saveSheet(\"user\")'>Save Sheet</button>" +
 			"<button id='discardChanges' onclick='window.discardChanges()'>Discard Changes Since Last Save</button>" +
 			"<button id='gotoManager' onclick='window.gotoManager()'>Go To Sheet Manager</button>" +
 			"<p id='saveStatus' class='noselect saveStatus'>Placeholder</p>" +
@@ -56,18 +56,32 @@ let initializeSheet = (window, sheetID) => {
 		window.location = "../";
 	};
 
-	window.lastSavedCharacteristics = characteristics;
+	window.lastSavedCharacteristics = JSON.parse(JSON.stringify(characteristics));
 
 	// For now, we'll just index the window's attribute directly.
 	// let characteristics = window.characteristics;
 	
-	window.saveSheet = (causedByPageClose) => {
+	window.saveSheet = (cause) => {
+		if(window._saveLock) {
+			return;
+		}
+
+		// Check if the sheet even needs to be saved
+		if(utils.deepObjectEquals(characteristics, window.lastSavedCharacteristics)) {
+			if(cause === "user") {
+				$("#saveStatus").css('visibility', 'visible').text("No changes to save.");
+				setTimeout(() => ($("#saveStatus").css('visibility', 'hidden')), 5000);
+			}
+
+			return;
+		}
+
 		$("#saveSheet").attr("disabled", true);
 
 		let characteristicsCopy = JSON.parse(JSON.stringify(characteristics));
 		
 		let message = {
-			sheetData: characteristics,
+			sheetData: characteristicsCopy,
 			email: utils.zealousGet("email"),
 			sessionKey: utils.zealousGet("sessionKey")
 		};
@@ -77,6 +91,7 @@ let initializeSheet = (window, sheetID) => {
 			$("#saveStatus").css('visibility', 'visible').text("Error saving sheet: " + err);
 		};
 		
+		window._saveLock = true;
 		fetch(STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID), {
 			"body": JSON.stringify(message),
 			"method": "PUT",
@@ -91,14 +106,16 @@ let initializeSheet = (window, sheetID) => {
 				}
 
 				window.lastSavedCharacteristics = characteristicsCopy;
-				$("#saveStatus").css('visibility', 'visible').text("Successfully saved sheet.");
-				
-				setTimeout(() => ($("#saveStatus").css('visibility', 'hidden')), 5000);
+				if(cause === "user") {
+					$("#saveStatus").css('visibility', 'visible').text("Successfully saved sheet.");
+					setTimeout(() => ($("#saveStatus").css('visibility', 'hidden')), 5000);
+				}
 			})
 			.catch((err) => {
 				failedToSave(err.toString());
 			})
 			.finally(() => {
+				window._saveLock = false;
 				$("#saveSheet").removeAttr("disabled");
 			});
 	};
@@ -110,7 +127,7 @@ let initializeSheet = (window, sheetID) => {
 			}
 		}
 		else {
-			window.saveSheet(true);
+			window.saveSheet("unload");
 		}
 	};
 
@@ -132,7 +149,7 @@ let initializeSheet = (window, sheetID) => {
 
 		if(UI.settings.get("autosaveEnabled")) {
 			autosaveIntervalId = setInterval(() => {
-				window.saveSheet();
+				window.saveSheet("autosave");
 			}, UI.settings.get("autosaveTimeoutInSeconds") * 1000);
 		}
 	};
@@ -1373,7 +1390,7 @@ let initializeSheet = (window, sheetID) => {
 						})
 						.done((data, text, xhr) => {
 							characteristics.hasPortrait = false;
-							window.saveSheet();
+							window.saveSheet("portrait");
 							reloadPortrait();
 						})
 						.fail((xhr, text, err) => {
@@ -1382,7 +1399,7 @@ let initializeSheet = (window, sheetID) => {
 
 							if(xhr.responseText.indexOf("not found") != -1) {
 								characteristics.hasPortrait = false;
-								window.saveSheet();
+								window.saveSheet("portrait");
 								reloadPortrait();
 							}
 							
@@ -1416,7 +1433,7 @@ let initializeSheet = (window, sheetID) => {
 						})
 						.done((data, text, xhr) => {
 							characteristics.hasPortrait = true;
-							window.saveSheet();
+							window.saveSheet("portrait");
 							reloadPortrait(files[0]);
 						})
 						.fail((xhr, text, err) => {
