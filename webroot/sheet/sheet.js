@@ -61,44 +61,90 @@ let initializeSheet = (window, sheetID) => {
 	// For now, we'll just index the window's attribute directly.
 	// let characteristics = window.characteristics;
 	
-	window.saveSheet = (doSynchronously) => {
+	window.saveSheet = (causedByPageClose) => {
 		$("#saveSheet").attr("disabled", true);
+
+		let characteristicsCopy = JSON.parse(JSON.stringify(characteristics));
 		
 		let message = {
 			sheetData: characteristics,
 			email: utils.zealousGet("email"),
 			sessionKey: utils.zealousGet("sessionKey")
 		};
+
+		let failedToSave = (err) => {
+			console.error(err);
+			$("#saveStatus").css('visibility', 'visible').text("Error saving sheet: " + err);
+		};
 		
-		$.ajax({
-			"url": STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID),
-			"data": JSON.stringify(message),
+		fetch(STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(sheetID), {
+			"body": JSON.stringify(message),
 			"method": "PUT",
-			"contentType": "application/json",
-			"async": !doSynchronously
+			"headers": [
+				["Content-Type", "application/json"]
+			],
+			"keepalive": true
 		})
-			.done((data, text, xhr) => {
-				window.lastSavedCharacteristics = characteristics;
+			.then((response) => {
+				if(!response.ok) {
+					return failedToSave(response.text());
+				}
+
+				window.lastSavedCharacteristics = characteristicsCopy;
 				$("#saveStatus").css('visibility', 'visible').text("Successfully saved sheet.");
 				
 				setTimeout(() => ($("#saveStatus").css('visibility', 'hidden')), 5000);
 			})
-			.fail((xhr, text, err) => {
-				console.error(err);
-				$("#saveStatus").css('visibility', 'visible').text("Error saving sheet: " + text);
+			.catch((err) => {
+				failedToSave(err.toString());
 			})
-			.always(() => {
+			.finally(() => {
 				$("#saveSheet").removeAttr("disabled");
 			});
 	};
 
-	let beforeUnloadSaveHandler = () => window.saveSheet(true);
+	let beforeUnloadSaveHandler = () => {
+		if(!UI.settings.get("saveBeforeUnload")) {
+			if(!UI.settings.get("dontWarnBeforeUnload")) {
+				return "Are you sure you want to leave this page? Your changes will be lost if you do not save.";
+			}
+		}
+		else {
+			window.saveSheet(true);
+		}
+	};
+
+	UI.settings.setField("saveBeforeUnload", {value: true});
+	UI.settings.setField("dontWarnBeforeUnload", {value: false});
 	
 	$(window).on("beforeunload", beforeUnloadSaveHandler);
 
+	UI.settings.setField("autosaveEnabled", {value: true});
+	UI.settings.setField("autosaveTimeoutInSeconds", {max: 3600, min: 30, value: 120});
+
+	let autosaveIntervalId;
+
+	let onAutosaveChange = () => {
+		if(autosaveIntervalId) {
+			clearInterval(autosaveIntervalId);
+			autosaveIntervalId = undefined;
+		}
+
+		if(UI.settings.get("autosaveEnabled")) {
+			autosaveIntervalId = setInterval(() => {
+				window.saveSheet();
+			}, UI.settings.get("autosaveTimeoutInSeconds") * 1000);
+		}
+	};
+
+	UI.settings.addTracker("autosaveEnabled", onAutosaveChange);
+	UI.settings.addTracker("autosaveTimeoutInSeconds", onAutosaveChange);
+
+	UI.settings.fetch();
+
 	window.discardChanges = () => {
 		if(window.confirm("Are you sure you want to discard all changes since the last time you saved?")) {
-			window.off("beforeunload", beforeUnloadSaveHandler);
+			$(window).off("beforeunload", beforeUnloadSaveHandler);
 
 			window.location.reload();
 		}

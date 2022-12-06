@@ -164,7 +164,8 @@ SOFTWARE.
 	
 	UI.settings = new UI.Settings({
 		canToggleMinimized: false,
-		documentWindowSizePixels: 600,		maxWindowWidth: 600,
+		documentWindowSizePixels: 600,
+		maxWindowWidth: 600,
 		maxWindowHeight: 600
 	});
 	UI.settings.setField("documentWindowSizePixels", {min: 100, max: 1000});
@@ -1143,7 +1144,10 @@ SOFTWARE.
 		for(var i = 0; i < keys.length; i++) {
 			name = keys[i];
 			var field = UI.settings.fields[name];
-			var value = UI.settings.get(name) || field.value;
+			var value = UI.settings.get(name);
+			if(value === null || value === undefined) {
+				value = field.value;
+			}
 			
 			var element;
 			if(field.type == "number") {
