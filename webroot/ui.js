@@ -65,7 +65,15 @@ SOFTWARE.
 		get: function(settingName, defaultValue) {
 			var value = this.settings[settingName];
 			if(value == undefined)
-				return defaultValue;
+			{
+				if(defaultValue !== undefined) {
+					return defaultValue;
+				}
+
+				if(this.fields[settingName]) {
+					return this.fields[settingName].value;
+				}
+			}
 			return value;
 		},
 		
