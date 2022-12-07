@@ -32,25 +32,32 @@ STRIPPED_PATHNAME = STRIPPED_PATHNAME + "/..";
 
 let initializeSheet = (window, sheetID) => {
 	console.log("Loading...");
+
+	let menuHTML = "<button id='openSettings' onclick='UI.createSettingsWindow().show()'>Open Settings</button>";
+	let saveStatusHTML = "";
+	
+	if(!window.SPECTATING && window.sheetPermissions.write) {
+		menuHTML += "<button id='saveSheet' onclick='window.saveSheet(\"user\")'>Save Sheet</button>" +
+					"<button id='discardChanges' onclick='window.discardChanges()'>Discard Changes Since Last Save</button>";
+		saveStatusHTML = "<p id='saveStatus' class='noselect saveStatus'>Placeholder</p>";
+	}
+	else if(window.SPECTATING) {
+		saveStatusHTML = "<p id='saveStatus' class='noselect' saveStatus' style='visibility: visible; color: green;'>Spectating sheet; saving disabled</p>";
+	}
+
+	menuHTML += "<button id='gotoManager' onclick='window.gotoManager()'>Go To Sheet Manager</button>" +
+				saveStatusHTML +
+				"<br />";
 	
 	let container = $("#container");
 	let sheet = container.html("")
 		.append(
-			"<button id='openSettings' onclick='UI.createSettingsWindow().show()'>Open Settings</button>" +
-			"<button id='saveSheet' onclick='window.saveSheet(\"user\")'>Save Sheet</button>" +
-			"<button id='discardChanges' onclick='window.discardChanges()'>Discard Changes Since Last Save</button>" +
-			"<button id='gotoManager' onclick='window.gotoManager()'>Go To Sheet Manager</button>" +
-			"<p id='saveStatus' class='noselect saveStatus'>Placeholder</p>" +
-			"<br />"
+			menuHTML
 		)
 		.append(
 			"<div id='sheet'></div>"
 		)
 		.children().last().wrap($("<div class='sheetContainer'></div>"));
-	
-	if(!window.sheetPermissions.write) {
-		$("#saveSheet").hide();
-	}
 	
 	window.gotoManager = () => {
 		window.location = "../";
@@ -62,6 +69,12 @@ let initializeSheet = (window, sheetID) => {
 	// let characteristics = window.characteristics;
 	
 	window.saveSheet = (cause) => {
+		if(window.SPECTATING) {
+			return;
+		}
+		if(!window.sheetPermissions.write) {
+			return;
+		}
 		if(window._saveLock) {
 			return;
 		}
@@ -121,6 +134,10 @@ let initializeSheet = (window, sheetID) => {
 	};
 
 	let beforeUnloadSaveHandler = () => {
+		if(window.SPECTATING) {
+			return;
+		}
+
 		if(!UI.settings.get("saveBeforeUnload")) {
 			if(!UI.settings.get("dontWarnBeforeUnload")) {
 				return "Are you sure you want to leave this page? Your changes will be lost if you do not save.";
@@ -142,6 +159,10 @@ let initializeSheet = (window, sheetID) => {
 	let autosaveIntervalId;
 
 	let onAutosaveChange = () => {
+		if(!window.SPECTATING) {
+			return;
+		}
+
 		if(autosaveIntervalId) {
 			clearInterval(autosaveIntervalId);
 			autosaveIntervalId = undefined;
@@ -177,9 +198,10 @@ let initializeSheet = (window, sheetID) => {
 			owningMessage.html("This sheet is owned by ").append($("<span style='color: green; font-style: italic'></span>").text(window.sheetOwner));
 
 			if(window.sheetPermissions.write) {
-				owningMessage
-					.append(" (you) ")
-					.append($("<button id='unclaimSheetButton'>Unclaim sheet?</button>").click(() => {
+				owningMessage.append(" (you) ");
+
+				if(!window.SPECTATING) {	
+					owningMessage.append($("<button id='unclaimSheetButton'>Unclaim sheet?</button>").click(() => {
 						$("#unclaimSheetButton").attr("disabled", true);
 
 						let message = {
@@ -203,11 +225,13 @@ let initializeSheet = (window, sheetID) => {
 								$("#unclaimSheetButton").removeAttr("disabled");
 							});
 					}));
+				}
 			}
 		}
 		else {
-			owningMessage.html("This sheet is owned by <span style='color: red; font-style: italic'>nobody</span>. ")
-				.append($("<button id='claimSheetButton'>Claim sheet?</button>")
+			owningMessage.html("This sheet is owned by <span style='color: red; font-style: italic'>nobody</span>. ");
+			if(!window.SPECTATING) {
+				owningMessage.append($("<button id='claimSheetButton'>Claim sheet?</button>")
 					.click(() => {
 						$("#claimSheetButton").attr("disabled", true);
 						
@@ -235,6 +259,7 @@ let initializeSheet = (window, sheetID) => {
 							});
 					})
 				);
+			}
 		}
 
 		permissionArea.empty();
@@ -328,13 +353,16 @@ let initializeSheet = (window, sheetID) => {
 					});
 			};
 
-			publicCheckbox.change(updatePermissions);
+			if(!window.SPECTATING) {
+				publicCheckbox.change(updatePermissions);
+				publicWritableCheckbox.change(updatePermissions);
+			}
+			else {
+				publicCheckbox.prop("disabled", true);
+				publicWritableCheckbox.prop("disabled", true);
+			}
 			
 			permissionArea.append(publicCheckbox).append(" Public");
-
-			// Show them another checkbox to make it publicWritable.
-			publicWritableCheckbox.change(updatePermissions);
-
 			permissionArea.append(publicWritableCheckbox).append(" Public Writable");
 		}
 	}
@@ -1475,6 +1503,7 @@ let initializeSheet = (window, sheetID) => {
 ((window) => {
 	let parameters = utils.getParameters();
 	let id = parameters.id;
+	window.SPECTATING = parameters.spectate === "true";
 	
 	if(parameters.id === undefined) {
 		let lastSheetId = utils.cookie.get("last-sheet-id");

@@ -47,6 +47,10 @@ let openSheet = (uuid) => {
 	window.open("./sheet?id=" + encodeURIComponent(uuid));
 };
 
+let spectateSheet = (uuid) => {
+	window.open("./sheet?id=" + encodeURIComponent(uuid) + "&spectate=true");
+};
+
 let deleteSheet = (uuid, after) => {
 	$.ajax({
 		"url": "./api/sheetData",
@@ -262,14 +266,21 @@ let createSheetList = (sheets, container, currentPage) => {
 					.append(
 						$("<ul></ul>")
 							.append(
-								$("<li><a href='#'>Open Sheet</a></li>").click(
+								$("<li><a href='#' title='Opens the sheet in a new tab'>Open Sheet</a></li>").click(
 									() => {
 										openSheet(sheet.uuid);
 									}
 								)
 							)
 							.append(
-								$("<li><a href='#'>Duplicate Sheet</a></li>").click(
+								$("<li><a href='#' title='Opens a sheet with saving disabled'>Spectate Sheet</a></li>").click(
+									() => {
+										spectateSheet(sheet.uuid);
+									}
+								)
+							)
+							.append(
+								$("<li><a href='#' title='Creates another sheet that is a duplicate of the selected sheet'>Duplicate Sheet</a></li>").click(
 									() => {
 										duplicateSheet(sheet.uuid, () => refreshSheet(container, currentPage, true));
 									}
@@ -283,14 +294,14 @@ let createSheetList = (sheets, container, currentPage) => {
 								)
 							) */
 							.append(
-								$("<li><a href='#'>Transfer Ownership</a></li>").click(
+								$("<li><a href='#' title='Allows one to transfer ownership of a sheet to another user'>Transfer Ownership</a></li>").click(
 									() => {
 										transferOwnership(sheet.uuid, () => refreshSheet(container, currentPage));
 									}
 								)
 							)
 							.append(
-								$("<li><a href='#'>Share Sheet</a></li>").click(
+								$("<li><a href='#' title='Opens viewing/editing permissions for a sheet'>Share Sheet</a></li>").click(
 									() => {
 										shareSheet(sheet.uuid);
 									}
