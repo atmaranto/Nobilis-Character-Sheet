@@ -64,6 +64,25 @@ function newSession() {
 	return (Buffer.from(crypto.randomBytes(sessionKeyLength))).toString("hex");
 }
 
+function _zealousFindValue(req, key) {
+	let value = req.body[key];
+	let from = "body";
+	if(typeof value !== "string") {
+		value = req.cookies[key];
+		from = "cookies";
+		if (typeof value !== "string" && (req.method === "GET" || req.method === "DELETE")) {
+			value = req.query[key];
+			from = "query";
+		}
+	}
+
+	if(typeof value !== "string") {
+		return null;
+	}
+
+	return {value: value, from: from};
+}
+
 function validateSession(req, res, callback, failureCallback, lean, populate) {
 	let _fail = (message) => {
 		if(typeof failureCallback === "function") {
@@ -73,16 +92,22 @@ function validateSession(req, res, callback, failureCallback, lean, populate) {
 			return res.status(401).send(message);
 		}
 	};
+
+	let emailResult = _zealousFindValue(req, "email");
+	let sessionKeyResult = _zealousFindValue(req, "sessionKey");
 	
-	if((typeof req.body.email !== "string" || req.body.email.match(emailRegex) === null) && (typeof req.cookies.email !== "string" || req.cookies.email.match(emailRegex) === null)) {
+	if(emailResult === null || typeof emailResult.value !== "string" || emailResult.value.match(emailRegex) === null) {
 		return _fail("Invalid or missing email");
 	}
-	if(typeof req.body.sessionKey !== "string" && typeof req.cookies.sessionKey !== "string") {
+	if(sessionKeyResult === null || typeof sessionKeyResult.value !== "string") {
 		return _fail("Invalid or missing session");
 	}
+	if(emailResult.from !== sessionKeyResult.from) {
+		return _fail("Email and session key must be provided in the same location");
+	}
 	
-	let email = req.body.email || req.cookies.email;
-	let sessionKey = req.body.sessionKey || req.cookies.sessionKey;
+	let email = emailResult.value;
+	let sessionKey = sessionKeyResult.value;
 
 	let filter = {email: email, session: {key: sessionKey, created: {$gte: Date.now() - sessionDuration}}};
 	
