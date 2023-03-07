@@ -1519,8 +1519,14 @@ let initializeSheet = (window, sheetID) => {
 		});
 	}
 	else {
-		$.ajax(STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(parameters.id))
-			.done((data, text, xhr) => {
+		$.ajax({
+			url: STRIPPED_PATHNAME + "/api/sheetData?id=" + encodeURIComponent(parameters.id),
+			data: {
+				"email": utils.zealousGet("email"),
+				"sessionKey": utils.zealousGet("sessionKey")
+			},
+			method: "GET"
+		}).done((data, text, xhr) => {
 				window.characteristics = data.sheetData;
 				window.sheetOwner = data.sheetOwner;
 				window.sheetPermissions = data.permission;
