@@ -23,7 +23,7 @@
     "cookie-parser": "^1.4.6",
     "express": "^4.17.1",
     "mongoose": "^6.4.6",
-    "multer": "file:1.4.5-lts.1",
+    "multer": "^1.4.5-lts.1",
     "quill": "^2.0.2",
     "quill-cursors": "^4.0.0",
     "reconnecting-websocket": "^4.4.0",
