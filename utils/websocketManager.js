@@ -25,7 +25,8 @@ SOFTWARE.
 */
 
 let WebSocket = require('ws'),
-	WebSocketJSONStream = require('@teamwork/websocket-json-stream')
+	WebSocketJSONStream = require("../webroot/websocket-json-stream"), // require('@teamwork/websocket-json-stream'),
+	{validateSession} = require('./accountManager.js'),
 	url = require("url");
 
 let installWebsocketManager = (app, config, backend, server) => {
@@ -46,6 +47,17 @@ let installWebsocketManager = (app, config, backend, server) => {
 			ws.close(1008, "Invalid path " + urlPath);
 			return;
 		}
+
+		validateSession(req, null, (acct) => {
+			let stream = new WebSocketJSONStream(ws);
+			stream.on("meta", (data) => {
+				// Metadata just came in
+				
+			});
+			backend.listen(stream);
+		}, (err) => {
+			ws.close(1008, "Invalid or missing credentials");
+		});
 	});
 
     return wss;
